@@ -18,6 +18,7 @@ from app.models.user import User
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.user_repository import OtpRepository, UserRepository
 from app.schemas.auth import TokenPair
+from app.services.otp_dev_store import store_dev_otp
 from app.services.otp_sender import get_otp_sender
 from app.services.token_store import is_refresh_jti_valid, revoke_refresh_jti, store_refresh_jti
 
@@ -43,6 +44,10 @@ async def request_otp(db: AsyncSession, *, phone: str, ip_address: str | None) -
         ip_address=ip_address,
     )
     await db.commit()
+
+    # Development convenience only — no-ops outside ENVIRONMENT=development
+    # (see otp_dev_store), never logged, never returned by the production API.
+    store_dev_otp(phone, code)
 
     await get_otp_sender().send(phone, code)
 

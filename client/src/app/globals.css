@@ -1,0 +1,18 @@
+/* Centralized typography — do not scatter font-family declarations in
+   components. Tailwind's font-sans/font-mono (see tailwind.config.ts)
+   resolve to these. Loaded via @import (a runtime browser fetch) rather
+   than next/font, so the build has no network dependency. */
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  @apply bg-white font-sans text-slate-900 antialiased;
+}

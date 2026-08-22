@@ -32,6 +32,13 @@ def create_app() -> FastAPI:
     register_exception_handlers(app)
     app.include_router(api_router)
 
+    if settings.ENVIRONMENT == "development":
+        # Dev-only OTP retrieval — never mounted outside development. See
+        # app/api/v1/auth/dev_routes.py and app/services/otp_dev_store.py.
+        from app.api.v1.auth.dev_routes import router as auth_dev_router
+
+        app.include_router(auth_dev_router, prefix="/api/v1")
+
     return app
 
 
