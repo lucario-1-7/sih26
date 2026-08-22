@@ -1,3 +1,4 @@
+import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../theme/app_theme.dart';
@@ -116,8 +117,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             );
                           },
                           child: const Icon(
-                            Icons.arrow_back,
-                            size: 22,
+                            FeatherIcons.arrowLeft,
+                            size: 20,
                             color: AppColors.primaryText,
                           ),
                         )
@@ -126,8 +127,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           behavior: HitTestBehavior.opaque,
                           onTap: () => Navigator.pop(context),
                           child: const Icon(
-                            Icons.arrow_back,
-                            size: 22,
+                            FeatherIcons.arrowLeft,
+                            size: 20,
                             color: AppColors.primaryText,
                           ),
                         ),

@@ -1,3 +1,4 @@
+import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -12,7 +13,7 @@ class ProfileScreen extends StatelessWidget {
         backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primaryText),
+          icon: const Icon(FeatherIcons.arrowLeft, color: AppColors.primaryText),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -46,8 +47,8 @@ class ProfileScreen extends StatelessWidget {
                       ),
                       child: const Center(
                         child: Icon(
-                          Icons.person_outline_rounded,
-                          size: 44,
+                          FeatherIcons.user,
+                          size: 38,
                           color: AppColors.primaryText,
                         ),
                       ),

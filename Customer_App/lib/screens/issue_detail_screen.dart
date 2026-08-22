@@ -1,3 +1,4 @@
+import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import '../models/issue_model.dart';
 import '../theme/app_theme.dart';
@@ -18,7 +19,7 @@ class IssueDetailScreen extends StatelessWidget {
         backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppColors.primaryText),
+          icon: const Icon(FeatherIcons.arrowLeft, color: AppColors.primaryText),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -91,11 +92,11 @@ class IssueDetailScreen extends StatelessWidget {
               Row(
                 children: [
                   const Icon(
-                    Icons.location_on_outlined,
-                    size: 16,
+                    FeatherIcons.mapPin,
+                    size: 14,
                     color: AppColors.secondaryText,
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 5),
                   Expanded(
                     child: Text(
                       issue.location,
@@ -221,7 +222,7 @@ class IssueDetailScreen extends StatelessWidget {
               ),
               child: isCompleted
                   ? const Icon(
-                      Icons.check,
+                      FeatherIcons.check,
                       size: 11,
                       color: Colors.white,
                     )

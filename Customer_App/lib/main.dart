@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'screens/phone_number_screen.dart';
+import 'screens/welcome_language_screen.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -26,7 +26,7 @@ class SocialServeApp extends StatelessWidget {
       title: 'Social Serve',
       debugShowCheckedModeBanner: false,
       theme: buildAppTheme(),
-      home: const PhoneNumberScreen(),
+      home: const WelcomeLanguageScreen(),
     );
   }
 }

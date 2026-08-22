@@ -1,3 +1,4 @@
+import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -61,9 +62,9 @@ class _MediaUploadCardState extends State<MediaUploadCard> {
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.check_rounded,
+                          FeatherIcons.check,
                           color: Colors.white,
-                          size: 24,
+                          size: 22,
                         ),
                       ),
                       const SizedBox(height: 10),
@@ -89,7 +90,7 @@ class _MediaUploadCardState extends State<MediaUploadCard> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       const Icon(
-                        Icons.upload_rounded,
+                        FeatherIcons.uploadCloud,
                         size: 28,
                         color: AppColors.primaryText,
                       ),

@@ -1,3 +1,4 @@
+import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import '../models/issue_model.dart';
 import '../theme/app_theme.dart';
@@ -32,9 +33,9 @@ class IssueSuccessScreen extends StatelessWidget {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(
-                  Icons.check_rounded,
+                  FeatherIcons.check,
                   color: Colors.white,
-                  size: 44,
+                  size: 38,
                 ),
               ),
 

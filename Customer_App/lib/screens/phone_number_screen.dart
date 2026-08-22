@@ -40,7 +40,8 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
     return AuthScreenLayout(
       currentStep: 1,
       totalSteps: 6,
-      showBack: false, // First screen in flow
+      showBack: true,
+      onBack: () => Navigator.pop(context),
       heading: 'Enter your phone number',
       supportingWidget: Text(
         "We'll send you a verification code",

@@ -1,3 +1,4 @@
+import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import '../models/issue_model.dart';
 import '../theme/app_theme.dart';
@@ -62,11 +63,11 @@ class IssueCard extends StatelessWidget {
               Row(
                 children: [
                   const Icon(
-                    Icons.location_on_outlined,
-                    size: 14,
+                    FeatherIcons.mapPin,
+                    size: 13,
                     color: AppColors.secondaryText,
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: 5),
                   Expanded(
                     child: Text(
                       issue.location,

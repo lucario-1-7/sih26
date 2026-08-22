@@ -1,3 +1,4 @@
+import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -56,9 +57,9 @@ class CustomDropdownField extends StatelessWidget {
               value: items.contains(value) ? value : items.first,
               isExpanded: true,
               icon: const Icon(
-                Icons.keyboard_arrow_down_rounded,
+                FeatherIcons.chevronDown,
                 color: AppColors.secondaryText,
-                size: 22,
+                size: 18,
               ),
               dropdownColor: AppColors.background,
               borderRadius: BorderRadius.circular(12.0),
