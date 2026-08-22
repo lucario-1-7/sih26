@@ -1,0 +1,1726 @@
+{
+  "_provenance_policy": {
+    "rule": "Institution names, cities, coordinates and department names are REAL and publicly verifiable. Capability strength scores, student counts, concurrent-project capacity, track record and all faculty entries are SYNTHETIC ESTIMATES created for demonstration. Every record carries data_provenance so the UI can render an honest badge. Never present synthetic fields to a judge as verified fact.",
+    "provenance_values": [
+      "PUBLIC_VERIFIED",
+      "ESTIMATED_DEMO",
+      "SYNTHETIC_DEMO"
+    ],
+    "warm_start_path": "Replace ESTIMATED_DEMO fields via a one-page institution self-registration form (Section 10 of the master plan). No schema change required."
+  },
+  "universities": [
+    {
+      "id": "U-BITM",
+      "name": "Birla Institute of Technology, Mesra",
+      "short": "BIT Mesra",
+      "kind": "UNIVERSITY",
+      "type_detail": "Deemed University (Private)",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.4126,
+      "lng": 85.44,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Civil and Environmental Engineering",
+          "expertise_text": "water supply engineering, groundwater hydrology, environmental engineering, water treatment, structural design, geotechnical engineering"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Electronics and Communication Engineering",
+          "expertise_text": "embedded systems, wireless sensor networks, LoRa and GSM telemetry, signal processing, low power electronics"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Computer Science and Engineering",
+          "expertise_text": "machine learning, data analytics, mobile and web application development, cloud systems"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Mechanical Engineering",
+          "expertise_text": "mechanism design, reliability engineering, maintenance engineering, fabrication, materials handling"
+        },
+        {
+          "kind": "CENTRE",
+          "name": "Innovation and Entrepreneurship Development Centre",
+          "expertise_text": "startup incubation, technology commercialisation, prototype funding, student venture support"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "SKILL_CIVIL_HYDRO",
+          "strength": 0.85
+        },
+        {
+          "code": "LAB_WATER_QUALITY",
+          "strength": 0.8
+        },
+        {
+          "code": "EQ_ELECTRONICS_IOT",
+          "strength": 0.88
+        },
+        {
+          "code": "SKILL_EMBEDDED",
+          "strength": 0.85
+        },
+        {
+          "code": "EQ_FABRICATION",
+          "strength": 0.8
+        },
+        {
+          "code": "SKILL_MECH_DESIGN",
+          "strength": 0.82
+        },
+        {
+          "code": "SKILL_ML_DATA",
+          "strength": 0.8
+        },
+        {
+          "code": "SKILL_SOFTWARE_APP",
+          "strength": 0.85
+        },
+        {
+          "code": "ORG_INCUBATION",
+          "strength": 0.85
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.9
+        },
+        {
+          "code": "SKILL_ENERGY_SYS",
+          "strength": 0.7
+        },
+        {
+          "code": "LAB_STRUCTURAL",
+          "strength": 0.75
+        },
+        {
+          "code": "EQ_DRONE_UAV",
+          "strength": 0.68
+        },
+        {
+          "code": "LAB_BIOTECH",
+          "strength": 0.6
+        }
+      ],
+      "metrics": {
+        "active_projects": 3,
+        "max_concurrent": 8,
+        "completed_projects": 11,
+        "students_by_discipline": {
+          "civil": 320,
+          "ece": 480,
+          "cse": 640,
+          "mech": 400
+        }
+      },
+      "coordinator": {
+        "name": "Dean, R&D and Industry Liaison",
+        "email": "rnd@demo-bitmesra.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-ISM",
+      "name": "Indian Institute of Technology (Indian School of Mines), Dhanbad",
+      "short": "IIT (ISM) Dhanbad",
+      "kind": "UNIVERSITY",
+      "type_detail": "Institute of National Importance",
+      "district": "Dhanbad",
+      "state": "Jharkhand",
+      "lat": 23.8143,
+      "lng": 86.4412,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Environmental Science and Engineering",
+          "expertise_text": "groundwater contamination, mine water management, water treatment technology, fluoride and iron removal, environmental monitoring, aquifer characterisation"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Applied Geophysics",
+          "expertise_text": "aquifer mapping, resistivity survey, subsurface characterisation, groundwater exploration"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Mining Engineering",
+          "expertise_text": "mining operations, subsidence, mine closure, land reclamation"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Computer Science and Engineering",
+          "expertise_text": "machine learning, sensor data analytics, predictive maintenance modelling"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "LAB_WATER_QUALITY",
+          "strength": 0.95
+        },
+        {
+          "code": "SKILL_CIVIL_HYDRO",
+          "strength": 0.93
+        },
+        {
+          "code": "LAB_ENV_MONITORING",
+          "strength": 0.9
+        },
+        {
+          "code": "EQ_GIS_RS",
+          "strength": 0.85
+        },
+        {
+          "code": "SKILL_ML_DATA",
+          "strength": 0.82
+        },
+        {
+          "code": "LAB_MATERIALS",
+          "strength": 0.8
+        },
+        {
+          "code": "ORG_INCUBATION",
+          "strength": 0.75
+        },
+        {
+          "code": "EQ_FIELD_VEHICLE",
+          "strength": 0.7
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.3
+        }
+      ],
+      "metrics": {
+        "active_projects": 6,
+        "max_concurrent": 8,
+        "completed_projects": 19,
+        "students_by_discipline": {
+          "environmental": 180,
+          "geophysics": 150,
+          "mining": 260,
+          "cse": 380
+        }
+      },
+      "coordinator": {
+        "name": "Dean, Research and Development",
+        "email": "rnd@demo-iitism.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-CUJ",
+      "name": "Central University of Jharkhand, Brambe",
+      "short": "CUJ Ranchi",
+      "kind": "UNIVERSITY",
+      "type_detail": "Central University",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.423,
+      "lng": 85.158,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Environmental Sciences",
+          "expertise_text": "water quality assessment, environmental pollution, natural resource management, watershed studies"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Geoinformatics",
+          "expertise_text": "GIS, remote sensing, spatial analysis, terrain mapping, watershed delineation"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Tribal Studies",
+          "expertise_text": "tribal community engagement, participatory rural appraisal, indigenous knowledge systems, social survey"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Computer Science and Engineering",
+          "expertise_text": "software engineering, data analytics, information systems"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "LAB_WATER_QUALITY",
+          "strength": 0.75
+        },
+        {
+          "code": "EQ_GIS_RS",
+          "strength": 0.88
+        },
+        {
+          "code": "SKILL_SOCIAL_SURVEY",
+          "strength": 0.9
+        },
+        {
+          "code": "FIELD_COMMUNITY_NETWORK",
+          "strength": 0.85
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.88
+        },
+        {
+          "code": "LAB_ENV_MONITORING",
+          "strength": 0.72
+        },
+        {
+          "code": "SKILL_SOFTWARE_APP",
+          "strength": 0.65
+        },
+        {
+          "code": "SKILL_POLICY_ECON",
+          "strength": 0.7
+        },
+        {
+          "code": "EQ_DRONE_UAV",
+          "strength": 0.72
+        }
+      ],
+      "metrics": {
+        "active_projects": 2,
+        "max_concurrent": 6,
+        "completed_projects": 7,
+        "students_by_discipline": {
+          "environmental": 140,
+          "geoinformatics": 90,
+          "tribal_studies": 110,
+          "cse": 200
+        }
+      },
+      "coordinator": {
+        "name": "Coordinator, Community Outreach Cell",
+        "email": "outreach@demo-cuj.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-NITJSR",
+      "name": "National Institute of Technology, Jamshedpur",
+      "short": "NIT Jamshedpur",
+      "kind": "UNIVERSITY",
+      "type_detail": "Institute of National Importance",
+      "district": "East Singhbhum",
+      "state": "Jharkhand",
+      "lat": 22.776,
+      "lng": 86.144,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Civil Engineering",
+          "expertise_text": "water resources engineering, environmental engineering, structural engineering, transportation"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Production and Industrial Engineering",
+          "expertise_text": "manufacturing systems, maintenance planning, supply chain, industrial engineering, reliability"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Metallurgical and Materials Engineering",
+          "expertise_text": "corrosion, materials selection, failure analysis, coatings"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Electrical Engineering",
+          "expertise_text": "power systems, renewable energy integration, solar photovoltaics, microgrids"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "SKILL_CIVIL_HYDRO",
+          "strength": 0.78
+        },
+        {
+          "code": "LAB_MATERIALS",
+          "strength": 0.9
+        },
+        {
+          "code": "SKILL_MECH_DESIGN",
+          "strength": 0.85
+        },
+        {
+          "code": "EQ_FABRICATION",
+          "strength": 0.86
+        },
+        {
+          "code": "SKILL_ENERGY_SYS",
+          "strength": 0.85
+        },
+        {
+          "code": "LAB_STRUCTURAL",
+          "strength": 0.82
+        },
+        {
+          "code": "FIELD_MAINTENANCE_NET",
+          "strength": 0.55
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.45
+        }
+      ],
+      "metrics": {
+        "active_projects": 4,
+        "max_concurrent": 7,
+        "completed_projects": 13,
+        "students_by_discipline": {
+          "civil": 300,
+          "production": 240,
+          "metallurgy": 220,
+          "electrical": 310
+        }
+      },
+      "coordinator": {
+        "name": "Dean, Industry and International Relations",
+        "email": "diir@demo-nitjsr.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-BAU",
+      "name": "Birsa Agricultural University, Kanke",
+      "short": "BAU Ranchi",
+      "kind": "UNIVERSITY",
+      "type_detail": "State Agricultural University",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.433,
+      "lng": 85.32,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Soil Science and Agricultural Chemistry",
+          "expertise_text": "soil health, nutrient management, water quality for irrigation, soil testing"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Soil and Water Conservation Engineering",
+          "expertise_text": "watershed management, rainwater harvesting, groundwater recharge, micro irrigation, farm ponds"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Agricultural Extension",
+          "expertise_text": "farmer extension, community mobilisation, Krishi Vigyan Kendra network, participatory technology transfer"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Plant Pathology",
+          "expertise_text": "crop disease diagnosis, integrated pest management"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "LAB_SOIL_AGRI",
+          "strength": 0.92
+        },
+        {
+          "code": "SKILL_AGRONOMY",
+          "strength": 0.92
+        },
+        {
+          "code": "SKILL_CIVIL_HYDRO",
+          "strength": 0.72
+        },
+        {
+          "code": "FIELD_COMMUNITY_NETWORK",
+          "strength": 0.92
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.88
+        },
+        {
+          "code": "EQ_FIELD_VEHICLE",
+          "strength": 0.8
+        },
+        {
+          "code": "LAB_WATER_QUALITY",
+          "strength": 0.68
+        },
+        {
+          "code": "SKILL_SOCIAL_SURVEY",
+          "strength": 0.78
+        }
+      ],
+      "metrics": {
+        "active_projects": 5,
+        "max_concurrent": 9,
+        "completed_projects": 16,
+        "students_by_discipline": {
+          "agriculture": 520,
+          "agri_engineering": 180,
+          "forestry": 140,
+          "veterinary": 160
+        }
+      },
+      "coordinator": {
+        "name": "Director, Extension Education",
+        "email": "extension@demo-bau.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-RU",
+      "name": "Ranchi University",
+      "short": "Ranchi University",
+      "kind": "UNIVERSITY",
+      "type_detail": "State University",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.37,
+      "lng": 85.335,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "University Department of Chemistry",
+          "expertise_text": "analytical chemistry, water chemistry, spectroscopy, chemical testing"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "University Department of Geology",
+          "expertise_text": "hydrogeology, aquifer systems, mineral resources"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "University Department of Economics",
+          "expertise_text": "development economics, rural livelihoods, impact evaluation, cost benefit analysis"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "University Department of Education",
+          "expertise_text": "pedagogy, teacher training, learning outcomes assessment"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "LAB_WATER_QUALITY",
+          "strength": 0.7
+        },
+        {
+          "code": "SKILL_CIVIL_HYDRO",
+          "strength": 0.62
+        },
+        {
+          "code": "SKILL_POLICY_ECON",
+          "strength": 0.8
+        },
+        {
+          "code": "SKILL_EDU_PEDAGOGY",
+          "strength": 0.82
+        },
+        {
+          "code": "SKILL_SOCIAL_SURVEY",
+          "strength": 0.75
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.9
+        },
+        {
+          "code": "FIELD_COMMUNITY_NETWORK",
+          "strength": 0.7
+        }
+      ],
+      "metrics": {
+        "active_projects": 2,
+        "max_concurrent": 6,
+        "completed_projects": 5,
+        "students_by_discipline": {
+          "science": 900,
+          "arts": 1400,
+          "commerce": 800,
+          "education": 260
+        }
+      },
+      "coordinator": {
+        "name": "Registrar, Research Cell",
+        "email": "research@demo-ranchiuniv.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-XISS",
+      "name": "Xavier Institute of Social Service, Ranchi",
+      "short": "XISS Ranchi",
+      "kind": "UNIVERSITY",
+      "type_detail": "Autonomous Institute (Social Work / Management)",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.376,
+      "lng": 85.33,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Rural Management",
+          "expertise_text": "rural development programmes, self help group systems, livelihood promotion, community institutions"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Social Work",
+          "expertise_text": "community organisation, participatory rural appraisal, field action projects, tribal welfare"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "SKILL_SOCIAL_SURVEY",
+          "strength": 0.92
+        },
+        {
+          "code": "FIELD_COMMUNITY_NETWORK",
+          "strength": 0.94
+        },
+        {
+          "code": "SKILL_POLICY_ECON",
+          "strength": 0.78
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.9
+        },
+        {
+          "code": "SKILL_PUBLIC_HEALTH",
+          "strength": 0.6
+        }
+      ],
+      "metrics": {
+        "active_projects": 3,
+        "max_concurrent": 6,
+        "completed_projects": 14,
+        "students_by_discipline": {
+          "rural_management": 180,
+          "social_work": 220,
+          "hrm": 200
+        }
+      },
+      "coordinator": {
+        "name": "Head, Field Action Projects",
+        "email": "fap@demo-xiss.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-VBU",
+      "name": "Vinoba Bhave University, Hazaribagh",
+      "short": "VBU Hazaribagh",
+      "kind": "UNIVERSITY",
+      "type_detail": "State University",
+      "district": "Hazaribagh",
+      "state": "Jharkhand",
+      "lat": 23.99,
+      "lng": 85.36,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "University Department of Environmental Science",
+          "expertise_text": "environmental monitoring, pollution assessment, water and air quality"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "University Department of Botany",
+          "expertise_text": "plant sciences, ethnobotany, biodiversity, forest resources"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "University Department of Computer Applications",
+          "expertise_text": "application development, information systems, data handling"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "LAB_ENV_MONITORING",
+          "strength": 0.68
+        },
+        {
+          "code": "LAB_WATER_QUALITY",
+          "strength": 0.62
+        },
+        {
+          "code": "SKILL_SOFTWARE_APP",
+          "strength": 0.58
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.7
+        },
+        {
+          "code": "SKILL_SOCIAL_SURVEY",
+          "strength": 0.65
+        }
+      ],
+      "metrics": {
+        "active_projects": 1,
+        "max_concurrent": 5,
+        "completed_projects": 3,
+        "students_by_discipline": {
+          "science": 700,
+          "arts": 900,
+          "computer_applications": 180
+        }
+      },
+      "coordinator": {
+        "name": "Dean, Science Faculty",
+        "email": "science@demo-vbu.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-KU",
+      "name": "Kolhan University, Chaibasa",
+      "short": "Kolhan University",
+      "kind": "UNIVERSITY",
+      "type_detail": "State University",
+      "district": "West Singhbhum",
+      "state": "Jharkhand",
+      "lat": 22.556,
+      "lng": 85.802,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "University Department of Geology",
+          "expertise_text": "hydrogeology, mineral resources, groundwater occurrence"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "University Department of Anthropology",
+          "expertise_text": "tribal communities, ethnography, community based research"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "SKILL_CIVIL_HYDRO",
+          "strength": 0.58
+        },
+        {
+          "code": "SKILL_SOCIAL_SURVEY",
+          "strength": 0.8
+        },
+        {
+          "code": "FIELD_COMMUNITY_NETWORK",
+          "strength": 0.78
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.6
+        }
+      ],
+      "metrics": {
+        "active_projects": 1,
+        "max_concurrent": 4,
+        "completed_projects": 2,
+        "students_by_discipline": {
+          "science": 500,
+          "arts": 800
+        }
+      },
+      "coordinator": {
+        "name": "Dean, Research",
+        "email": "research@demo-kolhan.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-JUT",
+      "name": "Jharkhand University of Technology, Ranchi",
+      "short": "JUT Ranchi",
+      "kind": "UNIVERSITY",
+      "type_detail": "State Technical University (affiliating)",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.355,
+      "lng": 85.326,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "ESTIMATED_DEMO",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "CENTRE",
+          "name": "Affiliated Engineering College Network",
+          "expertise_text": "engineering education across civil, mechanical, electrical, computer science disciplines; large student project capacity"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "SKILL_SOFTWARE_APP",
+          "strength": 0.65
+        },
+        {
+          "code": "EQ_FABRICATION",
+          "strength": 0.55
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.92
+        },
+        {
+          "code": "SKILL_MECH_DESIGN",
+          "strength": 0.58
+        },
+        {
+          "code": "FIELD_COMMUNITY_NETWORK",
+          "strength": 0.6
+        }
+      ],
+      "metrics": {
+        "active_projects": 2,
+        "max_concurrent": 12,
+        "completed_projects": 4,
+        "students_by_discipline": {
+          "civil": 1200,
+          "mech": 1400,
+          "electrical": 1100,
+          "cse": 2600
+        }
+      },
+      "coordinator": {
+        "name": "Controller of Examinations / Project Cell",
+        "email": "projects@demo-jut.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-IITM",
+      "name": "Indian Institute of Technology Madras",
+      "short": "IIT Madras",
+      "kind": "UNIVERSITY",
+      "type_detail": "Institute of National Importance (out of state)",
+      "district": "Chennai",
+      "state": "Tamil Nadu",
+      "lat": 12.9915,
+      "lng": 80.2337,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Civil Engineering, Environmental and Water Resources Division",
+          "expertise_text": "water treatment technology, decentralised water systems, water distribution networks, membrane and adsorption processes, rural water supply"
+        },
+        {
+          "kind": "CENTRE",
+          "name": "Centre for Research on Rural Technology and Development",
+          "expertise_text": "appropriate rural technology, low cost water treatment, technology transfer to rural India"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "LAB_WATER_QUALITY",
+          "strength": 0.97
+        },
+        {
+          "code": "SKILL_CIVIL_HYDRO",
+          "strength": 0.95
+        },
+        {
+          "code": "LAB_MATERIALS",
+          "strength": 0.92
+        },
+        {
+          "code": "SKILL_ML_DATA",
+          "strength": 0.92
+        },
+        {
+          "code": "ORG_INCUBATION",
+          "strength": 0.95
+        },
+        {
+          "code": "SKILL_EMBEDDED",
+          "strength": 0.88
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.05
+        }
+      ],
+      "metrics": {
+        "active_projects": 9,
+        "max_concurrent": 12,
+        "completed_projects": 40,
+        "students_by_discipline": {
+          "civil": 400,
+          "cse": 700,
+          "mech": 500
+        }
+      },
+      "coordinator": {
+        "name": "Office of Industrial Consultancy and Sponsored Research",
+        "email": "icsr@demo-iitm.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-IITR",
+      "name": "Indian Institute of Technology Roorkee",
+      "short": "IIT Roorkee",
+      "kind": "UNIVERSITY",
+      "type_detail": "Institute of National Importance (out of state)",
+      "district": "Haridwar",
+      "state": "Uttarakhand",
+      "lat": 29.865,
+      "lng": 77.896,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Hydrology",
+          "expertise_text": "hydrology, groundwater modelling, watershed hydrology, aquifer recharge, water resources systems"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Water Resources Development and Management",
+          "expertise_text": "water resources planning, irrigation systems, rural water supply management"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "SKILL_CIVIL_HYDRO",
+          "strength": 0.97
+        },
+        {
+          "code": "EQ_GIS_RS",
+          "strength": 0.9
+        },
+        {
+          "code": "LAB_WATER_QUALITY",
+          "strength": 0.88
+        },
+        {
+          "code": "SKILL_ML_DATA",
+          "strength": 0.85
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.05
+        }
+      ],
+      "metrics": {
+        "active_projects": 7,
+        "max_concurrent": 10,
+        "completed_projects": 33,
+        "students_by_discipline": {
+          "hydrology": 120,
+          "civil": 450,
+          "cse": 500
+        }
+      },
+      "coordinator": {
+        "name": "Sponsored Research and Industrial Consultancy",
+        "email": "sric@demo-iitr.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-XLRI",
+      "name": "XLRI Xavier School of Management, Jamshedpur",
+      "short": "XLRI Jamshedpur",
+      "kind": "UNIVERSITY",
+      "type_detail": "Autonomous Business School",
+      "district": "East Singhbhum",
+      "state": "Jharkhand",
+      "lat": 22.783,
+      "lng": 86.183,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "CENTRE",
+          "name": "Fr Arrupe Centre for Ecology and Sustainability",
+          "expertise_text": "sustainability, ecology, corporate social responsibility strategy, sustainable business models"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Operations Management and Decision Sciences",
+          "expertise_text": "supply chain design, service operations, spare parts logistics, optimisation, decision analytics"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "SKILL_POLICY_ECON",
+          "strength": 0.88
+        },
+        {
+          "code": "ORG_CSR_FUNDING",
+          "strength": 0.6
+        },
+        {
+          "code": "SKILL_ML_DATA",
+          "strength": 0.72
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.45
+        },
+        {
+          "code": "SKILL_SOCIAL_SURVEY",
+          "strength": 0.7
+        }
+      ],
+      "metrics": {
+        "active_projects": 2,
+        "max_concurrent": 5,
+        "completed_projects": 8,
+        "students_by_discipline": {
+          "management": 600
+        }
+      },
+      "coordinator": {
+        "name": "Chair, Social Initiatives",
+        "email": "socialinitiatives@demo-xlri.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-CIMFR",
+      "name": "CSIR - Central Institute of Mining and Fuel Research, Dhanbad",
+      "short": "CSIR-CIMFR",
+      "kind": "LAB",
+      "type_detail": "National Research Laboratory",
+      "district": "Dhanbad",
+      "state": "Jharkhand",
+      "lat": 23.796,
+      "lng": 86.431,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "LAB",
+          "name": "Environmental Management Division",
+          "expertise_text": "mine water treatment, environmental monitoring, effluent treatment, air quality, land reclamation"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "LAB_ENV_MONITORING",
+          "strength": 0.93
+        },
+        {
+          "code": "LAB_WATER_QUALITY",
+          "strength": 0.88
+        },
+        {
+          "code": "LAB_MATERIALS",
+          "strength": 0.85
+        },
+        {
+          "code": "EQ_FIELD_VEHICLE",
+          "strength": 0.75
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.3
+        }
+      ],
+      "metrics": {
+        "active_projects": 4,
+        "max_concurrent": 6,
+        "completed_projects": 25,
+        "students_by_discipline": {
+          "research_scholars": 90
+        }
+      },
+      "coordinator": {
+        "name": "Head, Business Development",
+        "email": "bd@demo-cimfr.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    },
+    {
+      "id": "U-RIMS",
+      "name": "Rajendra Institute of Medical Sciences, Ranchi",
+      "short": "RIMS Ranchi",
+      "kind": "UNIVERSITY",
+      "type_detail": "State Medical Institute and Teaching Hospital",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.362,
+      "lng": 85.334,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "departments": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "faculty": "SYNTHETIC_DEMO",
+        "metrics": "SYNTHETIC_DEMO"
+      },
+      "units": [
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Community Medicine",
+          "expertise_text": "community health, epidemiology, public health surveillance, health outreach camps, maternal and child health, waterborne disease investigation"
+        },
+        {
+          "kind": "DEPARTMENT",
+          "name": "Department of Microbiology",
+          "expertise_text": "microbial diagnostics, water and food borne pathogens, culture and sensitivity testing, disease outbreak investigation"
+        },
+        {
+          "kind": "CENTRE",
+          "name": "Central Diagnostic Laboratory",
+          "expertise_text": "clinical diagnostics, sample analysis, laboratory quality systems"
+        }
+      ],
+      "capabilities": [
+        {
+          "code": "SKILL_PUBLIC_HEALTH",
+          "strength": 0.92
+        },
+        {
+          "code": "LAB_CLINICAL_PH",
+          "strength": 0.9
+        },
+        {
+          "code": "LAB_BIOTECH",
+          "strength": 0.78
+        },
+        {
+          "code": "FIELD_COMMUNITY_NETWORK",
+          "strength": 0.75
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.9
+        },
+        {
+          "code": "SKILL_SOCIAL_SURVEY",
+          "strength": 0.7
+        },
+        {
+          "code": "LAB_WATER_QUALITY",
+          "strength": 0.6
+        }
+      ],
+      "metrics": {
+        "active_projects": 2,
+        "max_concurrent": 6,
+        "completed_projects": 9,
+        "students_by_discipline": {
+          "mbbs": 650,
+          "nursing": 300,
+          "paramedical": 220
+        }
+      },
+      "coordinator": {
+        "name": "Head, Community Medicine",
+        "email": "communitymed@demo-rims.invalid",
+        "provenance": "SYNTHETIC_DEMO"
+      }
+    }
+  ],
+  "industry_partners": [
+    {
+      "id": "I-TSF",
+      "name": "Tata Steel Foundation",
+      "kind": "CSR",
+      "sector": "Corporate Social Responsibility (Steel)",
+      "district": "East Singhbhum",
+      "state": "Jharkhand",
+      "lat": 22.8046,
+      "lng": 86.2029,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "csr_themes": "PUBLIC_VERIFIED",
+        "capacity_figures": "SYNTHETIC_DEMO"
+      },
+      "tech_expertise_text": "rural development programme delivery, drinking water and sanitation programmes, tribal community development, education and health outreach in Jharkhand and Odisha",
+      "csr_themes": [
+        "water_sanitation",
+        "tribal_development",
+        "education",
+        "health",
+        "livelihoods"
+      ],
+      "capabilities": [
+        {
+          "code": "ORG_CSR_FUNDING",
+          "strength": 0.95
+        },
+        {
+          "code": "FIELD_COMMUNITY_NETWORK",
+          "strength": 0.9
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.75
+        },
+        {
+          "code": "FIELD_MAINTENANCE_NET",
+          "strength": 0.6
+        },
+        {
+          "code": "SKILL_SOCIAL_SURVEY",
+          "strength": 0.75
+        }
+      ],
+      "roles_offered": [
+        "FUNDER",
+        "PILOT_HOST",
+        "DEPLOY_PARTNER"
+      ],
+      "annual_csr_capacity_inr": 25000000,
+      "mentors_available": 4,
+      "geographic_reach": [
+        "East Singhbhum",
+        "West Singhbhum",
+        "Seraikela",
+        "Ranchi",
+        "Khunti"
+      ]
+    },
+    {
+      "id": "I-JSLPS",
+      "name": "Jharkhand State Livelihood Promotion Society (JSLPS)",
+      "kind": "GOV_MISSION",
+      "sector": "State Rural Livelihoods Mission",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.36,
+      "lng": 85.33,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "mandate": "PUBLIC_VERIFIED",
+        "capacity_figures": "SYNTHETIC_DEMO"
+      },
+      "tech_expertise_text": "self help group federations, rural cadre training, community based service delivery, women led enterprise, last mile village institutions across all Jharkhand districts",
+      "csr_themes": [
+        "livelihoods",
+        "women_empowerment",
+        "rural_services"
+      ],
+      "capabilities": [
+        {
+          "code": "FIELD_COMMUNITY_NETWORK",
+          "strength": 0.98
+        },
+        {
+          "code": "FIELD_MAINTENANCE_NET",
+          "strength": 0.8
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.95
+        },
+        {
+          "code": "SKILL_SOCIAL_SURVEY",
+          "strength": 0.8
+        },
+        {
+          "code": "ORG_CSR_FUNDING",
+          "strength": 0.45
+        }
+      ],
+      "roles_offered": [
+        "DEPLOY_PARTNER",
+        "PILOT_HOST",
+        "DATA_PARTNER"
+      ],
+      "annual_csr_capacity_inr": 0,
+      "mentors_available": 8,
+      "geographic_reach": [
+        "ALL_JHARKHAND_DISTRICTS"
+      ]
+    },
+    {
+      "id": "I-CCL",
+      "name": "Central Coalfields Limited (CSR Division)",
+      "kind": "PSU",
+      "sector": "Mining / Public Sector Undertaking",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.373,
+      "lng": 85.33,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "csr_themes": "PUBLIC_VERIFIED",
+        "capacity_figures": "SYNTHETIC_DEMO"
+      },
+      "tech_expertise_text": "heavy field operations, borewell and water supply infrastructure in mining belt, community water supply under CSR, earthmoving and civil works capability",
+      "csr_themes": [
+        "water_sanitation",
+        "health",
+        "education",
+        "skill_development",
+        "rural_infrastructure"
+      ],
+      "capabilities": [
+        {
+          "code": "ORG_CSR_FUNDING",
+          "strength": 0.88
+        },
+        {
+          "code": "EQ_FIELD_VEHICLE",
+          "strength": 0.85
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.8
+        },
+        {
+          "code": "FIELD_MAINTENANCE_NET",
+          "strength": 0.65
+        },
+        {
+          "code": "ORG_MANUFACTURING",
+          "strength": 0.4
+        }
+      ],
+      "roles_offered": [
+        "FUNDER",
+        "DEPLOY_PARTNER"
+      ],
+      "annual_csr_capacity_inr": 18000000,
+      "mentors_available": 3,
+      "geographic_reach": [
+        "Ranchi",
+        "Hazaribagh",
+        "Ramgarh",
+        "Chatra",
+        "Latehar",
+        "Bokaro"
+      ]
+    },
+    {
+      "id": "I-HEC",
+      "name": "Heavy Engineering Corporation Ltd, Ranchi",
+      "kind": "PSU",
+      "sector": "Heavy Engineering / Manufacturing",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.386,
+      "lng": 85.28,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "capacity_figures": "SYNTHETIC_DEMO"
+      },
+      "tech_expertise_text": "heavy fabrication, foundry, machining, casting, mechanical component manufacture at scale, industrial design for manufacture",
+      "csr_themes": [
+        "skill_development",
+        "rural_infrastructure"
+      ],
+      "capabilities": [
+        {
+          "code": "EQ_FABRICATION",
+          "strength": 0.92
+        },
+        {
+          "code": "ORG_MANUFACTURING",
+          "strength": 0.9
+        },
+        {
+          "code": "LAB_MATERIALS",
+          "strength": 0.78
+        },
+        {
+          "code": "SKILL_MECH_DESIGN",
+          "strength": 0.8
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.85
+        }
+      ],
+      "roles_offered": [
+        "FAB_PARTNER",
+        "MENTOR",
+        "DEPLOY_PARTNER"
+      ],
+      "annual_csr_capacity_inr": 4000000,
+      "mentors_available": 5,
+      "geographic_reach": [
+        "Ranchi",
+        "Khunti",
+        "Lohardaga"
+      ]
+    },
+    {
+      "id": "I-JALTECH",
+      "name": "JalTech Sensors Pvt Ltd",
+      "kind": "STARTUP",
+      "sector": "Water technology / IoT hardware",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.3441,
+      "lng": 85.3096,
+      "data_provenance": {
+        "identity": "SYNTHETIC_DEMO",
+        "note": "Fictional startup used to demonstrate MSME/startup matching. Clearly labelled in the UI."
+      },
+      "tech_expertise_text": "low cost water level and flow sensors, LoRaWAN telemetry for rural assets, solar powered field devices, sensor data dashboards",
+      "csr_themes": [],
+      "capabilities": [
+        {
+          "code": "EQ_ELECTRONICS_IOT",
+          "strength": 0.9
+        },
+        {
+          "code": "SKILL_EMBEDDED",
+          "strength": 0.88
+        },
+        {
+          "code": "ORG_MANUFACTURING",
+          "strength": 0.55
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.9
+        },
+        {
+          "code": "SKILL_SOFTWARE_APP",
+          "strength": 0.75
+        }
+      ],
+      "roles_offered": [
+        "MENTOR",
+        "FAB_PARTNER",
+        "DEPLOY_PARTNER"
+      ],
+      "annual_csr_capacity_inr": 0,
+      "mentors_available": 2,
+      "geographic_reach": [
+        "Ranchi",
+        "Khunti",
+        "Gumla",
+        "Lohardaga",
+        "Hazaribagh"
+      ]
+    },
+    {
+      "id": "I-SBSL",
+      "name": "SAIL Bokaro Steel Plant (CSR)",
+      "kind": "PSU",
+      "sector": "Steel / Public Sector Undertaking",
+      "district": "Bokaro",
+      "state": "Jharkhand",
+      "lat": 23.6693,
+      "lng": 86.1511,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "csr_themes": "PUBLIC_VERIFIED",
+        "capacity_figures": "SYNTHETIC_DEMO"
+      },
+      "tech_expertise_text": "industrial water treatment, plant utilities engineering, large scale civil works, vocational skilling centres",
+      "csr_themes": [
+        "water_sanitation",
+        "health",
+        "skill_development",
+        "education"
+      ],
+      "capabilities": [
+        {
+          "code": "ORG_CSR_FUNDING",
+          "strength": 0.82
+        },
+        {
+          "code": "LAB_MATERIALS",
+          "strength": 0.75
+        },
+        {
+          "code": "EQ_FABRICATION",
+          "strength": 0.8
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.35
+        }
+      ],
+      "roles_offered": [
+        "FUNDER",
+        "FAB_PARTNER"
+      ],
+      "annual_csr_capacity_inr": 15000000,
+      "mentors_available": 3,
+      "geographic_reach": [
+        "Bokaro",
+        "Dhanbad",
+        "Ramgarh"
+      ]
+    },
+    {
+      "id": "I-AGRISETU",
+      "name": "AgriSetu Analytics LLP",
+      "kind": "MSME",
+      "sector": "AgriTech / Data services",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.35,
+      "lng": 85.32,
+      "data_provenance": {
+        "identity": "SYNTHETIC_DEMO",
+        "note": "Fictional MSME used to demonstrate matching. Clearly labelled in the UI."
+      },
+      "tech_expertise_text": "crop advisory platforms, satellite based crop monitoring, farmer facing mobile applications in Hindi, market linkage analytics",
+      "csr_themes": [],
+      "capabilities": [
+        {
+          "code": "SKILL_ML_DATA",
+          "strength": 0.82
+        },
+        {
+          "code": "EQ_GIS_RS",
+          "strength": 0.8
+        },
+        {
+          "code": "SKILL_SOFTWARE_APP",
+          "strength": 0.85
+        },
+        {
+          "code": "SKILL_AGRONOMY",
+          "strength": 0.62
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.85
+        }
+      ],
+      "roles_offered": [
+        "MENTOR",
+        "DATA_PARTNER",
+        "DEPLOY_PARTNER"
+      ],
+      "annual_csr_capacity_inr": 0,
+      "mentors_available": 2,
+      "geographic_reach": [
+        "Ranchi",
+        "Khunti",
+        "Gumla",
+        "Simdega",
+        "West Singhbhum"
+      ]
+    },
+    {
+      "id": "I-STPI",
+      "name": "STPI Ranchi Incubation Centre",
+      "kind": "INCUBATOR",
+      "sector": "Technology incubation",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.354,
+      "lng": 85.312,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "capacity_figures": "SYNTHETIC_DEMO"
+      },
+      "tech_expertise_text": "software product incubation, startup mentoring, seed support, market access for technology ventures",
+      "csr_themes": [
+        "entrepreneurship"
+      ],
+      "capabilities": [
+        {
+          "code": "ORG_INCUBATION",
+          "strength": 0.88
+        },
+        {
+          "code": "SKILL_SOFTWARE_APP",
+          "strength": 0.7
+        },
+        {
+          "code": "ORG_CSR_FUNDING",
+          "strength": 0.5
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.9
+        }
+      ],
+      "roles_offered": [
+        "MENTOR",
+        "FUNDER"
+      ],
+      "annual_csr_capacity_inr": 3000000,
+      "mentors_available": 6,
+      "geographic_reach": [
+        "Ranchi"
+      ]
+    },
+    {
+      "id": "I-USHA",
+      "name": "Usha Martin Limited",
+      "kind": "COMPANY",
+      "sector": "Wire ropes / Specialty steel",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.32,
+      "lng": 85.43,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "capabilities": "ESTIMATED_DEMO",
+        "capacity_figures": "SYNTHETIC_DEMO"
+      },
+      "tech_expertise_text": "specialty steel products, corrosion resistant components, industrial materials engineering, quality testing",
+      "csr_themes": [
+        "education",
+        "health",
+        "rural_infrastructure"
+      ],
+      "capabilities": [
+        {
+          "code": "LAB_MATERIALS",
+          "strength": 0.85
+        },
+        {
+          "code": "ORG_MANUFACTURING",
+          "strength": 0.8
+        },
+        {
+          "code": "ORG_CSR_FUNDING",
+          "strength": 0.6
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.8
+        }
+      ],
+      "roles_offered": [
+        "FAB_PARTNER",
+        "MENTOR",
+        "FUNDER"
+      ],
+      "annual_csr_capacity_inr": 6000000,
+      "mentors_available": 3,
+      "geographic_reach": [
+        "Ranchi",
+        "Khunti",
+        "Ramgarh"
+      ]
+    },
+    {
+      "id": "I-DWSD",
+      "name": "Drinking Water and Sanitation Department, Government of Jharkhand",
+      "kind": "GOV_DEPT",
+      "sector": "State Government Line Department",
+      "district": "Ranchi",
+      "state": "Jharkhand",
+      "lat": 23.369,
+      "lng": 85.328,
+      "data_provenance": {
+        "identity": "PUBLIC_VERIFIED",
+        "capacity_figures": "SYNTHETIC_DEMO"
+      },
+      "tech_expertise_text": "rural drinking water supply, hand pump and piped water scheme operation and maintenance, block level mechanic cadre, Jal Jeevan Mission implementation",
+      "csr_themes": [
+        "water_sanitation"
+      ],
+      "capabilities": [
+        {
+          "code": "FIELD_MAINTENANCE_NET",
+          "strength": 0.72
+        },
+        {
+          "code": "FIELD_LOCAL_PRESENCE",
+          "strength": 0.95
+        },
+        {
+          "code": "ORG_CSR_FUNDING",
+          "strength": 0.7
+        },
+        {
+          "code": "ORG_PROCUREMENT",
+          "strength": 0.9
+        },
+        {
+          "code": "SKILL_CIVIL_HYDRO",
+          "strength": 0.6
+        }
+      ],
+      "roles_offered": [
+        "DEPLOY_PARTNER",
+        "PILOT_HOST",
+        "FUNDER",
+        "DATA_PARTNER"
+      ],
+      "annual_csr_capacity_inr": 50000000,
+      "mentors_available": 2,
+      "geographic_reach": [
+        "ALL_JHARKHAND_DISTRICTS"
+      ]
+    }
+  ]
+}

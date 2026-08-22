@@ -1,0 +1,26 @@
+{
+  "raw_macro_f1": 0.9216,
+  "blended_macro_f1": 0.9216,
+  "keyword_only_macro_f1": 0.5438,
+  "prior_only_macro_f1": 0.3944,
+  "tuned_blend": {
+    "model": 0.95,
+    "keyword": 0.05,
+    "prior": 0.0
+  },
+  "prior_source": "chained from domain_clf (production path)",
+  "model_only_macro_f1": 0.9216,
+  "cv_macro_f1": 0.9356,
+  "best_C": 4.0,
+  "mean_intensity_by_class": {
+    "REMOTE_ANALYTICAL": 0.1045,
+    "HYBRID": 0.5453,
+    "FIELD_HEAVY": 0.8391
+  },
+  "monotonic": true,
+  "n_train": 200,
+  "n_test": 50,
+  "encoder": "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2",
+  "backend": "transformer",
+  "data_caveat": "250 rows is thin - roughly 66 per class after the split. Treat these numbers as indicative. The blend's guard rails exist precisely because the classifier alone is undertrained."
+}
