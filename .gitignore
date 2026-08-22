@@ -1,0 +1,33 @@
+.env
+
+# Claude Code local tooling / project instructions — not part of the repo
+.claude/
+.mcp.json
+CLAUDE.md
+CLAUDE.pdf
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+*.egg-info/
+
+# Alembic
+database/alembic/versions/__pycache__/
+
+# Node / client
+node_modules/
+dist/
+build/
+
+# Flutter / mobile
+mobile/.dart_tool/
+mobile/.flutter-plugins
+mobile/.flutter-plugins-dependencies
+mobile/build/
+
+# Logs and local artifacts
+*.log
+tokens.txt
+
