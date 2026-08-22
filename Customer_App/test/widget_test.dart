@@ -1,30 +1,50 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
-
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import 'package:customer_app/main.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUpAll(() {
+    GoogleFonts.config.allowRuntimeFetching = false;
+  });
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  testWidgets('Authentication to Onboarding flow smoke test',
+      (WidgetTester tester) async {
+    // Set phone viewport
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.0;
+    addTearDown(() {
+      tester.view.resetPhysicalSize();
+      tester.view.resetDevicePixelRatio();
+    });
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
+    // Build app
+    await tester.pumpWidget(const SocialServeApp());
     await tester.pump();
 
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
+    // 1. Phone number screen checks
+    expect(find.text('Enter your phone number'), findsOneWidget);
+    expect(find.text("We'll send you a verification code"), findsOneWidget);
+    expect(find.text('Continue'), findsOneWidget);
+
+    // 2. Navigate to OTP screen
+    await tester.tap(find.text('Continue'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    // OTP screen checks
+    expect(find.text('Enter verification code'), findsOneWidget);
+    expect(find.text('Verify'), findsOneWidget);
+    expect(find.text("Didn't receive the code?"), findsOneWidget);
+    expect(find.text('Resend code'), findsOneWidget);
+
+    // 3. Tap Verify to directly navigate to Onboarding screen
+    await tester.tap(find.text('Verify'));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 300));
+
+    // Onboarding screen checks
+    expect(find.text('Connect & Collaborate'), findsOneWidget);
+    expect(find.text('Skip'), findsOneWidget);
   });
 }
