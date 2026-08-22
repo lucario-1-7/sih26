@@ -30,8 +30,127 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _descriptionController = TextEditingController();
 
-  String _selectedCategory = 'Roads & Infrastructure';
   bool _hasAttachedMedia = false;
+  bool _isLocationShared = false;
+
+  Future<void> _requestLocationPermission() async {
+    final bool? granted = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext ctx) {
+        return Dialog(
+          backgroundColor: AppColors.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.inputBackground,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: const Icon(
+                    FeatherIcons.mapPin,
+                    size: 22,
+                    color: AppColors.primaryText,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Allow JanSeva to access this device\'s location?',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.heading(context).copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Precise GPS location is used to pinpoint civic issues and dispatch departmental response teams directly to the site.',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.supporting(context).copyWith(
+                    fontSize: 12.5,
+                    color: AppColors.secondaryText,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryButton,
+                      foregroundColor: AppColors.buttonText,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      elevation: 0,
+                    ),
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: const Text(
+                      'While Using the App',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.secondaryText,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    ),
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: const Text(
+                      'Don\'t Allow',
+                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13.5),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (granted == true) {
+      setState(() {
+        _isLocationShared = true;
+        _addressController.text = 'Near Anna Nagar Junction, 2nd Avenue';
+        _cityWardController.text = 'Ward 4, Zone 2';
+        _pincodeController.text = '600040';
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location permission granted! Address details auto-filled from GPS.'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } else if (granted == false) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location permission denied. Please enter address manually.'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
 
   void _onSubmit() {
     final titleText = _titleController.text.trim().isEmpty
@@ -44,10 +163,25 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
         ? 'Sector 12, Main Ward'
         : '${_addressController.text.trim()}, ${_cityWardController.text.trim()}';
 
+    // Model auto-classification based on reported content
+    String detectedCategory = 'Roads & Infrastructure';
+    final lower = '$titleText $descriptionText'.toLowerCase();
+    if (lower.contains('water') || lower.contains('pipe') || lower.contains('drain') || lower.contains('leak')) {
+      detectedCategory = 'Water & Utilities';
+    } else if (lower.contains('light') || lower.contains('electric') || lower.contains('wire') || lower.contains('power')) {
+      detectedCategory = 'Electrical & Lighting';
+    } else if (lower.contains('waste') || lower.contains('garbage') || lower.contains('trash') || lower.contains('sanitation') || lower.contains('clean')) {
+      detectedCategory = 'Sanitation & Health';
+    } else if (lower.contains('road') || lower.contains('pothole') || lower.contains('traffic') || lower.contains('street') || lower.contains('bridge')) {
+      detectedCategory = 'Roads & Infrastructure';
+    } else {
+      detectedCategory = 'Civic Infrastructure';
+    }
+
     final newIssue = IssueItem(
       id: 'ISS-2026-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
       title: titleText,
-      category: _selectedCategory,
+      category: detectedCategory,
       description: descriptionText,
       location: locationText,
       dateFiled: 'Today',
@@ -118,12 +252,55 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
               const SizedBox(height: 24),
 
               // SECTION 2: Grievance Location
-              _buildSectionHeader(2, 'Grievance Location'),
+              _buildSectionHeader(
+                2,
+                'Grievance Location',
+                trailing: GestureDetector(
+                  onTap: _requestLocationPermission,
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                    decoration: BoxDecoration(
+                      color: _isLocationShared
+                          ? AppColors.inputBackground
+                          : AppColors.background,
+                      borderRadius: BorderRadius.circular(20.0),
+                      border: Border.all(
+                        color: _isLocationShared
+                            ? AppColors.primaryText
+                            : AppColors.border,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          _isLocationShared ? FeatherIcons.check : FeatherIcons.mapPin,
+                          size: 13,
+                          color: AppColors.primaryText,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          _isLocationShared ? 'GPS Linked' : 'Use GPS',
+                          style: AppTypography.supporting(context).copyWith(
+                            fontSize: 11.5,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primaryText,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
               const SizedBox(height: 12),
+
               _buildInputField(
                 controller: _addressController,
                 placeholder: 'Address (House no., Street name)',
                 icon: FeatherIcons.mapPin,
+                suffixIcon: FeatherIcons.crosshair,
+                onSuffixTap: _requestLocationPermission,
               ),
               const SizedBox(height: 10),
               Row(
@@ -149,14 +326,9 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
 
               const SizedBox(height: 24),
 
-              // SECTION 3: Issue Category & Details
-              _buildSectionHeader(3, 'Issue Category & Details'),
+              // SECTION 3: Issue Details
+              _buildSectionHeader(3, 'Issue Details'),
               const SizedBox(height: 12),
-
-              // 4 Category Tiles matching the reference selector style
-              _buildCategoryTiles(),
-
-              const SizedBox(height: 14),
 
               _buildInputField(
                 controller: _titleController,
@@ -168,7 +340,7 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
                 controller: _descriptionController,
                 placeholder: 'Detailed problem description...',
                 icon: FeatherIcons.alignLeft,
-                maxLines: 3,
+                maxLines: 4,
               ),
 
               const SizedBox(height: 16),
@@ -212,54 +384,29 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
           ),
         ),
         Expanded(
-          child: Column(
-            children: [
-              Text(
-                'File Grievance',
-                style: AppTypography.heading(context).copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
+          child: Center(
+            child: Text(
+              'File Grievance',
+              style: AppTypography.heading(context).copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
               ),
-              const SizedBox(height: 2),
-              Text(
-                'Submit municipal issue securely',
-                style: AppTypography.supporting(context).copyWith(
-                  fontSize: 12,
-                  color: AppColors.secondaryText,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF0FDF4),
-            borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: const Color(0xFFDCFCE7), width: 1.0),
-          ),
-          child: const Center(
-            child: Icon(
-              FeatherIcons.shield,
-              size: 16,
-              color: Color(0xFF16A34A),
             ),
           ),
         ),
+        const SizedBox(width: 36), // Balances the leading back button for true centering
       ],
     );
   }
 
-  Widget _buildSectionHeader(int step, String title) {
+  Widget _buildSectionHeader(int step, String title, {Widget? trailing}) {
     return Row(
       children: [
         Container(
           width: 22,
           height: 22,
           decoration: const BoxDecoration(
-            color: Color(0xFF16A34A),
+            color: AppColors.primaryButton,
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -274,13 +421,16 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
           ),
         ),
         const SizedBox(width: 10),
-        Text(
-          title,
-          style: AppTypography.heading(context).copyWith(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
+        Expanded(
+          child: Text(
+            title,
+            style: AppTypography.heading(context).copyWith(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
+        ?trailing,
       ],
     );
   }
@@ -289,6 +439,8 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
     required TextEditingController controller,
     required String placeholder,
     required IconData icon,
+    IconData? suffixIcon,
+    VoidCallback? onSuffixTap,
     int maxLines = 1,
     TextInputType keyboardType = TextInputType.text,
   }) {
@@ -330,69 +482,21 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildCategoryTiles() {
-    final categories = [
-      {'id': 'Roads & Infrastructure', 'label': 'Roads', 'icon': FeatherIcons.mapPin},
-      {'id': 'Water & Utilities', 'label': 'Water', 'icon': FeatherIcons.droplet},
-      {'id': 'Electrical & Lighting', 'label': 'Electrical', 'icon': FeatherIcons.zap},
-      {'id': 'Sanitation & Health', 'label': 'Sanitation', 'icon': FeatherIcons.trash},
-    ];
-
-    return Row(
-      children: categories.map((cat) {
-        final id = cat['id'] as String;
-        final label = cat['label'] as String;
-        final icon = cat['icon'] as IconData;
-        final isSelected = _selectedCategory == id;
-
-        return Expanded(
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedCategory = id;
-              });
-            },
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 3.0),
-              padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
-              decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFF0FDF4) : AppColors.background,
-                borderRadius: BorderRadius.circular(12.0),
-                border: Border.all(
-                  color: isSelected ? const Color(0xFF16A34A) : AppColors.border,
-                  width: isSelected ? 1.5 : 1.0,
+          if (suffixIcon != null)
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onSuffixTap,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 6.0),
+                child: Icon(
+                  suffixIcon,
+                  size: 18,
+                  color: AppColors.primaryText,
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    icon,
-                    size: 20,
-                    color: isSelected ? const Color(0xFF16A34A) : AppColors.primaryText,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.supporting(context).copyWith(
-                      fontSize: 11,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? const Color(0xFF16A34A) : AppColors.primaryText,
-                    ),
-                  ),
-                ],
-              ),
             ),
-          ),
-        );
-      }).toList(),
+        ],
+      ),
     );
   }
 }

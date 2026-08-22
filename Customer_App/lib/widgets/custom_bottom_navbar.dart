@@ -51,12 +51,6 @@ class CustomBottomNavbar extends StatelessWidget {
               ),
               _buildNavItem(
                 index: 3,
-                icon: FeatherIcons.activity,
-                label: 'Activity',
-                context: context,
-              ),
-              _buildNavItem(
-                index: 4,
                 icon: FeatherIcons.user,
                 label: 'Profile',
                 context: context,

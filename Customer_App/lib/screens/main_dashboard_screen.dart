@@ -9,6 +9,7 @@ import '../widgets/issue_card.dart';
 import '../widgets/media_upload_card.dart';
 import '../widgets/primary_button.dart';
 import 'issue_detail_screen.dart';
+import 'recent_activity_screen.dart';
 import 'settings_screen.dart';
 
 class MainDashboardScreen extends StatefulWidget {
@@ -28,6 +29,27 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   int _currentTabIndex = 0;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _myIssuesSearchController = TextEditingController();
+  String _myIssuesStatusFilter = 'All';
+  String _myIssuesLocationFilter = 'All';
+  String _myIssuesCategoryFilter = 'All';
+
+  final List<String> _myIssuesStatusSections = [
+    'All',
+    'Issued',
+    'In Progress',
+    'Resolved',
+  ];
+
+  List<String> get _availableLocations {
+    final locs = _issues
+        .map((i) => i.location.trim())
+        .where((l) => l.isNotEmpty)
+        .toSet()
+        .toList();
+    locs.sort();
+    return ['All Locations', ...locs];
+  }
 
   @override
   void initState() {
@@ -38,6 +60,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _myIssuesSearchController.dispose();
     _formFullNameController.dispose();
     _formEmailController.dispose();
     _formMobileController.dispose();
@@ -47,6 +70,216 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     _formTitleController.dispose();
     _formDescriptionController.dispose();
     super.dispose();
+  }
+
+  void _openFilterBottomSheet() {
+    String tempStatus = _myIssuesStatusFilter;
+    String tempLocation = _myIssuesLocationFilter;
+    String tempCategory = _myIssuesCategoryFilter;
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: AppColors.background,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+      ),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: const EdgeInsets.fromLTRB(20, 16, 20, 32),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Center(
+                    child: Container(
+                      width: 36,
+                      height: 4,
+                      decoration: BoxDecoration(
+                        color: AppColors.border,
+                        borderRadius: BorderRadius.circular(2.0),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Filter Grievances',
+                        style: AppTypography.heading(context).copyWith(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      GestureDetector(
+                        onTap: () {
+                          setModalState(() {
+                            tempStatus = 'All';
+                            tempLocation = 'All';
+                            tempCategory = 'All';
+                          });
+                        },
+                        child: Text(
+                          'Reset All',
+                          style: AppTypography.supporting(context).copyWith(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.secondaryText,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+
+                  // STATUS FILTER
+                  Text(
+                    'Status',
+                    style: AppTypography.heading(context).copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: ['All', 'Issued', 'In Progress', 'Resolved'].map((st) {
+                      final sel = tempStatus == st;
+                      return ChoiceChip(
+                        label: Text(st),
+                        selected: sel,
+                        onSelected: (val) {
+                          if (val) setModalState(() => tempStatus = st);
+                        },
+                        selectedColor: AppColors.primaryButton,
+                        backgroundColor: AppColors.inputBackground,
+                        labelStyle: TextStyle(
+                          fontSize: 12,
+                          fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                          color: sel ? Colors.white : AppColors.primaryText,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                          side: BorderSide(
+                            color: sel ? AppColors.primaryButton : AppColors.border,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 18),
+
+                  // LOCATION FILTER
+                  Text(
+                    'Location / Ward',
+                    style: AppTypography.heading(context).copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 2.0),
+                    decoration: BoxDecoration(
+                      color: AppColors.inputBackground,
+                      borderRadius: BorderRadius.circular(12.0),
+                      border: Border.all(color: AppColors.border, width: 1.0),
+                    ),
+                    child: DropdownButtonHideUnderline(
+                      child: DropdownButton<String>(
+                        value: _availableLocations.contains(tempLocation == 'All' ? 'All Locations' : tempLocation)
+                            ? (tempLocation == 'All' ? 'All Locations' : tempLocation)
+                            : 'All Locations',
+                        isExpanded: true,
+                        icon: const Icon(FeatherIcons.chevronDown, size: 16, color: AppColors.secondaryText),
+                        dropdownColor: AppColors.background,
+                        borderRadius: BorderRadius.circular(12.0),
+                        items: _availableLocations.map((loc) {
+                          return DropdownMenuItem<String>(
+                            value: loc,
+                            child: Text(
+                              loc,
+                              style: AppTypography.supporting(context).copyWith(
+                                fontSize: 13,
+                                color: AppColors.primaryText,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                        onChanged: (val) {
+                          if (val != null) {
+                            setModalState(() {
+                              tempLocation = val == 'All Locations' ? 'All' : val;
+                            });
+                          }
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 18),
+
+                  // CATEGORY FILTER
+                  Text(
+                    'Department Category',
+                    style: AppTypography.heading(context).copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: ['All', 'Roads', 'Water', 'Electrical', 'Sanitation'].map((cat) {
+                      final sel = tempCategory == cat;
+                      return ChoiceChip(
+                        label: Text(cat),
+                        selected: sel,
+                        onSelected: (val) {
+                          if (val) setModalState(() => tempCategory = cat);
+                        },
+                        selectedColor: AppColors.primaryButton,
+                        backgroundColor: AppColors.inputBackground,
+                        labelStyle: TextStyle(
+                          fontSize: 12,
+                          fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
+                          color: sel ? Colors.white : AppColors.primaryText,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16.0),
+                          side: BorderSide(
+                            color: sel ? AppColors.primaryButton : AppColors.border,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  const SizedBox(height: 24),
+
+                  // APPLY BUTTON
+                  PrimaryButton(
+                    text: 'Apply Filters',
+                    onPressed: () {
+                      setState(() {
+                        _myIssuesStatusFilter = tempStatus;
+                        _myIssuesLocationFilter = tempLocation;
+                        _myIssuesCategoryFilter = tempCategory;
+                      });
+                      Navigator.pop(ctx);
+                    },
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   void _onFileIssuePressed() {
@@ -75,7 +308,6 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             _buildHomeTab(),
             _buildMyIssuesTab(),
             _buildFileGrievanceTab(),
-            _buildActivityTab(),
             _buildProfileTab(),
           ],
         ),
@@ -111,82 +343,143 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Bar with Grid & Notification Bell
+          // Top Header Bar: Avatar + Welcome Back & Name + Notification Bell
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Container(
-                padding: const EdgeInsets.all(10.0),
-                decoration: BoxDecoration(
-                  color: AppColors.inputBackground,
-                  borderRadius: BorderRadius.circular(12.0),
-                  border: Border.all(color: AppColors.border, width: 1.0),
-                ),
-                child: const Icon(
-                  FeatherIcons.grid,
-                  size: 18,
-                  color: AppColors.primaryText,
-                ),
-              ),
-              Text(
-                'Home',
-                style: AppTypography.heading(context).copyWith(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              InkWell(
+              // Citizen Avatar with Online Status
+              GestureDetector(
                 onTap: () {
                   setState(() {
-                    _currentTabIndex = 2; // Jump to activity/notifications
+                    _currentTabIndex = 3; // Jump to Profile
                   });
                 },
-                borderRadius: BorderRadius.circular(12.0),
-                child: Container(
-                  padding: const EdgeInsets.all(10.0),
-                  decoration: BoxDecoration(
-                    color: AppColors.inputBackground,
-                    borderRadius: BorderRadius.circular(12.0),
-                    border: Border.all(color: AppColors.border, width: 1.0),
-                  ),
-                  child: const Icon(
-                    FeatherIcons.bell,
-                    size: 18,
-                    color: AppColors.primaryText,
+                child: Stack(
+                  children: [
+                    Container(
+                      width: 44,
+                      height: 44,
+                      decoration: BoxDecoration(
+                        color: AppColors.inputBackground,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.border, width: 1.2),
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          FeatherIcons.user,
+                          size: 20,
+                          color: AppColors.primaryText,
+                        ),
+                      ),
+                    ),
+                    Positioned(
+                      right: 1,
+                      bottom: 1,
+                      child: Container(
+                        width: 10,
+                        height: 10,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF10B981),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.background, width: 2),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 12),
+
+              // Welcome Back & Name
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Welcome Back',
+                      style: AppTypography.supporting(context).copyWith(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                        color: AppColors.secondaryText,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      'Hi Dhyan',
+                      style: AppTypography.heading(context).copyWith(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: -0.4,
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
+                ),
+              ),
+
+              // Notification Bell
+              Material(
+                color: Colors.transparent,
+                shape: const CircleBorder(),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => RecentActivityScreen(issues: _issues),
+                      ),
+                    );
+                  },
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        width: 42,
+                        height: 42,
+                        decoration: BoxDecoration(
+                          color: AppColors.inputBackground,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: AppColors.border, width: 1.0),
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            FeatherIcons.bell,
+                            size: 18,
+                            color: AppColors.primaryText,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 9,
+                        right: 10,
+                        child: Container(
+                          width: 8,
+                          height: 8,
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF2563EB),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ),
             ],
           ),
 
-          const SizedBox(height: 24),
-
-          // Greeting Section
-          Text(
-            'Hi Dhyan!',
-            style: AppTypography.heading(context).copyWith(
-              fontSize: 26,
-              fontWeight: FontWeight.w700,
-              letterSpacing: -0.5,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Good morning',
-            style: AppTypography.supporting(context).copyWith(
-              fontSize: 14,
-              color: AppColors.secondaryText,
-            ),
-          ),
-
-          const SizedBox(height: 20),
+          const SizedBox(height: 18),
 
           // Search Bar with Feather Icons
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            padding: const EdgeInsets.symmetric(horizontal: 18.0),
             decoration: BoxDecoration(
               color: AppColors.inputBackground,
-              borderRadius: BorderRadius.circular(14.0),
+              borderRadius: BorderRadius.circular(30.0),
               border: Border.all(color: AppColors.border, width: 1.0),
             ),
             child: Row(
@@ -338,7 +631,11 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
           // 2x2 Grid of Issue Cards matching reference
           if (filteredIssues.isEmpty)
-            _buildEmptyState()
+            _buildEmptyState(
+              title: 'No Ongoing Issues',
+              subtitle: 'No active grievances found in this area. Notice a problem in your neighborhood?',
+              buttonText: 'File a Grievance',
+            )
           else
             GridView.builder(
               shrinkWrap: true,
@@ -348,13 +645,12 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 crossAxisCount: 2,
                 crossAxisSpacing: 12.0,
                 mainAxisSpacing: 12.0,
-                childAspectRatio: 0.74,
+                childAspectRatio: 0.72,
               ),
               itemBuilder: (context, index) {
                 final issue = filteredIssues[index];
                 return DashboardIssueCard(
                   issue: issue,
-                  isFeatured: index == 0,
                   onTap: () => _navigateToDetail(issue),
                 );
               },
@@ -367,59 +663,298 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // TAB 1: MY ISSUES (ALL FILED ISSUES)
+  // TAB 1: MY ISSUES (ALL FILED ISSUES - REDESIGNED PER REFERENCE)
   // ---------------------------------------------------------------------------
   Widget _buildMyIssuesTab() {
+    final query = _myIssuesSearchController.text.trim().toLowerCase();
+    final filteredIssues = _issues.where((issue) {
+      final matchesQuery = query.isEmpty ||
+          issue.title.toLowerCase().contains(query) ||
+          issue.description.toLowerCase().contains(query) ||
+          issue.location.toLowerCase().contains(query) ||
+          issue.category.toLowerCase().contains(query) ||
+          issue.id.toLowerCase().contains(query);
+
+      // Status filter
+      bool matchesStatus = true;
+      if (_myIssuesStatusFilter == 'Issued') {
+        matchesStatus = issue.status == IssueStatus.underReview;
+      } else if (_myIssuesStatusFilter == 'In Progress') {
+        matchesStatus = issue.status == IssueStatus.inProgress;
+      } else if (_myIssuesStatusFilter == 'Resolved') {
+        matchesStatus = issue.status == IssueStatus.resolved;
+      }
+
+      // Location filter
+      bool matchesLocation = true;
+      if (_myIssuesLocationFilter != 'All') {
+        matchesLocation = issue.location
+            .toLowerCase()
+            .contains(_myIssuesLocationFilter.toLowerCase());
+      }
+
+      // Category filter
+      bool matchesCategory = true;
+      if (_myIssuesCategoryFilter != 'All') {
+        matchesCategory = issue.category
+            .toLowerCase()
+            .contains(_myIssuesCategoryFilter.toLowerCase());
+      }
+
+      return matchesQuery && matchesStatus && matchesLocation && matchesCategory;
+    }).toList();
+
+    final hasActiveFilter = _myIssuesStatusFilter != 'All' ||
+        _myIssuesLocationFilter != 'All' ||
+        _myIssuesCategoryFilter != 'All';
+
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
       padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // 1. Search Bar Pill with Filter Action matching reference image
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(30.0),
+              border: Border.all(color: AppColors.border, width: 1.0),
+            ),
+            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+            child: Row(
+              children: [
+                const Icon(
+                  FeatherIcons.search,
+                  size: 18,
+                  color: AppColors.secondaryText,
+                ),
+                const SizedBox(width: 10),
+                Expanded(
+                  child: TextField(
+                    controller: _myIssuesSearchController,
+                    onChanged: (val) => setState(() {}),
+                    style: AppTypography.inputText(context).copyWith(fontSize: 14),
+                    decoration: InputDecoration(
+                      hintText: 'Search grievances, ID, location...',
+                      hintStyle: AppTypography.placeholder(context).copyWith(
+                        fontSize: 14,
+                        color: AppColors.mutedText,
+                      ),
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
+                    ),
+                  ),
+                ),
+                Container(
+                  width: 1.0,
+                  height: 20.0,
+                  color: AppColors.border,
+                ),
+                const SizedBox(width: 10),
+                GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: _openFilterBottomSheet,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 4.0),
+                    child: Icon(
+                      FeatherIcons.sliders,
+                      size: 16,
+                      color: hasActiveFilter
+                          ? AppColors.primaryText
+                          : AppColors.secondaryText,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 14),
+
+          // 2. Section Filter - Primary Status Segmented Bar
+          Container(
+            decoration: BoxDecoration(
+              color: AppColors.inputBackground,
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(color: AppColors.border, width: 1.0),
+            ),
+            padding: const EdgeInsets.all(3.0),
+            child: Row(
+              children: _myIssuesStatusSections.map((status) {
+                final isSelected = _myIssuesStatusFilter == status;
+                return Expanded(
+                  child: GestureDetector(
+                    behavior: HitTestBehavior.opaque,
+                    onTap: () {
+                      setState(() {
+                        _myIssuesStatusFilter = status;
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 150),
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      decoration: BoxDecoration(
+                        color: isSelected
+                            ? AppColors.primaryButton
+                            : Colors.transparent,
+                        borderRadius: BorderRadius.circular(9.0),
+                      ),
+                      child: Text(
+                        status,
+                        textAlign: TextAlign.center,
+                        style: AppTypography.supporting(context).copyWith(
+                          fontSize: 12,
+                          fontWeight:
+                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                          color: isSelected
+                              ? AppColors.buttonText
+                              : AppColors.secondaryText,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }).toList(),
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          // 2b. Location Filter Dropdown (Locations where issues have been filed)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 2.0),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(color: AppColors.border, width: 1.0),
+            ),
+            child: DropdownButtonHideUnderline(
+              child: DropdownButton<String>(
+                value: _availableLocations.contains(_myIssuesLocationFilter == 'All' ? 'All Locations' : _myIssuesLocationFilter)
+                    ? (_myIssuesLocationFilter == 'All' ? 'All Locations' : _myIssuesLocationFilter)
+                    : 'All Locations',
+                isExpanded: true,
+                icon: const Icon(
+                  FeatherIcons.chevronDown,
+                  size: 16,
+                  color: AppColors.secondaryText,
+                ),
+                borderRadius: BorderRadius.circular(12.0),
+                dropdownColor: AppColors.background,
+                items: _availableLocations.map((loc) {
+                  final isAll = loc == 'All Locations';
+                  final isSelected = (_myIssuesLocationFilter == 'All' && isAll) ||
+                      _myIssuesLocationFilter == loc;
+                  return DropdownMenuItem<String>(
+                    value: loc,
+                    child: Row(
+                      children: [
+                        Icon(
+                          isAll ? FeatherIcons.map : FeatherIcons.mapPin,
+                          size: 14,
+                          color: isSelected ? AppColors.primaryText : AppColors.secondaryText,
+                        ),
+                        const SizedBox(width: 10),
+                        Expanded(
+                          child: Text(
+                            loc,
+                            style: AppTypography.supporting(context).copyWith(
+                              fontSize: 13.5,
+                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              color: AppColors.primaryText,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+                onChanged: (val) {
+                  if (val != null) {
+                    setState(() {
+                      _myIssuesLocationFilter = val == 'All Locations' ? 'All' : val;
+                    });
+                  }
+                },
+              ),
+            ),
+          ),
+
+          const SizedBox(height: 18),
+
+          // 3. Locality / Ward Title Header matching reference image
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                'My Issues',
-                style: AppTypography.heading(context).copyWith(
-                  fontSize: 22,
-                  fontWeight: FontWeight.w700,
+              Expanded(
+                child: Text(
+                  _myIssuesLocationFilter != 'All'
+                      ? _myIssuesLocationFilter
+                      : 'All Reported Locations',
+                  style: AppTypography.heading(context).copyWith(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  overflow: TextOverflow.ellipsis,
                 ),
               ),
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12.0, vertical: 4.0),
-                decoration: BoxDecoration(
-                  color: AppColors.primaryText,
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                child: Text(
-                  '${_issues.length}',
-                  style: AppTypography.supporting(context).copyWith(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: Colors.white,
+              const SizedBox(width: 8),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (hasActiveFilter)
+                    GestureDetector(
+                      onTap: () {
+                        setState(() {
+                          _myIssuesStatusFilter = 'All';
+                          _myIssuesLocationFilter = 'All';
+                          _myIssuesCategoryFilter = 'All';
+                          _myIssuesSearchController.clear();
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(right: 8.0),
+                        child: Text(
+                          'Clear',
+                          style: AppTypography.supporting(context).copyWith(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.secondaryText,
+                          ),
+                        ),
+                      ),
+                    ),
+                  Text(
+                    '${filteredIssues.length} issues',
+                    style: AppTypography.supporting(context).copyWith(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.secondaryText,
+                    ),
                   ),
-                ),
+                ],
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          Text(
-            'All public grievances filed by you and their current status.',
-            style: AppTypography.supporting(context).copyWith(fontSize: 13),
-          ),
-          const SizedBox(height: 20),
 
-          if (_issues.isEmpty)
-            _buildEmptyState()
+          const SizedBox(height: 14),
+
+          // 4. Issue Cards List
+          if (filteredIssues.isEmpty)
+            _buildEmptyState(
+              title: 'No Issues Found',
+              subtitle: 'All clear in your selected area.',
+              showButton: false,
+            )
           else
             ListView.builder(
               shrinkWrap: true,
               physics: const NeverScrollableScrollPhysics(),
-              itemCount: _issues.length,
+              itemCount: filteredIssues.length,
               itemBuilder: (context, index) {
-                final issue = _issues[index];
+                final issue = filteredIssues[index];
                 return IssueCard(
                   issue: issue,
                   onTap: () => _navigateToDetail(issue),
@@ -451,8 +986,127 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   final TextEditingController _formTitleController = TextEditingController();
   final TextEditingController _formDescriptionController = TextEditingController();
 
-  String _formSelectedCategory = 'Roads & Infrastructure';
   bool _formHasAttachedMedia = false;
+  bool _formIsLocationShared = false;
+
+  Future<void> _requestLocationPermission() async {
+    final bool? granted = await showDialog<bool>(
+      context: context,
+      builder: (BuildContext ctx) {
+        return Dialog(
+          backgroundColor: AppColors.background,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16.0),
+          ),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  width: 48,
+                  height: 48,
+                  decoration: BoxDecoration(
+                    color: AppColors.inputBackground,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: const Icon(
+                    FeatherIcons.mapPin,
+                    size: 22,
+                    color: AppColors.primaryText,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  'Allow JanSeva to access this device\'s location?',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.heading(context).copyWith(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Precise GPS location is used to pinpoint civic issues and dispatch departmental response teams directly to the site.',
+                  textAlign: TextAlign.center,
+                  style: AppTypography.supporting(context).copyWith(
+                    fontSize: 12.5,
+                    color: AppColors.secondaryText,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primaryButton,
+                      foregroundColor: AppColors.buttonText,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 12.0),
+                      elevation: 0,
+                    ),
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: const Text(
+                      'While Using the App',
+                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: TextButton(
+                    style: TextButton.styleFrom(
+                      foregroundColor: AppColors.secondaryText,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12.0),
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 10.0),
+                    ),
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: const Text(
+                      'Don\'t Allow',
+                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13.5),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+
+    if (granted == true) {
+      setState(() {
+        _formIsLocationShared = true;
+        _formAddressController.text = 'Near Anna Nagar Junction, 2nd Avenue';
+        _formCityWardController.text = 'Ward 4, Zone 2';
+        _formPincodeController.text = '600040';
+      });
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location permission granted! Address details auto-filled from GPS.'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    } else if (granted == false) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location permission denied. Please enter address manually.'),
+            duration: Duration(seconds: 3),
+          ),
+        );
+      }
+    }
+  }
 
   void _onFormSubmit() {
     final titleText = _formTitleController.text.trim().isEmpty
@@ -465,10 +1119,25 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         ? 'Sector 12, Main Ward'
         : '${_formAddressController.text.trim()}, ${_formCityWardController.text.trim()}';
 
+    // Model auto-classification based on reported content
+    String detectedCategory = 'Roads & Infrastructure';
+    final lower = '$titleText $descriptionText'.toLowerCase();
+    if (lower.contains('water') || lower.contains('pipe') || lower.contains('drain') || lower.contains('leak')) {
+      detectedCategory = 'Water & Utilities';
+    } else if (lower.contains('light') || lower.contains('electric') || lower.contains('wire') || lower.contains('power')) {
+      detectedCategory = 'Electrical & Lighting';
+    } else if (lower.contains('waste') || lower.contains('garbage') || lower.contains('trash') || lower.contains('sanitation') || lower.contains('clean')) {
+      detectedCategory = 'Sanitation & Health';
+    } else if (lower.contains('road') || lower.contains('pothole') || lower.contains('traffic') || lower.contains('street') || lower.contains('bridge')) {
+      detectedCategory = 'Roads & Infrastructure';
+    } else {
+      detectedCategory = 'Civic Infrastructure';
+    }
+
     final newIssue = IssueItem(
       id: 'ISS-2026-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
       title: titleText,
-      category: _formSelectedCategory,
+      category: detectedCategory,
       description: descriptionText,
       location: locationText,
       dateFiled: 'Today',
@@ -485,7 +1154,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     });
 
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Grievance filed successfully!')),
+      SnackBar(content: Text('Grievance filed! Auto-classified as: $detectedCategory')),
     );
   }
 
@@ -496,7 +1165,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Top Heading Bar matching reference image
+          // Top Heading Bar
           _buildFormTopBar(),
 
           const SizedBox(height: 18),
@@ -527,12 +1196,55 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           const SizedBox(height: 24),
 
           // SECTION 2: Grievance Location
-          _buildFormSectionHeader(2, 'Grievance Location'),
+          _buildFormSectionHeader(
+            2,
+            'Grievance Location',
+            trailing: GestureDetector(
+              onTap: _requestLocationPermission,
+              child: Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                decoration: BoxDecoration(
+                  color: _formIsLocationShared
+                      ? AppColors.inputBackground
+                      : AppColors.background,
+                  borderRadius: BorderRadius.circular(20.0),
+                  border: Border.all(
+                    color: _formIsLocationShared
+                        ? AppColors.primaryText
+                        : AppColors.border,
+                    width: 1.0,
+                  ),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(
+                      _formIsLocationShared ? FeatherIcons.check : FeatherIcons.mapPin,
+                      size: 13,
+                      color: AppColors.primaryText,
+                    ),
+                    const SizedBox(width: 5),
+                    Text(
+                      _formIsLocationShared ? 'GPS Linked' : 'Use GPS',
+                      style: AppTypography.supporting(context).copyWith(
+                        fontSize: 11.5,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.primaryText,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ),
           const SizedBox(height: 12),
+
           _buildFormInputField(
             controller: _formAddressController,
             placeholder: 'Address (House no., Street name)',
             icon: FeatherIcons.mapPin,
+            suffixIcon: FeatherIcons.crosshair,
+            onSuffixTap: _requestLocationPermission,
           ),
           const SizedBox(height: 10),
           Row(
@@ -558,14 +1270,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
           const SizedBox(height: 24),
 
-          // SECTION 3: Issue Category & Details
-          _buildFormSectionHeader(3, 'Issue Category & Details'),
+          // SECTION 3: Issue Details
+          _buildFormSectionHeader(3, 'Issue Details'),
           const SizedBox(height: 12),
-
-          // 4 Category Tiles matching the reference selector style
-          _buildCategoryTiles(),
-
-          const SizedBox(height: 14),
 
           _buildFormInputField(
             controller: _formTitleController,
@@ -577,7 +1284,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             controller: _formDescriptionController,
             placeholder: 'Detailed problem description...',
             icon: FeatherIcons.alignLeft,
-            maxLines: 3,
+            maxLines: 4,
           ),
 
           const SizedBox(height: 16),
@@ -601,7 +1308,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  // Top Bar matching reference image with centered title/subtitle and security shield
+  // Top Bar with centered title and back button
   Widget _buildFormTopBar() {
     return Row(
       children: [
@@ -624,55 +1331,30 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           ),
         ),
         Expanded(
-          child: Column(
-            children: [
-              Text(
-                'File Grievance',
-                style: AppTypography.heading(context).copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
+          child: Center(
+            child: Text(
+              'File Grievance',
+              style: AppTypography.heading(context).copyWith(
+                fontSize: 18,
+                fontWeight: FontWeight.w700,
               ),
-              const SizedBox(height: 2),
-              Text(
-                'Submit municipal issue securely',
-                style: AppTypography.supporting(context).copyWith(
-                  fontSize: 12,
-                  color: AppColors.secondaryText,
-                ),
-              ),
-            ],
-          ),
-        ),
-        Container(
-          width: 36,
-          height: 36,
-          decoration: BoxDecoration(
-            color: const Color(0xFFF0FDF4),
-            borderRadius: BorderRadius.circular(10.0),
-            border: Border.all(color: const Color(0xFFDCFCE7), width: 1.0),
-          ),
-          child: const Center(
-            child: Icon(
-              FeatherIcons.shield,
-              size: 16,
-              color: Color(0xFF16A34A),
             ),
           ),
         ),
+        const SizedBox(width: 36), // Balances the leading back button for true centering
       ],
     );
   }
 
-  // Numbered step badge + section heading
-  Widget _buildFormSectionHeader(int step, String title) {
+  // Monochromatic Numbered step badge + section heading
+  Widget _buildFormSectionHeader(int step, String title, {Widget? trailing}) {
     return Row(
       children: [
         Container(
           width: 22,
           height: 22,
           decoration: const BoxDecoration(
-            color: Color(0xFF16A34A),
+            color: AppColors.primaryButton,
             shape: BoxShape.circle,
           ),
           child: Center(
@@ -687,13 +1369,16 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           ),
         ),
         const SizedBox(width: 10),
-        Text(
-          title,
-          style: AppTypography.heading(context).copyWith(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
+        Expanded(
+          child: Text(
+            title,
+            style: AppTypography.heading(context).copyWith(
+              fontSize: 15,
+              fontWeight: FontWeight.w700,
+            ),
           ),
         ),
+        ?trailing,
       ],
     );
   }
@@ -703,6 +1388,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     required TextEditingController controller,
     required String placeholder,
     required IconData icon,
+    IconData? suffixIcon,
+    VoidCallback? onSuffixTap,
     int maxLines = 1,
     TextInputType keyboardType = TextInputType.text,
   }) {
@@ -744,182 +1431,19 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               ),
             ),
           ),
-        ],
-      ),
-    );
-  }
-
-  // Category Tiles matching the payment methods in reference image
-  Widget _buildCategoryTiles() {
-    final categories = [
-      {'id': 'Roads & Infrastructure', 'label': 'Roads', 'icon': FeatherIcons.mapPin},
-      {'id': 'Water & Utilities', 'label': 'Water', 'icon': FeatherIcons.droplet},
-      {'id': 'Electrical & Lighting', 'label': 'Electrical', 'icon': FeatherIcons.zap},
-      {'id': 'Sanitation & Health', 'label': 'Sanitation', 'icon': FeatherIcons.trash},
-    ];
-
-    return Row(
-      children: categories.map((cat) {
-        final id = cat['id'] as String;
-        final label = cat['label'] as String;
-        final icon = cat['icon'] as IconData;
-        final isSelected = _formSelectedCategory == id;
-
-        return Expanded(
-          child: GestureDetector(
-            onTap: () {
-              setState(() {
-                _formSelectedCategory = id;
-              });
-            },
-            child: Container(
-              margin: const EdgeInsets.symmetric(horizontal: 3.0),
-              padding: const EdgeInsets.symmetric(vertical: 12.0, horizontal: 4.0),
-              decoration: BoxDecoration(
-                color: isSelected ? const Color(0xFFF0FDF4) : AppColors.background,
-                borderRadius: BorderRadius.circular(12.0),
-                border: Border.all(
-                  color: isSelected ? const Color(0xFF16A34A) : AppColors.border,
-                  width: isSelected ? 1.5 : 1.0,
+          if (suffixIcon != null)
+            GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: onSuffixTap,
+              child: Padding(
+                padding: const EdgeInsets.only(left: 6.0),
+                child: Icon(
+                  suffixIcon,
+                  size: 18,
+                  color: AppColors.primaryText,
                 ),
               ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    icon,
-                    size: 20,
-                    color: isSelected ? const Color(0xFF16A34A) : AppColors.primaryText,
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    label,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: AppTypography.supporting(context).copyWith(
-                      fontSize: 11,
-                      fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-                      color: isSelected ? const Color(0xFF16A34A) : AppColors.primaryText,
-                    ),
-                  ),
-                ],
-              ),
             ),
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // TAB 3: ACTIVITY / NOTIFICATIONS
-  // ---------------------------------------------------------------------------
-  Widget _buildActivityTab() {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            'Recent Activity',
-            style: AppTypography.heading(context).copyWith(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Live updates and status changes on your reported grievances.',
-            style: AppTypography.supporting(context).copyWith(fontSize: 13),
-          ),
-          const SizedBox(height: 20),
-
-          _buildActivityTile(
-            icon: FeatherIcons.checkCircle,
-            title: 'Streetlight outage marked Resolved',
-            subtitle: 'Municipal Electrical Division completed inspection',
-            time: '2h ago',
-          ),
-          _buildActivityTile(
-            icon: FeatherIcons.truck,
-            title: 'Road damage inspection scheduled',
-            subtitle: 'Assigned to Public Works Department field unit',
-            time: 'Yesterday',
-          ),
-          _buildActivityTile(
-            icon: FeatherIcons.droplet,
-            title: 'Water supply interruption under review',
-            subtitle: 'Sector 4 water lines triage in progress',
-            time: '3 days ago',
-          ),
-          _buildActivityTile(
-            icon: FeatherIcons.fileText,
-            title: 'Citizen grievance submitted',
-            subtitle: 'Reference ISS-2026-001 created successfully',
-            time: '4 days ago',
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActivityTile({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required String time,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12.0),
-      padding: const EdgeInsets.all(16.0),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(14.0),
-        border: Border.all(color: AppColors.border, width: 1.0),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(10.0),
-            decoration: BoxDecoration(
-              color: AppColors.inputBackground,
-              borderRadius: BorderRadius.circular(10.0),
-            ),
-            child: Icon(icon, size: 18, color: AppColors.primaryText),
-          ),
-          const SizedBox(width: 14),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: AppTypography.heading(context).copyWith(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  subtitle,
-                  style: AppTypography.supporting(context).copyWith(
-                    fontSize: 12,
-                    color: AppColors.secondaryText,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          const SizedBox(width: 8),
-          Text(
-            time,
-            style: AppTypography.supporting(context).copyWith(
-              fontSize: 11,
-              color: AppColors.mutedText,
-            ),
-          ),
         ],
       ),
     );
@@ -1112,39 +1636,78 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(vertical: 36.0, horizontal: 20.0),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(16.0),
-        border: Border.all(color: AppColors.border, width: 1.0),
-      ),
-      child: Column(
-        children: [
-          const Icon(
-            FeatherIcons.inbox,
-            size: 40,
-            color: AppColors.mutedText,
-          ),
-          const SizedBox(height: 12),
-          Text(
-            'No issues found',
-            style: AppTypography.heading(context).copyWith(
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
+  Widget _buildEmptyState({
+    String title = 'No Issues Found',
+    String subtitle = 'All clear in your selected area. Have a municipal concern to report?',
+    String buttonText = 'File a Grievance',
+    bool showButton = true,
+    double animationHeight = 280,
+  }) {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 20.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            // Centered Lottie Animation with fallback
+            SizedBox(
+              height: animationHeight,
+              child: Lottie.asset(
+                'lib/assets/no_issues_found.json',
+                fit: BoxFit.contain,
+                errorBuilder: (context, error, stackTrace) {
+                  return Lottie.asset(
+                    'assets/animations/no_issues_found.json',
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, err2, stack2) {
+                      return const Icon(
+                        FeatherIcons.checkCircle,
+                        size: 80,
+                        color: AppColors.primaryText,
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-          const SizedBox(height: 6),
-          Text(
-            'Report a problem in your community to track it here.',
-            textAlign: TextAlign.center,
-            style: AppTypography.supporting(context).copyWith(
-              fontSize: 13,
+            const SizedBox(height: 16),
+
+            // Headline Message
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              style: AppTypography.heading(context).copyWith(
+                fontSize: 22,
+                fontWeight: FontWeight.w700,
+                letterSpacing: -0.4,
+              ),
             ),
-          ),
-        ],
+            const SizedBox(height: 8),
+
+            // Sub-Message
+            Text(
+              subtitle,
+              textAlign: TextAlign.center,
+              style: AppTypography.supporting(context).copyWith(
+                fontSize: 14.5,
+                color: AppColors.secondaryText,
+                height: 1.35,
+              ),
+            ),
+
+            if (showButton) ...[
+              const SizedBox(height: 20),
+              SizedBox(
+                width: 220,
+                child: PrimaryButton(
+                  text: buttonText,
+                  onPressed: _onFileIssuePressed,
+                ),
+              ),
+            ],
+          ],
+        ),
       ),
     );
   }

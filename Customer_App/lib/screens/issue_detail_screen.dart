@@ -1,5 +1,6 @@
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import '../models/issue_model.dart';
 import '../theme/app_theme.dart';
 
@@ -10,6 +11,79 @@ class IssueDetailScreen extends StatelessWidget {
     super.key,
     required this.issue,
   });
+
+  String _getCategoryAnimation(String category) {
+    final lower = category.toLowerCase();
+    if (lower.contains('water') ||
+        lower.contains('pipe') ||
+        lower.contains('drain') ||
+        lower.contains('leak') ||
+        lower.contains('sewage')) {
+      return 'assets/animations/water.json';
+    } else if (lower.contains('elect') ||
+        lower.contains('light') ||
+        lower.contains('power') ||
+        lower.contains('energy') ||
+        lower.contains('wire')) {
+      return 'assets/animations/energy.json';
+    } else if (lower.contains('sanitat') ||
+        lower.contains('waste') ||
+        lower.contains('garbage') ||
+        lower.contains('trash') ||
+        lower.contains('clean')) {
+      return 'assets/animations/sanitation.json';
+    } else if (lower.contains('road') ||
+        lower.contains('infra') ||
+        lower.contains('pothole') ||
+        lower.contains('bridge') ||
+        lower.contains('traffic') ||
+        lower.contains('street') ||
+        lower.contains('urban')) {
+      return 'assets/animations/urban_infrastructure.json';
+    } else if (lower.contains('health') ||
+        lower.contains('med') ||
+        lower.contains('hosp') ||
+        lower.contains('clinic')) {
+      return 'assets/animations/healthcare.json';
+    } else if (lower.contains('edu') ||
+        lower.contains('school') ||
+        lower.contains('college')) {
+      return 'assets/animations/education.json';
+    } else if (lower.contains('agri') ||
+        lower.contains('farm') ||
+        lower.contains('crop')) {
+      return 'assets/animations/Agriculture.json';
+    } else if (lower.contains('access') ||
+        lower.contains('disab') ||
+        lower.contains('ramp')) {
+      return 'assets/animations/accesibility.json';
+    } else {
+      return 'assets/animations/public_administration.json';
+    }
+  }
+
+  Widget _buildLottieAnimation(String category) {
+    final primaryPath = _getCategoryAnimation(category);
+    final fallbackPath = primaryPath.startsWith('assets/animations/')
+        ? primaryPath.replaceFirst('assets/animations/', 'lib/assets/')
+        : primaryPath.replaceFirst('lib/assets/', 'assets/animations/');
+
+    return Lottie.asset(
+      primaryPath,
+      fit: BoxFit.contain,
+      repeat: true,
+      errorBuilder: (context, error, stackTrace) {
+        return Lottie.asset(
+          fallbackPath,
+          fit: BoxFit.contain,
+          repeat: true,
+          errorBuilder: (context, err2, stack2) {
+            return const SizedBox.shrink();
+          },
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -29,54 +103,15 @@ class IssueDetailScreen extends StatelessWidget {
             fontWeight: FontWeight.w700,
           ),
         ),
-        bottom: const PreferredSize(
-          preferredSize: Size.fromHeight(1.0),
-          child: Divider(height: 1, thickness: 1, color: AppColors.divider),
-        ),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
-          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 20.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header tag & ID
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Container(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 10.0, vertical: 4.0),
-                    decoration: BoxDecoration(
-                      color: AppColors.inputBackground,
-                      borderRadius: BorderRadius.circular(6.0),
-                      border: Border.all(color: AppColors.border, width: 1.0),
-                    ),
-                    child: Text(
-                      issue.category.toUpperCase(),
-                      style: AppTypography.supporting(context).copyWith(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
-                        color: AppColors.primaryText,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    issue.id,
-                    style: AppTypography.supporting(context).copyWith(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                      color: AppColors.mutedText,
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 16),
-
-              // Title
+              // Title (Issue Name)
               Text(
                 issue.title,
                 style: AppTypography.heading(context).copyWith(
@@ -86,7 +121,7 @@ class IssueDetailScreen extends StatelessWidget {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 8),
 
               // Location and Date Row
               Row(
@@ -116,15 +151,44 @@ class IssueDetailScreen extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 24),
-              const Divider(height: 1, thickness: 1, color: AppColors.divider),
-              const SizedBox(height: 24),
+              const SizedBox(height: 16),
 
-              // Status Timeline Section
+              // Domain Animation (Blending with background)
+              SizedBox(
+                width: double.infinity,
+                height: 210,
+                child: Center(
+                  child: _buildLottieAnimation(issue.category),
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // 1. Description Section (Followed by description)
+              Text(
+                'Description',
+                style: AppTypography.heading(context).copyWith(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                issue.description,
+                style: AppTypography.supporting(context).copyWith(
+                  fontSize: 15,
+                  height: 1.45,
+                  color: AppColors.primaryText,
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              // 2. Status & Timeline Section (Lastly Status and timeline)
               Text(
                 'Status & Timeline',
                 style: AppTypography.heading(context).copyWith(
-                  fontSize: 16,
+                  fontSize: 18,
                   fontWeight: FontWeight.w700,
                 ),
               ),
@@ -158,28 +222,6 @@ class IssueDetailScreen extends StatelessWidget {
                 isCompleted: issue.status == IssueStatus.resolved,
                 isCurrent: issue.status == IssueStatus.resolved,
                 isLast: true,
-              ),
-
-              const SizedBox(height: 20),
-              const Divider(height: 1, thickness: 1, color: AppColors.divider),
-              const SizedBox(height: 24),
-
-              // Description Section
-              Text(
-                'Description',
-                style: AppTypography.heading(context).copyWith(
-                  fontSize: 16,
-                  fontWeight: FontWeight.w700,
-                ),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                issue.description,
-                style: AppTypography.supporting(context).copyWith(
-                  fontSize: 15,
-                  height: 1.45,
-                  color: AppColors.primaryText,
-                ),
               ),
 
               const SizedBox(height: 32),
@@ -255,9 +297,9 @@ class IssueDetailScreen extends StatelessWidget {
               Text(
                 title,
                 style: AppTypography.heading(context).copyWith(
-                  fontSize: 15,
+                  fontSize: 15.5,
                   fontWeight:
-                      isCurrent || isCompleted ? FontWeight.w600 : FontWeight.w400,
+                      isCurrent || isCompleted ? FontWeight.w600 : FontWeight.w500,
                   color: isCurrent || isCompleted
                       ? AppColors.primaryText
                       : AppColors.mutedText,
