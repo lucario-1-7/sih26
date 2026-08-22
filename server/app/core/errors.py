@@ -1,8 +1,13 @@
+import logging
 import uuid
 
 from fastapi import FastAPI, HTTPException, Request, status
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+
+from app.services.ml_client import MLServiceError
+
+logger = logging.getLogger("app.errors")
 
 
 class AppError(HTTPException):
@@ -25,6 +30,20 @@ def register_exception_handlers(app: FastAPI) -> None:
         else:
             payload = {"detail": str(body), "code": "HTTP_ERROR", "request_id": request_id}
         return JSONResponse(status_code=exc.status_code, content=payload)
+
+    @app.exception_handler(MLServiceError)
+    async def ml_service_error_handler(request: Request, exc: MLServiceError):
+        # Never leak the underlying httpx exception message (connection
+        # details, internal hostnames) to clients — log it server-side instead.
+        logger.error("ml_service_unavailable request_id=%s error=%s", _request_id(request), exc)
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "detail": "The ML service is temporarily unavailable. Please try again shortly.",
+                "code": "ML_SERVICE_UNAVAILABLE",
+                "request_id": _request_id(request),
+            },
+        )
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):

@@ -24,7 +24,8 @@ from app.core.security import TokenType, create_token
 from app.db.session import AsyncSessionLocal
 from app.main import app
 from app.models.administrative_area import AdministrativeArea
-from app.models.enums import AdministrativeLevel, Role
+from app.models.enums import AdministrativeLevel, Domain, OrganizationType, Role
+from app.models.organization import Organization
 from app.models.user import User
 
 
@@ -50,8 +51,16 @@ async def administrative_area(db: AsyncSession) -> AdministrativeArea:
     return area
 
 
-async def _make_user(db: AsyncSession, role: Role) -> User:
-    user = User(phone=f"+91{uuid.uuid4().int % 10**10:010d}", name=f"Test {role.value}", role=role)
+async def _make_user(
+    db: AsyncSession, role: Role, domain: Domain, organization_id: uuid.UUID | None = None
+) -> User:
+    user = User(
+        phone=f"+91{uuid.uuid4().int % 10**10:010d}",
+        name=f"Test {role.value}",
+        role=role,
+        domain=domain,
+        organization_id=organization_id,
+    )
     db.add(user)
     await db.commit()
     await db.refresh(user)
@@ -60,17 +69,55 @@ async def _make_user(db: AsyncSession, role: Role) -> User:
 
 @pytest_asyncio.fixture
 async def citizen_user(db: AsyncSession) -> User:
-    return await _make_user(db, Role.CITIZEN)
+    return await _make_user(db, Role.CITIZEN, Domain.CITIZEN)
 
 
 @pytest_asyncio.fixture
-async def officer_user(db: AsyncSession) -> User:
-    return await _make_user(db, Role.OFFICER)
+async def field_assistant_user(db: AsyncSession) -> User:
+    return await _make_user(db, Role.FIELD_ASSISTANT, Domain.GOVERNMENT)
 
 
 @pytest_asyncio.fixture
-async def admin_user(db: AsyncSession) -> User:
-    return await _make_user(db, Role.ADMIN)
+async def validator_user(db: AsyncSession) -> User:
+    return await _make_user(db, Role.VALIDATOR, Domain.GOVERNMENT)
+
+
+@pytest_asyncio.fixture
+async def superadmin_user(db: AsyncSession) -> User:
+    return await _make_user(db, Role.SUPERADMIN, Domain.SUPERADMIN)
+
+
+async def _make_organization(db: AsyncSession, type: OrganizationType) -> Organization:
+    org = Organization(name=f"Test {type.value} Org {uuid.uuid4().hex[:8]}", type=type, domain_tags=[])
+    db.add(org)
+    await db.commit()
+    await db.refresh(org)
+    return org
+
+
+@pytest_asyncio.fixture
+async def university_org(db: AsyncSession) -> Organization:
+    return await _make_organization(db, OrganizationType.UNIVERSITY)
+
+
+@pytest_asyncio.fixture
+async def industry_org(db: AsyncSession) -> Organization:
+    return await _make_organization(db, OrganizationType.INDUSTRY)
+
+
+@pytest_asyncio.fixture
+async def coordinator_user(db: AsyncSession, university_org: Organization) -> User:
+    return await _make_user(db, Role.COORDINATOR, Domain.UNIVERSITY, university_org.id)
+
+
+@pytest_asyncio.fixture
+async def faculty_user(db: AsyncSession, university_org: Organization) -> User:
+    return await _make_user(db, Role.FACULTY, Domain.UNIVERSITY, university_org.id)
+
+
+@pytest_asyncio.fixture
+async def industry_user(db: AsyncSession, industry_org: Organization) -> User:
+    return await _make_user(db, Role.INDUSTRY, Domain.INDUSTRY, industry_org.id)
 
 
 def auth_headers(user: User) -> dict:

@@ -18,3 +18,8 @@ async def enqueue_duplicate_candidate_generation(challenge_id: str) -> None:
 async def enqueue_consortium_suggestion(project_id: str, team_size: int) -> None:
     pool = await get_arq_pool()
     await pool.enqueue_job("generate_consortium_suggestion", project_id, team_size)
+
+
+async def enqueue_cluster_embedding_generation(cluster_id: str) -> None:
+    pool = await get_arq_pool()
+    await pool.enqueue_job("generate_cluster_embedding", cluster_id)

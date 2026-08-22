@@ -20,9 +20,9 @@ router = APIRouter(prefix="/challenges", tags=["challenges"])
 async def create_challenge(
     payload: ChallengeCreate,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(require_role(Role.CITIZEN, Role.OFFICER, Role.ADMIN)),
+    user: User = Depends(require_role(Role.CITIZEN, Role.FIELD_ASSISTANT)),
 ) -> ChallengeResponse:
-    challenge = await challenge_service.create_challenge(db, data=payload, actor_id=user.id)
+    challenge = await challenge_service.create_challenge(db, data=payload, actor=user)
     return ChallengeResponse.model_validate(challenge)
 
 
@@ -32,20 +32,20 @@ async def list_challenges(
     submitted_by_id: uuid.UUID | None = None,
     cluster_id: uuid.UUID | None = None,
     limit: int = Query(default=20, ge=1, le=100),
-    offset: int = Query(default=0, ge=0),
+    cursor: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ) -> PaginatedResponse[ChallengeResponse]:
-    challenges = await challenge_service.list_challenges(
+    challenges, next_cursor = await challenge_service.list_challenges(
         db,
         status_filter=status_filter,
         submitted_by_id=submitted_by_id,
         cluster_id=cluster_id,
         limit=limit,
-        offset=offset,
+        cursor=cursor,
     )
     return PaginatedResponse(
         items=[ChallengeResponse.model_validate(c) for c in challenges],
-        next_cursor=str(offset + limit) if len(challenges) == limit else None,
+        next_cursor=next_cursor,
     )
 
 
@@ -60,7 +60,7 @@ async def update_challenge(
     challenge_id: uuid.UUID,
     payload: ChallengeUpdate,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(require_role(Role.CITIZEN, Role.OFFICER, Role.ADMIN)),
+    user: User = Depends(require_role(Role.CITIZEN, Role.FIELD_ASSISTANT, Role.VALIDATOR)),
 ) -> ChallengeResponse:
-    challenge = await challenge_service.update_challenge(db, challenge_id, data=payload, actor_id=user.id)
+    challenge = await challenge_service.update_challenge(db, challenge_id, data=payload, actor=user)
     return ChallengeResponse.model_validate(challenge)

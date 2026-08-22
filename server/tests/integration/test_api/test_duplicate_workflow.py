@@ -7,7 +7,7 @@ from tests.conftest import auth_headers
 
 @pytest.mark.asyncio
 async def test_duplicate_decision_requires_human_review_and_is_never_automatic(
-    client, db, administrative_area, citizen_user, officer_user
+    client, db, administrative_area, citizen_user, validator_user
 ):
     original = Challenge(
         title="Broken streetlight near market",
@@ -38,7 +38,7 @@ async def test_duplicate_decision_requires_human_review_and_is_never_automatic(
 
     resp = await client.get(
         f"/api/v1/duplicate/challenges/{duplicate_report.id}/candidates",
-        headers=auth_headers(officer_user),
+        headers=auth_headers(validator_user),
     )
     assert resp.status_code == 200
     candidates = resp.json()
@@ -65,12 +65,12 @@ async def test_duplicate_decision_requires_human_review_and_is_never_automatic(
             "decision": "duplicate",
             "reason": "Same streetlight, same location.",
         },
-        headers=auth_headers(officer_user),
+        headers=auth_headers(validator_user),
     )
     assert resp.status_code == 201
     body = resp.json()
     assert body["decision"] == "duplicate"
-    assert body["reviewer_id"] == str(officer_user.id)
+    assert body["reviewer_id"] == str(validator_user.id)
 
     resp = await client.get(f"/api/v1/challenges/{duplicate_report.id}")
     assert resp.status_code == 200
@@ -81,7 +81,11 @@ async def test_duplicate_decision_requires_human_review_and_is_never_automatic(
     resp_original = await client.get(f"/api/v1/challenges/{original.id}")
     assert resp_original.status_code == 200
 
-    # A second decision on the same pair is rejected — the audit trail is immutable.
+    # A second decision on the same pair is not rejected — it's a correction.
+    # The original decision row is never updated or deleted (append-only,
+    # enforced at the DB level); this just appends a new record that becomes
+    # the current effective decision. See test_duplicate_corrections.py for
+    # full coverage of the correction workflow.
     resp = await client.post(
         "/api/v1/duplicate/decisions",
         json={
@@ -89,6 +93,12 @@ async def test_duplicate_decision_requires_human_review_and_is_never_automatic(
             "candidate_challenge_id": str(original.id),
             "decision": "not_duplicate",
         },
-        headers=auth_headers(officer_user),
+        headers=auth_headers(validator_user),
     )
-    assert resp.status_code == 409
+    assert resp.status_code == 201
+
+    resp = await client.get(f"/api/v1/challenges/{duplicate_report.id}")
+    assert resp.status_code == 200
+    corrected = resp.json()
+    assert corrected["status"] == "open"
+    assert corrected["duplicate_of_id"] is None

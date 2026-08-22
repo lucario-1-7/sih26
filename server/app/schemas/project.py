@@ -28,5 +28,6 @@ class ProjectResponse(BaseModel):
     description: str | None
     status: ProjectStatus
     owner_id: uuid.UUID
+    organization_id: uuid.UUID | None
     created_at: datetime
     updated_at: datetime

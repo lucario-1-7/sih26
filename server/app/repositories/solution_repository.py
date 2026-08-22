@@ -4,6 +4,7 @@ import uuid
 
 from sqlalchemy import select
 
+from app.core.pagination import paginate
 from app.models.solution import Solution
 from app.repositories.base import BaseRepository
 
@@ -15,16 +16,26 @@ class SolutionRepository(BaseRepository):
             return None
         return solution
 
-    async def list(self, *, project_id: uuid.UUID | None, limit: int = 20, offset: int = 0) -> list[Solution]:
+    async def list(
+        self, *, project_id: uuid.UUID | None, limit: int = 20, cursor: str | None = None
+    ) -> tuple[list[Solution], str | None]:
         stmt = select(Solution).where(Solution.deleted_at.is_(None))
         if project_id is not None:
             stmt = stmt.where(Solution.project_id == project_id)
-        stmt = stmt.order_by(Solution.created_at.desc()).limit(limit).offset(offset)
-        result = await self.db.execute(stmt)
-        return list(result.scalars().all())
+        return await paginate(self.db, stmt, model=Solution, limit=limit, cursor=cursor)
 
-    async def create(self, *, project_id: uuid.UUID, title: str, description: str | None) -> Solution:
-        solution = Solution(project_id=project_id, title=title, description=description)
+    async def create(
+        self,
+        *,
+        project_id: uuid.UUID,
+        title: str,
+        description: str | None,
+        outcome: str | None,
+        embedding: list[float] | None,
+    ) -> Solution:
+        solution = Solution(
+            project_id=project_id, title=title, description=description, outcome=outcome, embedding=embedding
+        )
         self.db.add(solution)
         await self.db.flush()
         return solution

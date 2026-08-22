@@ -5,7 +5,8 @@ from datetime import datetime, timezone
 
 from sqlalchemy import select
 
-from app.models.enums import Role
+from app.core.pagination import paginate
+from app.models.enums import Domain, Role
 from app.models.user import OtpCode, User
 from app.repositories.base import BaseRepository
 
@@ -13,6 +14,28 @@ from app.repositories.base import BaseRepository
 class UserRepository(BaseRepository):
     async def get(self, user_id: uuid.UUID) -> User | None:
         return await self.db.get(User, user_id)
+
+    async def create(
+        self,
+        *,
+        phone: str,
+        name: str,
+        role: Role,
+        domain: Domain,
+        organization_id: uuid.UUID | None,
+        administrative_area_id: uuid.UUID | None,
+    ) -> User:
+        user = User(
+            phone=phone,
+            name=name,
+            role=role,
+            domain=domain,
+            organization_id=organization_id,
+            administrative_area_id=administrative_area_id,
+        )
+        self.db.add(user)
+        await self.db.flush()
+        return user
 
     async def get_by_phone(self, phone: str) -> User | None:
         result = await self.db.execute(select(User).where(User.phone == phone))
@@ -27,13 +50,13 @@ class UserRepository(BaseRepository):
         await self.db.flush()
         return user
 
-    async def list(self, *, role: Role | None = None, limit: int = 20, offset: int = 0) -> list[User]:
+    async def list(
+        self, *, role: Role | None = None, limit: int = 20, cursor: str | None = None
+    ) -> tuple[list[User], str | None]:
         stmt = select(User).where(User.deleted_at.is_(None))
         if role is not None:
             stmt = stmt.where(User.role == role)
-        stmt = stmt.order_by(User.created_at.desc()).limit(limit).offset(offset)
-        result = await self.db.execute(stmt)
-        return list(result.scalars().all())
+        return await paginate(self.db, stmt, model=User, limit=limit, cursor=cursor)
 
 
 class OtpRepository(BaseRepository):

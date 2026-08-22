@@ -4,6 +4,7 @@ import uuid
 
 from sqlalchemy import select
 
+from app.core.pagination import paginate
 from app.models.enums import OrganizationType
 from app.models.organization import Organization
 from app.repositories.base import BaseRepository
@@ -17,14 +18,12 @@ class OrganizationRepository(BaseRepository):
         return org
 
     async def list(
-        self, *, type: OrganizationType | None = None, limit: int = 20, offset: int = 0
-    ) -> list[Organization]:
+        self, *, type: OrganizationType | None = None, limit: int = 20, cursor: str | None = None
+    ) -> tuple[list[Organization], str | None]:
         stmt = select(Organization).where(Organization.deleted_at.is_(None))
         if type is not None:
             stmt = stmt.where(Organization.type == type)
-        stmt = stmt.order_by(Organization.created_at.desc()).limit(limit).offset(offset)
-        result = await self.db.execute(stmt)
-        return list(result.scalars().all())
+        return await paginate(self.db, stmt, model=Organization, limit=limit, cursor=cursor)
 
     async def create(
         self,

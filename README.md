@@ -28,11 +28,16 @@ ARQ Worker (shares server code, runs background jobs)
   ranked candidate matches with a similarity score; a human reviewer
   (`officer`/`admin`) records the final `DUPLICATE` / `NOT_DUPLICATE`
   decision, which is persisted as an auditable, append-only record. Nothing
-  is ever auto-merged or deleted.
+  is ever auto-merged or deleted. A reviewer *can* correct an earlier
+  decision on the same candidate pair — see "Duplicate decisions" below.
 - Domain model: `Challenge` (citizen report) → `Cluster` (systemic problem)
   → `Theme` (broader pattern); `Cluster` → `Project` (execution) → `Solution`
   (result). Matching/consortium formation connects `Cluster`/`Project` to
   `Organization` (university/industry) candidates.
+- A `Cluster`'s embedding is computed by the `generate_cluster_embedding` ARQ
+  job after create/update — never lazily inside a `GET`. Until that job has
+  run, `GET /matching/clusters/{id}` simply returns an empty ranking; reads
+  never write.
 
 ## Directory Structure
 
@@ -156,6 +161,64 @@ avoid collisions instead, which is enough at the current test volume.
 
 OpenAPI docs: `GET /api/v1/docs` (Swagger UI), raw schema at
 `GET /api/v1/openapi.json`.
+
+### Pagination
+
+Every list endpoint (`GET /challenges`, `/clusters`, `/themes`, `/projects`,
+`/solutions`, `/users`, `/matching/organizations`) uses **cursor (keyset)
+pagination** — there is no `offset` parameter anywhere.
+
+```
+GET /api/v1/clusters?limit=20
+GET /api/v1/clusters?limit=20&cursor=<opaque token from the previous page>
+```
+
+Response shape:
+
+```json
+{
+  "items": [ ... ],
+  "next_cursor": "<opaque token, or null on the last page>",
+  "total": null
+}
+```
+
+- Ordering is `(created_at DESC, id DESC)` — a fixed, stable, deterministic
+  order. `id` breaks ties when two rows share a `created_at`.
+- The cursor is an opaque, base64-encoded token carrying the last item's
+  `(created_at, id)`. Treat it as an opaque string — do not decode or
+  construct one client-side; its internal format may change.
+- The first page is requested by omitting `cursor` entirely.
+- The last page is signaled by `next_cursor: null`.
+- A malformed or tampered cursor returns `422` with
+  `{"code": "INVALID_CURSOR", ...}`, never a `500`.
+- This scales to large tables because it never uses `OFFSET` — every page
+  costs the same regardless of how deep into the collection it is.
+
+### Duplicate decisions
+
+`POST /api/v1/duplicate/decisions` is **append-only and reversible**:
+recording a second `DUPLICATE`/`NOT_DUPLICATE` decision on the same
+`(challenge_id, candidate_challenge_id)` pair does not fail with `409` — it
+is a *correction*. The original row is never updated or deleted (the
+database rejects `UPDATE`/`DELETE` on `duplicate_decisions` with a trigger —
+see `database/alembic/versions/c64f1440c539_*.py`); a new row is appended
+and becomes the current effective decision. The challenge's status is
+always recomputed from the *latest* decision per candidate pair, so a
+correction can reopen a challenge a prior decision had marked `duplicate`,
+or re-mark one a prior decision had cleared. Every correction writes an
+audit log entry (`duplicate.decision.corrected`) that references the
+decision it corrects. RBAC (`officer`/`admin`) applies identically to the
+initial decision and to any correction.
+
+### ML service unavailability
+
+If the ML service (embeddings, duplicate ranking, matching, consortium
+suggestion) cannot be reached — connection refused, timeout, or a
+non-2xx response — the server returns `503` with
+`{"code": "ML_SERVICE_UNAVAILABLE", ...}` rather than a generic `500`.
+Internal connection details are logged server-side only, never returned to
+the client.
 
 ## Development Workflow
 

@@ -20,7 +20,7 @@ router = APIRouter(prefix="/clusters", tags=["clusters"])
 async def create_cluster(
     payload: ClusterCreate,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(require_role(Role.OFFICER, Role.ANALYST, Role.ADMIN)),
+    user: User = Depends(require_role(Role.VALIDATOR, Role.SUPERADMIN)),
 ) -> ClusterResponse:
     cluster = await cluster_service.create_cluster(db, data=payload, actor_id=user.id)
     return ClusterResponse.model_validate(cluster)
@@ -30,15 +30,15 @@ async def create_cluster(
 async def list_clusters(
     status_filter: ClusterStatus | None = Query(default=None, alias="status"),
     limit: int = Query(default=20, ge=1, le=100),
-    offset: int = Query(default=0, ge=0),
+    cursor: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ) -> PaginatedResponse[ClusterResponse]:
-    clusters = await cluster_service.list_clusters(
-        db, status_filter=status_filter, limit=limit, offset=offset
+    clusters, next_cursor = await cluster_service.list_clusters(
+        db, status_filter=status_filter, limit=limit, cursor=cursor
     )
     return PaginatedResponse(
         items=[ClusterResponse.model_validate(c) for c in clusters],
-        next_cursor=str(offset + limit) if len(clusters) == limit else None,
+        next_cursor=next_cursor,
     )
 
 
@@ -53,7 +53,7 @@ async def update_cluster(
     cluster_id: uuid.UUID,
     payload: ClusterUpdate,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(require_role(Role.OFFICER, Role.ANALYST, Role.ADMIN)),
+    user: User = Depends(require_role(Role.VALIDATOR, Role.SUPERADMIN)),
 ) -> ClusterResponse:
     cluster = await cluster_service.update_cluster(db, cluster_id, data=payload, actor_id=user.id)
     return ClusterResponse.model_validate(cluster)

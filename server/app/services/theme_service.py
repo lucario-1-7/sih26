@@ -29,8 +29,8 @@ async def get_theme(db: AsyncSession, theme_id: uuid.UUID) -> Theme:
     return theme
 
 
-async def list_themes(db: AsyncSession, *, limit: int, offset: int) -> list[Theme]:
-    return await ThemeRepository(db).list(limit=limit, offset=offset)
+async def list_themes(db: AsyncSession, *, limit: int, cursor: str | None) -> tuple[list[Theme], str | None]:
+    return await ThemeRepository(db).list(limit=limit, cursor=cursor)
 
 
 async def update_theme(
@@ -47,4 +47,5 @@ async def update_theme(
         user_id=actor_id, action="theme.update", entity_type="theme", entity_id=theme.id
     )
     await db.commit()
+    await db.refresh(theme)  # onupdate=now() is server-computed — refresh before serializing
     return theme

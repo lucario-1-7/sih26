@@ -5,7 +5,7 @@ from sqlalchemy import ForeignKey, String, Text
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, SoftDeleteMixin, TimestampMixin, UUIDPKMixin, pg_enum
-from app.models.enums import ChallengeStatus
+from app.models.enums import ChallengeSeverity, ChallengeStatus
 
 
 class Challenge(UUIDPKMixin, TimestampMixin, SoftDeleteMixin, Base):
@@ -33,3 +33,12 @@ class Challenge(UUIDPKMixin, TimestampMixin, SoftDeleteMixin, Base):
     duplicate_of_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("challenges.id", ondelete="RESTRICT"), nullable=True, index=True
     )
+    # Government VALIDATOR responsibility ("set/review severity"); null until reviewed.
+    severity: Mapped[ChallengeSeverity | None] = mapped_column(
+        pg_enum(ChallengeSeverity, "challenge_severity"), nullable=True
+    )
+    # Set only when a FIELD_ASSISTANT submits on a citizen's behalf — the
+    # citizen themself is never required to have an account. Null for
+    # citizen-submitted challenges.
+    on_behalf_of_name: Mapped[str | None] = mapped_column(String(200), nullable=True)
+    on_behalf_of_phone: Mapped[str | None] = mapped_column(String(20), nullable=True)
