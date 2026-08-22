@@ -1,0 +1,251 @@
+id,text,label
+FI001,The handpump near the primary school in Torpa block has stopped working completely; villagers are now fetching water from a stream two kilometres away.,FIELD_HEAVY
+FI002,"हमारे गांव का चापाकल पिछले दस दिनों से खराब पड़ा है, मिस्त्री को बुलाना ज़रूरी है।",FIELD_HEAVY
+FI003,Overhead water tank in our panchayat has developed a crack near the base and is leaking badly; needs someone to check the structure.,FIELD_HEAVY
+FI004,"Borewell ka motor jal gaya hai, mechanic bhejna padega jaldi.",FIELD_HEAVY
+FI005,Field assistant report: three community wells in Simdega block show visibly discoloured water; physical sensor deployment and pump inspection required onsite.,FIELD_HEAVY
+FI006,गुमला जिले के एक गांव में पाइपलाइन बीच से टूट गई है जिससे पानी सड़क पर बह रहा है।,FIELD_HEAVY
+FI007,Paani ka pump kaam nahi kar raha.,FIELD_HEAVY
+FI008,The check dam built two years ago has silted up and needs desilting before the monsoon; the irrigation committee wants an on-site survey.,FIELD_HEAVY
+FI009,"Naya submersible pump lagwane ke baad bhi pressure bahut kam aa raha hai, technician ko site pe aana padega.",FIELD_HEAVY
+FI010,Residents of a hamlet in Latehar report that the newly dug well collapsed at the edges after heavy rain and now needs to be reinforced and re-dug.,FIELD_HEAVY
+FI011,Water-quality sensors installed at 15 village points require on-site recalibration to match the dashboard readings with field staff observations.,HYBRID
+FI012,"Alongside the IoT-based leak detection system flagging alerts, we need a team to physically trace and fix the pipeline leaks.",HYBRID
+FI013,"स्मार्ट वाटर मीटर डेटा सर्वर तक सही से नहीं पहुंच रहा, इसलिए नेटवर्क सेटअप के साथ-साथ घर-घर जाकर भौतिक जांच करनी होगी।",HYBRID
+FI014,The chlorine dosing unit requires weekly hands-on servicing to complement the remote monitoring system of the water treatment plant.,HYBRID
+FI015,"Panchayat ke water ATM app ke functioning ke baavjood, machine filter change karne ke liye technician ka aana zaroori hai.",HYBRID
+FI016,"The canal gates telemetry operates remotely; however, jamming gate motors demand a mechanic on site regularly.",HYBRID
+FI017,"सेंसर आधारित जल स्तर प्रणाली के सुचारू सॉफ्टवेयर के बावजूद, जानवरों द्वारा काटी गई सेंसर केबलों को भौतिक रूप से बदलना पड़ रहा है।",HYBRID
+FI018,"Groundwater monitoring dashboard shows anomalies in three blocks, but confirming whether this is sensor drift or actual depletion needs a team to visit and calibrate the piezometers.",HYBRID
+FI019,District-wide water allocation sensor logs across panchayats are inconsistent and need to be reconciled through database assessment before the next budget cycle.,REMOTE_ANALYTICAL
+FI020,The online portal for reporting water tariff disputes shows duplicate entries for the same household across two financial years.,REMOTE_ANALYTICAL
+FI021,"जल जीवन मिशन के तहत गांवों को दी गई कनेक्शन संख्या और ज़मीनी रिपोर्ट में भारी अंतर है, इसका डेटा मिलान ज़रूरी है।",REMOTE_ANALYTICAL
+FI022,Sochta hoon ki water supply scheduling algorithm ko optimize karna chahiye kyunki current rotation policy ke hisaab se kai wards ko unfair time slot mil raha hai.,REMOTE_ANALYTICAL
+FI023,"The annual water-quality report format used by the district differs from the state template, making comparison across blocks impossible without reformatting the historical data.",REMOTE_ANALYTICAL
+FI024,A comprehensive study of ten years of rainfall and reservoir-level records suggests the current allocation formula for irrigation releases needs revision.,REMOTE_ANALYTICAL
+FI025,The community toilet block near the market in Khunti has a broken septic tank that is overflowing into the drain.,FIELD_HEAVY
+FI026,बस्ती के शौचालय की टंकी टूट गई है और गंदा पानी गली में फैल रहा है।,FIELD_HEAVY
+FI027,Anganwadi ke paas bane toilet ka darwaza tut gaya hai aur seat bhi crack ho gayi hai.,FIELD_HEAVY
+FI028,Field note: open drain running through the hamlet has broken flow-sensors and stagnant water is visible; it has not been desilted in over a year.,FIELD_HEAVY
+FI029,Community soak pit constructed under the sanitation scheme is not draining properly and needs to be dug out and relined.,FIELD_HEAVY
+FI030,"गांव में बना सामुदायिक शौचालय गंदगी से भरा पड़ा है, सफाई और मरम्मत दोनों की जरूरत है।",FIELD_HEAVY
+FI031,"Toilet complex mein pani ka connection nahi hai, pipeline dalni padegi.",FIELD_HEAVY
+FI032,"The waste segregation shed built by the panchayat has a collapsed roof and garbage is now exposed to rain, attracting stray animals.",FIELD_HEAVY
+FI033,A cluster of households in West Singhbhum report that their newly built twin-pit toilets have never been connected to a working water source.,FIELD_HEAVY
+FI034,Redesigning the actual garbage truck route via physical ward visits is essential to supplement the e-governance reporting system.,HYBRID
+FI035,स्मार्ट कूड़ा प्रबंधन सिस्टम के साथ-साथ ज़मीनी रूट प्लानिंग और सर्वे की आवश्यकता है ताकि गाड़ियां हर इलाके में पहुंच सकें।,HYBRID
+FI036,"RFID bin tracking system functioning hone ke saath saath, toote hue bins ko manually replace karna pad raha hai.",HYBRID
+FI037,Supervisors must perform random field checks to supplement the digital sanitation-worker attendance system.,HYBRID
+FI038,Physical barricading and signage must be installed by the panchayat at open defecation spots reported via the mobile app.,HYBRID
+FI039,सीवेज ट्रीटमेंट प्लांट के ऑटोमेशन के साथ-साथ पंप और पाइप की नियमित मैन्युअल सफाई की आवश्यकता है।,HYBRID
+FI040,The sanitation scheme's beneficiary list has thousands of duplicate entries across two years of Swachh Bharat records that need to be cleaned up.,REMOTE_ANALYTICAL
+FI041,District sanitation coverage statistics reported to the state do not match the numbers in the block-level spreadsheets.,REMOTE_ANALYTICAL
+FI042,"स्वच्छता सर्वेक्षण के लिए भेजे गए आंकड़ों और वास्तविक पंजीकरण संख्या में भारी अंतर है, इसकी समीक्षा ज़रूरी है।",REMOTE_ANALYTICAL
+FI043,Municipal sanitation budget utilisation certificates from the last three years need to be audited and reconciled against approved work orders.,REMOTE_ANALYTICAL
+FI044,"Humein lagta hai ki sanitation ranking ke liye jo formula use ho raha hai wo chhote panchayats ke against biased hai, isko dobara evaluate karna chahiye.",REMOTE_ANALYTICAL
+FI045,The PHC in Torpa has no functioning refrigerator for vaccine storage; the cold chain equipment needs replacement and installation.,FIELD_HEAVY
+FI046,अस्पताल में ऑक्सीजन सिलेंडर खत्म हो गए हैं और नए सिलेंडर की सप्लाई तुरंत चाहिए।,FIELD_HEAVY
+FI047,"Sub-centre ki delivery room mein bed hi nahi hai, furniture aur equipment turant chahiye.",FIELD_HEAVY
+FI048,Field report: the ambulance assigned via the dispatch app has been non-functional due to a mechanical fault; patients are being carried on carts requiring immediate physical dispatch.,FIELD_HEAVY
+FI049,The anganwadi centre's growth-monitoring scale is broken and children's weight cannot be recorded during the monthly health camp.,FIELD_HEAVY
+FI050,गांव के स्वास्थ्य उप-केंद्र की छत बारिश में टपकती है और दवाइयां भीग जाती हैं।,FIELD_HEAVY
+FI051,"PHC mein dawaiyon ki stock khatam ho gaya hai, restocking ke liye kisi ko block office jaana padega.",FIELD_HEAVY
+FI052,A community health worker in Gumla reports that the solar-powered vaccine fridge stopped working after the recent storm and needs a technician to inspect the panel and battery.,FIELD_HEAVY
+FI053,The telemedicine kiosk requires local nurses to undergo hands-on training and periodic calibration of diagnostic peripherals.,HYBRID
+FI054,टेलीमेडिसिन सेवा के सुचारू संचालन के लिए कमजोर इंटरनेट कनेक्शन वाले गांवों में जाकर उपकरणों को भौतिक रूप से ठीक करना होगा।,HYBRID
+FI055,"E-Sanjeevani consultation ke saath, sub-centre pe BP machine aur oxymeter jaise devices physically install karne honge.",HYBRID
+FI056,The X-ray machine needs on-site recalibration by a technician to work with the newly installed remote diagnostic software.,HYBRID
+FI057,"स्वास्थ्य ऐप के सही अपडेट होने के बावजूद, दूरदराज़ के गांवों में नमूने इकट्ठा करने के लिए स्टाफ को खुद जाना पड़ता है।",HYBRID
+FI058,The portable X-ray van must travel to each village for actual scans to feed the AI-based tuberculosis screening software.,HYBRID
+FI059,"AI-based tuberculosis screening software works on the uploaded X-rays, but the portable X-ray van still has to travel to each village for the actual scans.",HYBRID
+FI060,"Mobile health van software scheduling ke baavjood van purani hone ki wajah se baar baar field breakdown hoti hai, repair chahiye.",HYBRID
+FI061,Data-entry staff at the PHC need in-person training and proper server room wiring to support the hospital management system.,HYBRID
+FI062,जिला अस्पताल में डिजिटल टोकन सिस्टम के साथ बुज़ुर्ग मरीज़ों की मदद के लिए काउंटर पर एक कर्मचारी की भौतिक मौजूदगी ज़रूरी है।,HYBRID
+FI063,Sub-centres require on-site repair for portable ECG devices connected to the cloud-reading service after months of use.,HYBRID
+FI064,"Sanjeevani van mein telemedicine setup lag chuka hai, bas driver aur nurse ki training baaki hai field visit ke through.",HYBRID
+FI065,"Insurance claim rejections have spiked, but the pattern cannot be understood until we assess the eligibility database thoroughly.",REMOTE_ANALYTICAL
+FI066,"The Ayushman Bharat empanelment system keeps timing out, but the underlying issue seems to be a server-side configuration error needing investigation.",REMOTE_ANALYTICAL
+FI067,जिला स्वास्थ्य रिपोर्टिंग फॉर्म में हर महीने अलग-अलग फॉर्मेट भेजा जाता है जिससे डेटा तुलना करना मुश्किल हो जाता है।,REMOTE_ANALYTICAL
+FI068,Humein health scheme ke coverage numbers ko evaluate karke ye dekhna hai ki kaunse blocks mein enrolment sabse kam hai.,REMOTE_ANALYTICAL
+FI069,"The maternal mortality dashboard aggregates data from multiple sources but the definitions of 'high risk' differ across those sources, causing inconsistent counts.",REMOTE_ANALYTICAL
+FI070,A review of five years of PHC staffing records is needed to understand why vacancy rates differ so sharply between similar-sized blocks.,REMOTE_ANALYTICAL
+FI071,The online grievance system for medicine stock-outs generates tickets that are never routed to the correct district pharmacist.,REMOTE_ANALYTICAL
+FI072,Locust-like pest infestation reported in paddy fields near Dumka; entomology team needs to inspect the crops on the ground.,FIELD_HEAVY
+FI073,"सॉफ्टवेयर से बुक की गई ट्रैक्टर योजना का उपकरण खराब हो गया है, मरम्मत के लिए मैकेनिक को खेत पर आना होगा।",FIELD_HEAVY
+FI074,"Tractor scheme ke under diya gaya equipment kharab ho gaya hai, mechanic ko farm pe bulana padega.",FIELD_HEAVY
+FI075,Field visit note: soil in three adjoining farms near Latehar shows signs of salinity; samples need to be collected for lab testing.,FIELD_HEAVY
+FI076,"The community seed-storage godown's roof collapsed during the last storm, damaging stored grain; repair and a fresh structural inspection are needed.",FIELD_HEAVY
+FI077,गांव के तालाब से खेतों तक पानी ले जाने वाली पाइपलाइन जगह-जगह से टूट गई है।,FIELD_HEAVY
+FI078,"Ganne ke khet mein keede lag gaye hain, turant spray aur inspection chahiye.",FIELD_HEAVY
+FI079,"A group of farmers in Torpa report that the newly dug farm pond is leaking from the base and losing water faster than expected, needing an on-site check of the lining.",FIELD_HEAVY
+FI080,Physical collection and courier of soil samples from each farm is necessary alongside the soil-testing mobile app recommendations.,FIELD_HEAVY
+FI081,स्मार्ट सिंचाई सेंसर प्रणाली से अलर्ट मिलने पर जानवरों द्वारा काटी गई तारों को खेत में जाकर ठीक करना पड़ता है।,HYBRID
+FI082,"Drone crop health survey report aane ke baad, unhealthy patches ka physical verification farmer ke saath karna zaroori hai.",HYBRID
+FI083,Automatic weather stations feeding the advisory SMS service need periodic on-site maintenance.,HYBRID
+FI084,Uncalibrated weighing machines at the local market require physical checking despite the live rates shown on the e-mandi price app.,HYBRID
+FI085,किसान क्रेडिट कार्ड डिजिटल ट्रैकिंग के साथ-साथ कई किसानों के ज़मीन के दस्तावेज़ों का भौतिक सत्यापन गांव जाकर करना होगा।,HYBRID
+FI086,Half the IoT-based moisture sensors installed in the demo farm have been damaged by ploughing and require manual replacement.,HYBRID
+FI087,"Automated poultry feeding system ke app control ke baavjood, machine jam hone par mechanic ki on-site zaroorat padti hai.",HYBRID
+FI088,A field verification team must confirm the damage flagged by remote crop-insurance satellite imagery before claims are processed.,HYBRID
+FI089,"डेयरी डिजिटल मशीन के सही काम करने पर भी, कैलिब्रेशन के लिए हर महीने खेत पर जाकर भौतिक जांच करनी पड़ती है।",HYBRID
+FI090,Manual weighing errors at the counter require physical audits to correct the fertiliser-subsidy tracking app counts.,HYBRID
+FI091,A ten-year statistical review of crop-yield figures suggests the subsidy formula for a particular seed variety needs revision.,HYBRID
+FI092,Analysis of five years of crop-yield data suggests the subsidy formula for a particular seed variety needs revision before the next sowing season.,REMOTE_ANALYTICAL
+FI093,मंडी में फसल की कीमतों के ऐतिहासिक विवरणों का अध्ययन करके यह समझना है कि किस महीने किसानों को सबसे कम दाम मिलता है।,REMOTE_ANALYTICAL
+FI094,मंडी में फसल की कीमतों के ऐतिहासिक आंकड़ों का विश्लेषण करके यह समझना है कि किस महीने किसानों को सबसे कम दाम मिलता है।,REMOTE_ANALYTICAL
+FI095,Humein lagta hai ki minimum support price database aur actual procurement records ke beech ka gap analyse karna chahiye.,REMOTE_ANALYTICAL
+FI096,A review of the state's crop advisory bulletins from the last two seasons shows inconsistent pest-management recommendations across districts.,REMOTE_ANALYTICAL
+FI097,The digital land-record mismatch for farmers applying to a subsidy scheme needs to be reconciled between the revenue department database and the agriculture department's list.,REMOTE_ANALYTICAL
+FI098,"The government school building in Simdega has a collapsed boundary wall, exposing children to the main road.",FIELD_HEAVY
+FI099,"स्कूल के शौचालय की छत गिर गई है, बच्चों को अब खुले में जाना पड़ता है।",FIELD_HEAVY
+FI100,"School ki chaardiwari gir gayi hai, turant repair chahiye taaki bachche safe rahein.",FIELD_HEAVY
+FI101,Field note: the ramp built for wheelchair access at the middle school is too steep and unusable; needs to be rebuilt to the correct gradient.,FIELD_HEAVY
+FI102,A cluster of anganwadi centres in Khunti block report leaking roofs that need urgent repair before the monsoon.,FIELD_HEAVY
+FI103,"स्कूल के मैदान में पानी भर जाता है क्योंकि जल निकासी की व्यवस्था खराब है, इसे ठीक करना होगा।",FIELD_HEAVY
+FI104,The tablet-based learning programme requires 40 devices to undergo physical repair or replacement after a term of use.,HYBRID
+FI105,"डिजिटल क्लासरूम सॉफ्टवेयर के साथ, कई स्कूलों में खराब पड़े प्रोजेक्टर और स्पीकर जैसे उपकरणों की मरम्मत ज़रूरी है।",HYBRID
+FI106,"School mein smart board update ke baad, internet connectivity ke liye wire aur router physically lagana baaki hai.",HYBRID
+FI107,Trainers must visit schools to observe classroom practice and give feedback to complement the remote teacher-training platform.,HYBRID
+FI108,"E-library app ready hone par, remote schools mein tablets distribute karna aur unko charge karne ka physical setup karna baaki hai.",HYBRID
+FI109,Technicians need to visit 20 schools to fix malfunctioning biometric devices connected to the centralised attendance-tracking app.,HYBRID
+FI110,"वीडियो लेक्चर सुविधा के साथ, प्रोजेक्टर की स्क्रीन और बिजली कनेक्शन कई जगह भौतिक रूप से ठीक करने पड़ेंगे।",HYBRID
+FI111,"A career-counselling chatbot has been deployed for high schools, but rural students say they still need someone to physically demonstrate how to use it on the shared computer.",HYBRID
+FI112,"The scholarship application format is correct, but the digital platform rejects valid documents, requiring an architectural code review.",REMOTE_ANALYTICAL
+FI113,स्कूल में दाखिले की ऑनलाइन प्रक्रिया बार-बार सर्वर एरर देती है और आवेदन जमा नहीं हो पाता।,REMOTE_ANALYTICAL
+FI114,Humein scholarship disbursement data ko analyse karke pata karna hai ki kaunse districts mein delay sabse zyada hai.,REMOTE_ANALYTICAL
+FI115,The mid-day meal budget allocation spreadsheet used by the block office does not match the format required by the state department.,REMOTE_ANALYTICAL
+FI116,"जिले में शिक्षकों की भर्ती परीक्षा के परिणामों में गड़बड़ी की शिकायतें आ रही हैं, इसका डेटा पुनरीक्षण ज़रूरी है।",REMOTE_ANALYTICAL
+FI117,A review of the curriculum mapping documents across ten schools reveals inconsistent alignment with the state syllabus.,REMOTE_ANALYTICAL
+FI118,The online transfer-certificate issuance system frequently generates duplicate certificate numbers for different students.,REMOTE_ANALYTICAL
+FI119,Sochta hoon ki teacher transfer policy ka jo point-based system hai usme kuch loopholes hain jo dobara review karne chahiye.,REMOTE_ANALYTICAL
+FI120,Analysis of dropout data across five years suggests the current early-warning indicators used by the education department may be missing key risk factors.,REMOTE_ANALYTICAL
+FI121,The digital learning-outcomes dashboard aggregates test scores inconsistently because different schools use different assessment templates.,REMOTE_ANALYTICAL
+FI122,Illegal sand mining along the riverbank near Dumka has caused visible erosion; officials need to inspect the site before the next monsoon.,FIELD_HEAVY
+FI123,"गांव के पास जंगल में बार-बार आग लगने की घटनाएं हो रही हैं, मौके पर जाकर जांच ज़रूरी है।",FIELD_HEAVY
+FI124,"Factory ke paas nala ka pani kaala ho gaya hai, data collection aur paani ka sample lene ke liye team ko site pe bhejna padega.",FIELD_HEAVY
+FI125,Field report: a stretch of forest near Torpa shows signs of unauthorised tree felling; forest guards need to conduct a ground survey.,FIELD_HEAVY
+FI126,Residents near a stone quarry in West Singhbhum report cracks appearing in house walls after blasting; a structural and environmental inspection team must visit.,FIELD_HEAVY
+FI127,"नदी किनारे कचरा जमा हो गया है और बदबू फैल रही है, सफाई अभियान चलाना होगा।",FIELD_HEAVY
+FI128,"Talab mein machliyan mar rahi hain, paani ka sample lena padega jaldi.",FIELD_HEAVY
+FI129,A community in Lohardaga reports a sudden drop in the water table after a nearby industrial unit began operations; hydrogeologists need to survey the area.,FIELD_HEAVY
+FI130,"Air-quality sensors installed near the industrial zone stream data to a public dashboard, but half of them need field calibration after six months of dust exposure.",HYBRID
+FI131,"वन क्षेत्र में कैमरा ट्रैप और सेंसर लगाए गए हैं जो डेटा तो भेज रहे हैं, लेकिन बैटरी बदलने के लिए टीम को जंगल में जाना पड़ता है।",HYBRID
+FI132,Satellite se deforestation ka data mil raha hai lekin flagged areas ko verify karne ke liye ground team bhejni padegi.,HYBRID
+FI133,"The river water-quality monitoring app updates automatically, but the sensor buoys keep drifting and need to be repositioned by boat every month.",HYBRID
+FI134,"Remote wildlife-tracking collars send location data reliably, but the forest department still needs field staff to dart and replace batteries periodically.",HYBRID
+FI135,"स्मार्ट कचरा निगरानी प्रणाली शहर में लगाई गई है, ऐप से अलर्ट मिलते हैं पर कचरा उठाने के लिए टीम को मौके पर जाना ही पड़ता है।",HYBRID
+FI136,Ten years of rainfall and groundwater-level metrics for the district need to be studied to update the drought vulnerability map.,REMOTE_ANALYTICAL
+FI137,The environmental clearance application portal keeps rejecting valid project documents due to a formatting bug.,REMOTE_ANALYTICAL
+FI138,"जिले के प्रदूषण स्तर की रिपोर्टों में अलग-अलग महीनों के विवरण में विसंगति दिख रही है, इसकी जांच ज़रूरी है।",REMOTE_ANALYTICAL
+FI139,Humein forest cover change ko historical satellite images se analyse karke ek trend report banani hai.,REMOTE_ANALYTICAL
+FI140,A comparative review of environmental impact assessment reports submitted by three mining companies shows inconsistent baseline data.,REMOTE_ANALYTICAL
+FI141,The carbon-credit calculation spreadsheet used by the state forest department does not account for regional variation in tree species.,REMOTE_ANALYTICAL
+FI142,The solar street lights installed along the village road two years ago have stopped working; batteries need replacement.,FIELD_HEAVY
+FI143,"ट्रांसफार्मर जल गया है और पूरे गांव की बिजली गायब है, तुरंत मरम्मत चाहिए।",FIELD_HEAVY
+FI144,Panchayat bhavan ka solar panel toot gaya hai aur power backup band ho gaya hai.,FIELD_HEAVY
+FI145,Field note: overhead electric lines are sagging dangerously close to a school compound in Gumla; a technical team needs to inspect and re-string the lines.,FIELD_HEAVY
+FI146,A cluster of households near Chaibasa report that the newly installed micro-grid inverter overheats and shuts down every afternoon.,FIELD_HEAVY
+FI147,"बिजली के खंभे टूटे पड़े हैं और तार सड़क पर लटक रहे हैं, खतरनाक स्थिति है।",FIELD_HEAVY
+FI148,"Genset kharab ho gaya hai PHC mein, turant technician chahiye.",FIELD_HEAVY
+FI149,"The smart metering system reads consumption correctly for most households, but faulty meters at 30 homes need physical replacement.",HYBRID
+FI150,"सोलर माइक्रोग्रिड का मॉनिटरिंग ऐप ठीक काम कर रहा है, पर बैटरी बैंक की नियमित जांच के लिए तकनीशियन को मौके पर जाना पड़ता है।",HYBRID
+FI151,"Remote SCADA system for the substation gives real-time alerts, but breaker faults still require an on-site engineer to reset and repair equipment.",HYBRID
+FI152,"Grid ka load-balancing software naya install hua hai, kaam achha kar raha hai, lekin transformer overload hone par site pe jaake check karna padta hai.",HYBRID
+FI153,"The mobile app for reporting power outages routes complaints efficiently, but the linemen still need to physically trace and fix the actual faults.",HYBRID
+FI154,"बायोगैस प्लांट में सेंसर आधारित निगरानी लगाई गई है, डेटा सही आ रहा है पर गैस पाइपलाइन का रिसाव ठीक करने के लिए मौके पर जाना पड़ता है।",HYBRID
+FI155,"Automated demand-response software for industrial users works well, but a few factories report their smart relays need physical recalibration after installation.",HYBRID
+FI156,The electricity billing portal generates incorrect bills for households that recently shifted to the new tariff slab.,REMOTE_ANALYTICAL
+FI157,जिले में बिजली सब्सिडी वितरण के आंकड़ों और वास्तविक लाभार्थियों की सूची में भारी अंतर पाया गया है।,REMOTE_ANALYTICAL
+FI158,Humein energy consumption metrics ko evaluate karke peak-load hours ka accurate pattern nikalna hai.,REMOTE_ANALYTICAL
+FI159,A review of five years of transformer failure records suggests the maintenance schedule used by the discom needs revision.,REMOTE_ANALYTICAL
+FI160,The renewable-energy subsidy application system frequently loses uploaded documents during the review stage.,REMOTE_ANALYTICAL
+FI161,Comparative analysis of tariff structures across three states is needed to recommend changes to the current slab system.,REMOTE_ANALYTICAL
+FI162,"A large pothole has formed on the main road near the market in Ranchi, causing frequent two-wheeler accidents.",FIELD_HEAVY
+FI163,"सड़क पर बड़ा गड्ढा हो गया है, बारिश के पानी से भरा रहता है और हादसे हो रहे हैं।",FIELD_HEAVY
+FI164,"Field report: the newly laid drainage pipes near the market have cracked, contradicting the inspection data; urgent physical repair needed.",FIELD_HEAVY
+FI165,Field report: the newly laid drainage pipes near the market have already cracked in three places and are causing waterlogging.,FIELD_HEAVY
+FI166,Residents of a colony in East Singhbhum report that the footbridge over the drain has a broken railing and is unsafe for children walking to school.,FIELD_HEAVY
+FI167,"पुल के खंभे में दरारें आ गई हैं, इंजीनियरों को तुरंत जाकर जांच करनी चाहिए।",FIELD_HEAVY
+FI168,"Naali choke ho gayi hai poore mohalle mein, safai turant chahiye.",FIELD_HEAVY
+FI169,The municipal park's boundary wall has collapsed onto the adjoining lane after recent rains.,FIELD_HEAVY
+FI170,A water-logging complaint from a low-lying colony near Dumka notes that the storm-water drain has never been desilted since construction.,FIELD_HEAVY
+FI171,Exposed wiring on several smart traffic-signal poles requires urgent physical repair to maintain the automated timing system.,FIELD_HEAVY
+FI172,"स्मार्ट स्ट्रीट लाइट सिस्टम ऐप से नियंत्रित होने पर भी, धूल जमने से खराब हुए सेंसरों की मैन्युअल सफाई ज़रूरी है।",HYBRID
+FI173,"GPS-tracked garbage trucks mein software sahi hone par bhi, mechanical breakdown ke kaaran unhe tow karna pad raha hai.",HYBRID
+FI174,Inspectors must visit sites to verify physical compliance before final approval on the online building-permission system.,HYBRID
+FI175,"The online building-permission system processes applications quickly, but inspectors still need to visit sites to verify compliance before final approval.",HYBRID
+FI176,"CCTV-based traffic monitoring is functioning well, but three cameras near the market have been vandalised and need physical replacement.",HYBRID
+FI177,"पानी की पाइपलाइन में सेंसर लगाए गए हैं जो लीक का अलर्ट भेजते हैं, पर मरम्मत के लिए मजदूरों को मौके पर भेजना पड़ता है।",HYBRID
+FI178,"The e-challan system for traffic violations works fine, but the automatic number-plate cameras at two junctions are misaligned and need on-site adjustment.",HYBRID
+FI179,"Smart parking app se slots book ho rahe hain, lekin sensors jo car detect karte hain wo kai jagah dhool aur mitti ki wajah se kaam nahi kar rahe.",HYBRID
+FI180,"The municipal solid-waste tracking dashboard is accurate, but two composting units it monitors have broken shredder blades needing physical repair.",HYBRID
+FI181,"भूमिगत केबल बिछाने का काम सॉफ्टवेयर से ट्रैक हो रहा है, पर असली खुदाई और केबल बिछाने का काम अभी भी मैदान में ही करना पड़ता है।",HYBRID
+FI182,The municipal property-tax portal calculates incorrect dues for properties that were recently subdivided.,REMOTE_ANALYTICAL
+FI183,"शहर के भवन निर्माण अनुमति सिस्टम में कई आवेदन दो बार दर्ज हो गए हैं, इसे डेटाबेस स्तर पर ठीक करना ज़रूरी है।",REMOTE_ANALYTICAL
+FI184,Humein traffic accident data ko analyse karke pata karna hai ki kaunse junctions sabse zyada risky hain.,REMOTE_ANALYTICAL
+FI185,A comparative review of urban master plans from five similar-sized towns is needed before finalising the city's zoning revision.,REMOTE_ANALYTICAL
+FI186,"The online water-tax payment gateway frequently fails during the last week of the month, based on complaint-log analysis.",REMOTE_ANALYTICAL
+FI187,The municipal budget-allocation spreadsheet for ward-level infrastructure projects has not been reconciled with actual expenditure records in two years.,REMOTE_ANALYTICAL
+FI188,The wheelchair ramp at the block office is too narrow and steep for actual use; it needs to be rebuilt to standard specifications.,FIELD_HEAVY
+FI189,"सरकारी दफ्तर में विकलांग व्यक्तियों के लिए बनी रैंप बहुत ऊंची है, इसे फिर से बनाना होगा।",FIELD_HEAVY
+FI190,"Bus stand mein disabled logo ke liye koi proper seating ya ramp nahi hai, construction chahiye.",FIELD_HEAVY
+FI191,Field note: the tactile paving installed for visually impaired pedestrians near the market has been damaged by roadworks and needs replacement.,FIELD_HEAVY
+FI192,A community member in Khunti reports that the accessible toilet at the PHC has no grab bars installed despite being labelled 'accessible'.,FIELD_HEAVY
+FI193,स्कूल में दिव्यांग बच्चों के लिए बनाई गई रैंप का रेलिंग टूट गया है।,FIELD_HEAVY
+FI194,"Bank mein wheelchair access ke liye lift nahi hai, sirf sidhiyan hain.",FIELD_HEAVY
+FI195,"The screen-reader-compatible government website works well, but the physical service counters still lack staff trained in sign language for in-person visits.",HYBRID
+FI196,"दिव्यांगजनों के लिए बना हेल्पलाइन ऐप ठीक काम कर रहा है, पर गांव में उपकरण वितरण और प्रशिक्षण के लिए टीम को जाना पड़ता है।",HYBRID
+FI197,"Assistive-technology devices for hearing-impaired students were distributed with a companion app, but half the devices need on-site fitting adjustments.",HYBRID
+FI198,"Divyang pension ke liye online application form to simple bana diya gaya hai, lekin verification ke liye field officer ko ghar jaake dekhna padta hai.",HYBRID
+FI199,"A remote sign-language interpretation service has been set up for hospital visits, but the tablets used for video calls at the PHC frequently need physical repair.",HYBRID
+FI200,The disability pension application portal rejects valid Aadhaar-linked applications due to a data-matching error.,REMOTE_ANALYTICAL
+FI201,Humein accessibility complaint logs ko evaluate karke pata karna hai ki kaunse departments ke against sabse zyada shikayatein hain.,REMOTE_ANALYTICAL
+FI202,Humein accessibility complaint data ko analyse karke pata karna hai ki kaunse departments ke against sabse zyada shikayatein hain.,REMOTE_ANALYTICAL
+FI203,"A review of the state accessibility-audit checklist shows it does not account for hearing-impairment needs, only mobility.",REMOTE_ANALYTICAL
+FI204,The reserved-quota tracking system for disability employment shows inconsistent numbers between the labour department and individual offices.,REMOTE_ANALYTICAL
+FI205,जिले में विकलांगता प्रमाण पत्र जारी होने की गति की समीक्षा करने के लिए पिछले तीन साल के आंकड़ों का विश्लेषण ज़रूरी है।,REMOTE_ANALYTICAL
+FI206,"The online grievance tracker for accessibility complaints does not categorise issues by type, making it hard to identify systemic patterns.",REMOTE_ANALYTICAL
+FI207,"Analysis of scheme-uptake data suggests awareness campaigns for disability benefits are not reaching certain districts, based on application volume alone.",REMOTE_ANALYTICAL
+FI208,Field verification team needs to physically visit 200 households in a panchayat to confirm ration-card eligibility after a data-matching flag.,FIELD_HEAVY
+FI209,राशन कार्ड सत्यापन के लिए अधिकारियों को गांव-गांव जाकर घरों की जांच करनी होगी।,FIELD_HEAVY
+FI210,"Panchayat bhavan ki chhat gir gayi hai, meeting hall use nahi ho pa raha, repair zaroori hai.",FIELD_HEAVY
+FI211,The block office's land-records room has severe termite damage to old paper files that need physical restoration before digitisation.,FIELD_HEAVY
+FI212,"The e-governance kiosk for certificate applications works well online, but villagers without smartphones still need an operator physically present to assist.",HYBRID
+FI213,"डिजिटल सेवा केंद्र में आवेदन ऑनलाइन जमा हो रहे हैं, पर दूरदराज़ के गांवों में मोबाइल वैन भेजकर लोगों की मदद करनी पड़ती है।",HYBRID
+FI214,"Aadhaar update camp ka software theek chal raha hai, lekin biometric machine kharab hone par technician ko camp site pe bhejna padta hai.",HYBRID
+FI215,"The land-record digitisation software is functional, but surveyors still need to physically re-measure disputed plots before updating the database.",HYBRID
+FI216,"पंचायत में ई-सेवा केंद्र खोला गया है, कंप्यूटर सिस्टम ठीक काम कर रहा है पर बिजली कनेक्शन और फर्नीचर अभी लगाना बाकी है।",HYBRID
+FI217,"The birth-certificate issuance portal is automated, but the outreach camps to register unregistered births in remote hamlets still require field staff.",HYBRID
+FI218,The RTI response tracking system frequently misroutes applications to the wrong department.,REMOTE_ANALYTICAL
+FI219,"पंचायत के बजट आवंटन के आंकड़ों में पिछले दो वर्षों से भारी विसंगति देखी गई है, समीक्षा ज़रूरी है।",REMOTE_ANALYTICAL
+FI220,Humein grievance redressal data ko analyse karke pata karna hai ki kaunse departments response time mein sabse peeche hain.,REMOTE_ANALYTICAL
+FI221,A review of five years of e-governance service-delivery timelines is needed to identify which certificates take longest to process.,REMOTE_ANALYTICAL
+FI222,The online caste-certificate application system rejects valid documents due to a file-size formatting bug.,REMOTE_ANALYTICAL
+FI223,Sochta hoon ki CM helpline ke logs ko evaluate karke recurring complaint categories identify karni chahiye.,REMOTE_ANALYTICAL
+FI224,Sochta hoon ki CM helpline ke data ko analyse karke recurring complaint categories identify karni chahiye.,REMOTE_ANALYTICAL
+FI225,The public-service delivery guarantee act dashboard shows department-wise compliance rates that don't match the underlying complaint logs.,REMOTE_ANALYTICAL
+FI226,A comparative study of RTI disposal rates across ten districts is needed to identify best practices for faster response.,REMOTE_ANALYTICAL
+FI227,The online domicile-certificate system generates certificate numbers that clash with an older legacy database.,REMOTE_ANALYTICAL
+FI228,"स्थानीय निकाय के चुनाव आंकड़ों और मतदाता सूची में विसंगति पाई गई है, इसकी जांच डेटा स्तर पर होनी चाहिए।",REMOTE_ANALYTICAL
+FI229,The government job-portal's eligibility filter incorrectly excludes candidates with valid state-domicile certificates.,REMOTE_ANALYTICAL
+FI230,Analysis of ten years of panchayat election spending records is needed to flag unusual patterns for audit.,REMOTE_ANALYTICAL
+FI231,The MGNREGA worksite near a village in Latehar has no functioning water point for labourers despite the scheme's requirement.,FIELD_HEAVY
+FI232,"गांव के हथकरघा केंद्र की मशीनें कई महीनों से खराब पड़ी हैं, बुनकरों का काम रुका हुआ है।",FIELD_HEAVY
+FI233,"SHG ke sewing machine kharab ho gaye hain, mistri ko center pe bulana padega.",FIELD_HEAVY
+FI234,"Field note: the community poultry shed built under a livelihoods scheme has a collapsed wire mesh fence, letting predators in at night.",FIELD_HEAVY
+FI235,"A group of women in a self-help group near Simdega report that the dairy cooperative's milk-chilling unit has stopped working, spoiling collected milk.",FIELD_HEAVY
+FI236,"बकरी पालन योजना के तहत बनाया गया शेड बारिश में टपकता है, बकरियां बीमार पड़ रही हैं।",FIELD_HEAVY
+FI237,"Handicraft training center ka bijli connection kaat diya gaya hai, artisans kaam nahi kar pa rahe.",FIELD_HEAVY
+FI238,"The e-marketplace app for tribal handicrafts is generating orders, but artisans need training and packaging equipment installed at the cluster level.",HYBRID
+FI239,"स्वयं सहायता समूह के उत्पाद बेचने के लिए ऐप बनाया गया है, ऑर्डर तो आ रहे हैं पर पैकेजिंग और लॉजिस्टिक्स के लिए ज़मीनी सहायता चाहिए।",HYBRID
+FI240,"Mushroom cultivation training video series to online available hai, lekin actual spawn distribution aur unit setup ke liye field team chahiye.",HYBRID
+FI241,"The livelihood-mission's digital loan-tracking system works well, but loan officers still need to conduct in-person verification visits for new SHG members.",HYBRID
+FI242,"बुनकरों के लिए बनाया गया ऑनलाइन कैटलॉग सिस्टम ठीक काम कर रहा है, पर लूम मरम्मत और कच्चे माल की आपूर्ति के लिए मौके पर जाना ज़रूरी है।",HYBRID
+FI243,"A remote market-linkage platform connects farmers' producer groups to buyers, but the group's warehouse still needs a working weighing scale and storage racks installed.",HYBRID
+FI244,A comprehensive assessment of MGNREGA wage-payment delay logs across blocks is needed to identify which panchayats consistently pay late.,REMOTE_ANALYTICAL
+FI245,स्वयं सहायता समूहों को दिए गए ऋण की वसूली के आंकड़ों में कई विसंगतियां पाई गई हैं।,REMOTE_ANALYTICAL
+FI246,Humein SHG loan default data ko analyse karke pata karna hai ki kaunse blocks mein recovery rate sabse kam hai.,REMOTE_ANALYTICAL
+FI247,The job-card issuance portal under the rural employment scheme frequently duplicates entries for the same worker across different panchayats.,REMOTE_ANALYTICAL
+FI248,A review of five years of livelihood-scheme fund disbursement records is needed to understand delays between sanction and actual transfer.,REMOTE_ANALYTICAL
+FI249,The online market-price advisory for minor forest produce shows rates that haven't been updated in over a year for several districts.,REMOTE_ANALYTICAL
+FI250,जिले में स्वरोजगार योजना के लाभार्थियों की सूची और बैंक खाता स्थानांतरण के आंकड़ों में मेल नहीं है।,REMOTE_ANALYTICAL
