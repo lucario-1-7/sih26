@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 
-from sqlalchemy import DateTime, Float, ForeignKey, String, Text, UniqueConstraint
+from sqlalchemy import BigInteger, DateTime, Float, ForeignKey, Identity, String, Text, UniqueConstraint
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.db.base import Base, TimestampMixin, UUIDPKMixin, pg_enum
@@ -49,3 +49,6 @@ class DuplicateDecision(UUIDPKMixin, Base):
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True), server_default="now()", nullable=False
     )
+    # Monotonic tiebreaker for "current effective decision" — created_at alone
+    # can collide when two decisions on the same pair land in the same tick.
+    sequence: Mapped[int] = mapped_column(BigInteger, Identity(always=True), nullable=False, unique=True)

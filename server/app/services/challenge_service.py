@@ -5,7 +5,8 @@ from fastapi import HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.challenge import Challenge
-from app.models.enums import ChallengeStatus
+from app.models.enums import ChallengeStatus, Role
+from app.models.user import User
 from app.repositories.administrative_area_repository import AdministrativeAreaRepository
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.challenge_repository import ChallengeRepository
@@ -26,24 +27,39 @@ NOT_MUTABLE = HTTPException(
     status_code=status.HTTP_409_CONFLICT,
     detail={"detail": "Challenge can no longer be edited in its current status", "code": "CONFLICT"},
 )
+NOT_OWNER = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail={"detail": "Only the submitter can edit challenge content", "code": "FORBIDDEN"},
+)
+SEVERITY_REQUIRES_VALIDATOR = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail={"detail": "Only a VALIDATOR can set challenge severity", "code": "FORBIDDEN"},
+)
 
 logger = logging.getLogger("app.challenges")
 
 
-async def create_challenge(db: AsyncSession, *, data: ChallengeCreate, actor_id: uuid.UUID) -> Challenge:
+async def create_challenge(db: AsyncSession, *, data: ChallengeCreate, actor: User) -> Challenge:
     area = await AdministrativeAreaRepository(db).get(data.administrative_area_id)
     if area is None:
         raise AREA_NOT_FOUND
 
+    # on_behalf_of_* only ever applies to a FIELD_ASSISTANT submission — the
+    # citizen being reported for has no account of their own. Silently
+    # dropped for a CITIZEN's own submission rather than erroring, since a
+    # client-supplied value there would be meaningless, not malicious.
+    is_assisted = actor.role == Role.FIELD_ASSISTANT
     challenge = await ChallengeRepository(db).create(
         title=data.title,
         description=data.description,
-        submitted_by_id=actor_id,
+        submitted_by_id=actor.id,
         administrative_area_id=data.administrative_area_id,
         pin_code=data.pin_code,
+        on_behalf_of_name=data.on_behalf_of_name if is_assisted else None,
+        on_behalf_of_phone=data.on_behalf_of_phone if is_assisted else None,
     )
     await AuditRepository(db).log(
-        user_id=actor_id, action="challenge.create", entity_type="challenge", entity_id=challenge.id
+        user_id=actor.id, action="challenge.create", entity_type="challenge", entity_id=challenge.id
     )
     await db.commit()
 
@@ -78,31 +94,51 @@ async def list_challenges(
     submitted_by_id: uuid.UUID | None,
     cluster_id: uuid.UUID | None,
     limit: int,
-    offset: int,
-) -> list[Challenge]:
+    cursor: str | None,
+) -> tuple[list[Challenge], str | None]:
     return await ChallengeRepository(db).list(
         status=status_filter,
         submitted_by_id=submitted_by_id,
         cluster_id=cluster_id,
         limit=limit,
-        offset=offset,
+        cursor=cursor,
     )
 
 
 async def update_challenge(
-    db: AsyncSession, challenge_id: uuid.UUID, *, data: ChallengeUpdate, actor_id: uuid.UUID
+    db: AsyncSession, challenge_id: uuid.UUID, *, data: ChallengeUpdate, actor: User
 ) -> Challenge:
+    """Content fields (title/description) are owner-only — a CITIZEN or
+    FIELD_ASSISTANT may only edit their own submission. `severity` is a
+    VALIDATOR-only field (government review responsibility) and is not
+    subject to the owner/status checks that gate content edits."""
     challenge = await ChallengeRepository(db).get(challenge_id)
     if challenge is None:
         raise NOT_FOUND
-    if challenge.status not in (ChallengeStatus.SUBMITTED, ChallengeStatus.OPEN):
-        raise NOT_MUTABLE
-    if data.title is not None:
-        challenge.title = data.title
-    if data.description is not None:
-        challenge.description = data.description
+
+    content_edited = data.title is not None or data.description is not None
+    if content_edited:
+        if challenge.submitted_by_id != actor.id:
+            raise NOT_OWNER
+        if challenge.status not in (ChallengeStatus.SUBMITTED, ChallengeStatus.OPEN):
+            raise NOT_MUTABLE
+        if data.title is not None:
+            challenge.title = data.title
+        if data.description is not None:
+            challenge.description = data.description
+
+    if data.severity is not None:
+        if actor.role != Role.VALIDATOR:
+            raise SEVERITY_REQUIRES_VALIDATOR
+        challenge.severity = data.severity
+
     await AuditRepository(db).log(
-        user_id=actor_id, action="challenge.update", entity_type="challenge", entity_id=challenge.id
+        user_id=actor.id, action="challenge.update", entity_type="challenge", entity_id=challenge.id
     )
     await db.commit()
+    # `updated_at`'s onupdate value is computed server-side by the UPDATE
+    # statement — without a refresh it's left expired, and a later sync
+    # attribute access (e.g. Pydantic serialization) would crash with
+    # MissingGreenlet trying to lazy-load it outside an awaited context.
+    await db.refresh(challenge)
     return challenge

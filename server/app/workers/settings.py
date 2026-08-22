@@ -2,11 +2,15 @@ from arq.connections import RedisSettings
 
 from app.core.config import get_settings
 from app.core.logging import configure_logging
-from app.workers.tasks import generate_consortium_suggestion, generate_duplicate_candidates
+from app.workers.tasks import (
+    generate_cluster_embedding,
+    generate_consortium_suggestion,
+    generate_duplicate_candidates,
+)
 
 
 class WorkerSettings:
-    functions = [generate_duplicate_candidates, generate_consortium_suggestion]
+    functions = [generate_duplicate_candidates, generate_consortium_suggestion, generate_cluster_embedding]
     redis_settings = RedisSettings.from_dsn(get_settings().REDIS_URL)
     max_tries = 3
     job_timeout = 120

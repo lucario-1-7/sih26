@@ -14,15 +14,15 @@ def _user(role: Role) -> User:
 
 @pytest.mark.asyncio
 async def test_require_role_allows_matching_role():
-    dependency = require_role(Role.ADMIN)
-    user = _user(Role.ADMIN)
+    dependency = require_role(Role.SUPERADMIN)
+    user = _user(Role.SUPERADMIN)
     result = await dependency(user=user)
     assert result is user
 
 
 @pytest.mark.asyncio
 async def test_require_role_denies_non_matching_role():
-    dependency = require_role(Role.ADMIN)
+    dependency = require_role(Role.SUPERADMIN)
     user = _user(Role.CITIZEN)
     with pytest.raises(HTTPException) as exc_info:
         await dependency(user=user)
@@ -31,7 +31,7 @@ async def test_require_role_denies_non_matching_role():
 
 @pytest.mark.asyncio
 async def test_require_role_allows_any_of_multiple_roles():
-    dependency = require_role(Role.OFFICER, Role.ADMIN)
-    user = _user(Role.OFFICER)
+    dependency = require_role(Role.VALIDATOR, Role.SUPERADMIN)
+    user = _user(Role.VALIDATOR)
     result = await dependency(user=user)
     assert result is user

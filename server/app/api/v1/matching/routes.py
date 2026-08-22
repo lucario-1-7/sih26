@@ -27,12 +27,12 @@ router = APIRouter(prefix="/matching", tags=["matching"])
     "/organizations",
     response_model=OrganizationResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Register a university/industry organization as a matching candidate",
+    summary="Register a university/industry organization as a matching candidate (Superadmin-managed)",
 )
 async def create_organization(
     payload: OrganizationCreate,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(require_role(Role.OFFICER, Role.ADMIN)),
+    user: User = Depends(require_role(Role.SUPERADMIN)),
 ) -> OrganizationResponse:
     org = await matching_service.create_organization(db, data=payload, actor_id=user.id)
     return OrganizationResponse.model_validate(org)
@@ -44,13 +44,13 @@ async def create_organization(
 async def list_organizations(
     type: OrganizationType | None = None,
     limit: int = Query(default=20, ge=1, le=100),
-    offset: int = Query(default=0, ge=0),
+    cursor: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ) -> PaginatedResponse[OrganizationResponse]:
-    orgs = await matching_service.list_organizations(db, type=type, limit=limit, offset=offset)
+    orgs, next_cursor = await matching_service.list_organizations(db, type=type, limit=limit, cursor=cursor)
     return PaginatedResponse(
         items=[OrganizationResponse.model_validate(o) for o in orgs],
-        next_cursor=str(offset + limit) if len(orgs) == limit else None,
+        next_cursor=next_cursor,
     )
 
 
@@ -63,7 +63,7 @@ async def match_cluster(
     cluster_id: uuid.UUID,
     org_type: OrganizationType | None = Query(default=None, alias="type"),
     db: AsyncSession = Depends(get_db),
-    _user: User = Depends(require_role(Role.OFFICER, Role.ANALYST, Role.ADMIN)),
+    _user: User = Depends(require_role(Role.VALIDATOR, Role.COORDINATOR, Role.SUPERADMIN)),
 ) -> list[MatchResult]:
     return await matching_service.rank_matches_for_cluster(db, cluster_id=cluster_id, org_type=org_type)
 
@@ -76,7 +76,7 @@ async def match_cluster(
 async def request_consortium(
     project_id: uuid.UUID,
     payload: ConsortiumRequest,
-    _user: User = Depends(require_role(Role.OFFICER, Role.ADMIN)),
+    _user: User = Depends(require_role(Role.COORDINATOR, Role.FACULTY, Role.SUPERADMIN)),
 ) -> dict:
     await enqueue_consortium_suggestion(str(project_id), payload.team_size)
     return {"detail": "Consortium suggestion queued"}
@@ -107,12 +107,12 @@ async def list_consortium_members(
 @router.patch(
     "/consortiums/{consortium_id}/confirm",
     response_model=ConsortiumResponse,
-    summary="Officer/admin confirms a proposed consortium (human decision, auditable)",
+    summary="Coordinator/Faculty confirms a proposed consortium (human decision, auditable)",
 )
 async def confirm_consortium(
     consortium_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(require_role(Role.OFFICER, Role.ADMIN)),
+    user: User = Depends(require_role(Role.COORDINATOR, Role.FACULTY, Role.SUPERADMIN)),
 ) -> ConsortiumResponse:
     consortium = await matching_service.confirm_consortium(db, consortium_id, actor_id=user.id)
     return ConsortiumResponse.model_validate(consortium)

@@ -4,6 +4,7 @@ import uuid
 
 from sqlalchemy import select
 
+from app.core.pagination import paginate
 from app.models.challenge import Challenge
 from app.models.enums import ChallengeStatus
 from app.repositories.base import BaseRepository
@@ -23,8 +24,8 @@ class ChallengeRepository(BaseRepository):
         submitted_by_id: uuid.UUID | None = None,
         cluster_id: uuid.UUID | None = None,
         limit: int = 20,
-        offset: int = 0,
-    ) -> list[Challenge]:
+        cursor: str | None = None,
+    ) -> tuple[list[Challenge], str | None]:
         stmt = select(Challenge).where(Challenge.deleted_at.is_(None))
         if status is not None:
             stmt = stmt.where(Challenge.status == status)
@@ -32,9 +33,7 @@ class ChallengeRepository(BaseRepository):
             stmt = stmt.where(Challenge.submitted_by_id == submitted_by_id)
         if cluster_id is not None:
             stmt = stmt.where(Challenge.cluster_id == cluster_id)
-        stmt = stmt.order_by(Challenge.created_at.desc()).limit(limit).offset(offset)
-        result = await self.db.execute(stmt)
-        return list(result.scalars().all())
+        return await paginate(self.db, stmt, model=Challenge, limit=limit, cursor=cursor)
 
     async def create(
         self,
@@ -44,6 +43,8 @@ class ChallengeRepository(BaseRepository):
         submitted_by_id: uuid.UUID,
         administrative_area_id: uuid.UUID,
         pin_code: str | None,
+        on_behalf_of_name: str | None = None,
+        on_behalf_of_phone: str | None = None,
     ) -> Challenge:
         challenge = Challenge(
             title=title,
@@ -51,6 +52,8 @@ class ChallengeRepository(BaseRepository):
             submitted_by_id=submitted_by_id,
             administrative_area_id=administrative_area_id,
             pin_code=pin_code,
+            on_behalf_of_name=on_behalf_of_name,
+            on_behalf_of_phone=on_behalf_of_phone,
         )
         self.db.add(challenge)
         await self.db.flush()

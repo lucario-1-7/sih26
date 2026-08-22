@@ -80,6 +80,36 @@ async def generate_duplicate_candidates(ctx, challenge_id: str) -> None:
             )
 
 
+async def generate_cluster_embedding(ctx, cluster_id: str) -> None:
+    """Idempotent: skips computation if the cluster already has an embedding.
+
+    Runs after cluster create/update so `GET /matching/clusters/{id}` never has
+    to compute-and-persist an embedding as a side effect of a read.
+    """
+    cid = uuid.UUID(cluster_id)
+
+    async with AsyncSessionLocal() as db:
+        async with db.begin():
+            cluster_repo = ClusterRepository(db)
+            cluster = await cluster_repo.get(cid)
+            if cluster is None:
+                logger.info("cluster_embedding_job_skipped_missing_cluster cluster_id=%s", cluster_id)
+                return
+
+            if cluster.embedding is not None:
+                logger.info("cluster_embedding_job_skipped_already_present cluster_id=%s", cluster_id)
+                return
+
+            cluster.embedding = await ml_client.embed_text(f"{cluster.title}\n{cluster.description or ''}")
+
+            await AuditRepository(db).log(
+                user_id=None,
+                action="cluster.embedding_generated",
+                entity_type="cluster",
+                entity_id=cluster.id,
+            )
+
+
 async def generate_consortium_suggestion(ctx, project_id: str, team_size: int) -> None:
     """Idempotent: if a consortium already exists for this project, does nothing."""
     pid = uuid.UUID(project_id)

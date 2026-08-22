@@ -48,9 +48,33 @@ class DuplicateRepository(BaseRepository):
         return result.scalar_one_or_none()
 
     async def list_decisions(self, challenge_id: uuid.UUID) -> list[DuplicateDecision]:
-        stmt = select(DuplicateDecision).where(DuplicateDecision.challenge_id == challenge_id)
+        """Full append-only history for a challenge, oldest first. Ordered by the
+        monotonic `sequence` column, not `created_at` — two decisions on the
+        same pair recorded in quick succession can share a timestamp."""
+        stmt = (
+            select(DuplicateDecision)
+            .where(DuplicateDecision.challenge_id == challenge_id)
+            .order_by(DuplicateDecision.sequence.asc())
+        )
         result = await self.db.execute(stmt)
         return list(result.scalars().all())
+
+    async def get_latest_decision(
+        self, challenge_id: uuid.UUID, candidate_challenge_id: uuid.UUID
+    ) -> DuplicateDecision | None:
+        """The current effective decision for a candidate pair — the most recent
+        append-only record (by `sequence`), never a mutated row."""
+        stmt = (
+            select(DuplicateDecision)
+            .where(
+                DuplicateDecision.challenge_id == challenge_id,
+                DuplicateDecision.candidate_challenge_id == candidate_challenge_id,
+            )
+            .order_by(DuplicateDecision.sequence.desc())
+            .limit(1)
+        )
+        result = await self.db.execute(stmt)
+        return result.scalar_one_or_none()
 
     async def create_decision(
         self,

@@ -25,7 +25,7 @@ router = APIRouter(prefix="/duplicate", tags=["duplicate"])
 async def list_candidates(
     challenge_id: uuid.UUID,
     db: AsyncSession = Depends(get_db),
-    _user: User = Depends(require_role(Role.OFFICER, Role.ANALYST, Role.ADMIN)),
+    _user: User = Depends(require_role(Role.VALIDATOR, Role.SUPERADMIN)),
 ) -> list[DuplicateCandidateResponse]:
     candidates = await duplicate_service.list_candidates(db, challenge_id)
     return [DuplicateCandidateResponse.model_validate(c) for c in candidates]
@@ -40,7 +40,7 @@ async def list_candidates(
 async def create_decision(
     payload: DuplicateDecisionCreate,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(require_role(Role.OFFICER, Role.ADMIN)),
+    user: User = Depends(require_role(Role.VALIDATOR)),
 ) -> DuplicateDecisionResponse:
     decision = await duplicate_service.decide(db, data=payload, reviewer_id=user.id)
     return DuplicateDecisionResponse.model_validate(decision)

@@ -4,7 +4,9 @@ from app.core.config import get_settings
 
 
 class MLServiceError(Exception):
-    pass
+    """The ML service could not be reached, timed out, or returned an error.
+    Mapped to an HTTP 503 by the global exception handler (see app.core.errors)
+    — callers should let this propagate rather than catching it themselves."""
 
 
 def _to_list(embedding) -> list[float]:
