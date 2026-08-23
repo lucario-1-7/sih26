@@ -13,6 +13,7 @@ import { ParticipantsPanel } from "@/components/university/ParticipantsPanel";
 import { ProjectStatusActions } from "@/components/university/ProjectStatusActions";
 import { SolutionPanel } from "@/components/university/SolutionPanel";
 import { ImpactIndicatorsPanel } from "@/components/organization/ImpactIndicatorsPanel";
+import { UniversityUptake } from "@/components/organization/UniversityUptake";
 import { Card } from "@/components/ui/Card";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -115,6 +116,7 @@ function ProjectDetailsView({
                   {clusterQuery.data?.title ?? (clusterQuery.isLoading ? "Loading…" : project.cluster_id)}
                 </dd>
               </div>
+              <UniversityUptake university={project.university} />
             </dl>
           </Card>
         ) : null}

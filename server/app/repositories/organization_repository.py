@@ -17,6 +17,15 @@ class OrganizationRepository(BaseRepository):
             return None
         return org
 
+    async def get_many(self, org_ids: set[uuid.UUID]) -> dict[uuid.UUID, Organization]:
+        """Batch lookup keyed by id, for enriching a list of other resources
+        (e.g. projects) without an N+1 query per row."""
+        if not org_ids:
+            return {}
+        stmt = select(Organization).where(Organization.id.in_(org_ids), Organization.deleted_at.is_(None))
+        result = await self.db.execute(stmt)
+        return {org.id: org for org in result.scalars().all()}
+
     async def list(
         self, *, type: OrganizationType | None = None, limit: int = 20, cursor: str | None = None
     ) -> tuple[list[Organization], str | None]:

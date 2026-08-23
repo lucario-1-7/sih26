@@ -31,7 +31,7 @@ export default function HomePage() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <Spinner label="Loading Sahyog…" />
+      <Spinner label="Loading SocioSolve…" />
     </div>
   );
 }

@@ -1,4 +1,4 @@
-# Sahyog (sih26)
+# SocioSolve (sih26)
 
 Citizen challenge reporting → clustering → theme → project → solution platform,
 with ML-assisted (never automatic) duplicate detection and university/industry

@@ -102,7 +102,7 @@ export default function LoginPage() {
       // 1. MSG91 verifies the OTP itself and returns an access-token.
       const accessToken = await verifyMsg91Otp(otp);
       // 2. Our backend independently re-verifies that token with MSG91
-      //    server-side before issuing a Sahyog session — the phone number
+      //    server-side before issuing a SocioSolve session, the phone number
       //    is never taken on the client's word.
       await authApi.verifyMsg91AccessToken(accessToken);
       await completeLogin();

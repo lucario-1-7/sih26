@@ -11,6 +11,7 @@ export function listChallenges(params: {
   limit?: number;
   status?: ChallengeStatus;
   cluster_id?: string;
+  unclustered?: boolean;
   submitted_by_id?: string;
 }): Promise<PaginatedResponse<ChallengeResponse>> {
   return apiFetch<PaginatedResponse<ChallengeResponse>>("/challenges", {
@@ -19,6 +20,7 @@ export function listChallenges(params: {
       limit: params.limit ?? 20,
       status: params.status,
       cluster_id: params.cluster_id,
+      unclustered: params.unclustered,
       submitted_by_id: params.submitted_by_id,
     },
   });

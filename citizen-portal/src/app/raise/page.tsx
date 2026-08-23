@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { useAppStore } from '@/store/useAppStore';
 import { translations } from '@/lib/translations';
 import { JHARKHAND_DISTRICTS } from '@/lib/seedData';
-import { Category, ProblemMedia } from '@/types';
+import { ProblemMedia } from '@/types';
 import { ApiError } from '@/lib/api/client';
 import confetti from 'canvas-confetti';
 import {
@@ -26,19 +26,6 @@ import {
   Loader2
 } from 'lucide-react';
 
-const CATEGORIES: Category[] = [
-  'Education',
-  'Agriculture',
-  'Healthcare',
-  'Water Resources',
-  'Environment',
-  'Energy',
-  'Urban Development',
-  'Accessibility',
-  'Public Administration',
-  'Rural Livelihoods',
-];
-
 export default function RaiseProblemPage() {
   const router = useRouter();
   const { language, user, addProblem, showToast, administrativeAreas, loadAdministrativeAreas } = useAppStore();
@@ -53,7 +40,6 @@ export default function RaiseProblemPage() {
 
   // Form State
   const [title, setTitle] = useState('');
-  const [category, setCategory] = useState<Category>('Water Resources');
   const [description, setDescription] = useState('');
   // Free-text fields below are for the citizen's own reference only — the
   // backend has no fields for block/village/GPS on a challenge. Only
@@ -284,26 +270,7 @@ export default function RaiseProblemPage() {
               </p>
             </div>
 
-            {/* 2. Category Dropdown (Exact 10 Required Categories) */}
-            <div className="space-y-2">
-              <label htmlFor="probCategory" className="block text-xs font-bold uppercase tracking-wider text-black">
-                {t.probCategoryLabel} *
-              </label>
-              <select
-                id="probCategory"
-                value={category}
-                onChange={(e) => setCategory(e.target.value as Category)}
-                className="w-full bg-[#FAF8F5] border-2 border-black rounded-2xl px-4 py-3 text-sm font-bold text-black focus:bg-white focus:outline-none focus:ring-2 focus:ring-black cursor-pointer"
-              >
-                {CATEGORIES.map((cat) => (
-                  <option key={cat} value={cat}>
-                    {cat}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* 3. Description Textarea */}
+            {/* 2. Description Textarea */}
             <div className="space-y-2">
               <label htmlFor="probDesc" className="block text-xs font-bold uppercase tracking-wider text-black">
                 {t.probDescLabel} *
@@ -323,7 +290,7 @@ export default function RaiseProblemPage() {
               </div>
             </div>
 
-            {/* 4. Upload Area (Images, Videos, PDFs) */}
+            {/* 3. Upload Area (Images, Videos, PDFs) */}
             <div className="space-y-3">
               <label className="block text-xs font-bold uppercase tracking-wider text-black">
                 {t.probMediaLabel}
@@ -390,7 +357,7 @@ export default function RaiseProblemPage() {
               )}
             </div>
 
-            {/* 5. GPS Location & District Capture */}
+            {/* 4. GPS Location & District Capture */}
             <div className="space-y-4 pt-4 border-t border-black/10">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
                 <label className="block text-xs font-bold uppercase tracking-wider text-black">

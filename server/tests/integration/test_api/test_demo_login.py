@@ -70,6 +70,7 @@ async def test_demo_login_covers_every_organization_persona(client, monkeypatch)
         "government_validator": "validator",
         "government_field_assistant": "field_assistant",
         "university_coordinator": "coordinator",
+        "university_faculty": "faculty",
         "industry": "industry",
         "superadmin": "superadmin",
     }
@@ -121,6 +122,10 @@ async def test_normal_otp_login_route_is_unaffected_by_demo_mode_being_off(clien
     # route's behavior at all — still 202 Accepted for a well-formed request
     # against the dev/console fallback (DEMO_MODE and MSG91 vars are both
     # cleared by the autouse conftest fixture for this test).
-    phone = f"+91{uuid.uuid4().int % 10**10:010d}"
+    # Leading digit fixed at 9 (not a full random 0-9): OtpRequestIn.phone now
+    # enforces the real +91[6-9]XXXXXXXXX Indian mobile format, and this is
+    # the only place in the suite that sends a random phone through that
+    # schema rather than constructing a User row directly.
+    phone = f"+919{uuid.uuid4().int % 10**9:09d}"
     resp = await client.post("/api/v1/auth/otp/request", json={"phone": phone})
     assert resp.status_code == 202

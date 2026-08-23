@@ -53,9 +53,14 @@ async def get_cluster(db: AsyncSession, cluster_id: uuid.UUID) -> Cluster:
 
 
 async def list_clusters(
-    db: AsyncSession, *, status_filter: ClusterStatus | None, limit: int, cursor: str | None
+    db: AsyncSession,
+    *,
+    status_filter: ClusterStatus | None,
+    unclaimed: bool,
+    limit: int,
+    cursor: str | None,
 ) -> tuple[list[Cluster], str | None]:
-    return await ClusterRepository(db).list(status=status_filter, limit=limit, cursor=cursor)
+    return await ClusterRepository(db).list(status=status_filter, unclaimed=unclaimed, limit=limit, cursor=cursor)
 
 
 async def update_cluster(

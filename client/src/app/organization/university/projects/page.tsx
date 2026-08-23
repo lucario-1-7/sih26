@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import { useCursorPagination, useSyncCursorPage } from "@/hooks/useCursorPagination";
 import { useAuth } from "@/hooks/useAuth";
 import { useProjectsList } from "@/hooks/useProjectQueries";
+import { UniversityUptakeInline } from "@/components/organization/UniversityUptake";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -33,6 +34,11 @@ export default function ProjectsPage() {
   const columns: Column<ProjectResponse>[] = [
     { key: "title", header: "Title", render: (p) => p.title },
     { key: "status", header: "Status", render: (p) => <StatusBadge status={p.status} /> },
+    {
+      key: "university",
+      header: "Taken up by",
+      render: (p) => <UniversityUptakeInline university={p.university} />,
+    },
     {
       key: "updated_at",
       header: "Last updated",

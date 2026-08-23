@@ -29,12 +29,15 @@ async def create_cluster(
 @router.get("", response_model=PaginatedResponse[ClusterResponse], summary="List clusters")
 async def list_clusters(
     status_filter: ClusterStatus | None = Query(default=None, alias="status"),
+    unclaimed: bool = Query(
+        default=False, description="Only clusters with no Project yet - the actual 'opportunities' feed."
+    ),
     limit: int = Query(default=20, ge=1, le=100),
     cursor: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ) -> PaginatedResponse[ClusterResponse]:
     clusters, next_cursor = await cluster_service.list_clusters(
-        db, status_filter=status_filter, limit=limit, cursor=cursor
+        db, status_filter=status_filter, unclaimed=unclaimed, limit=limit, cursor=cursor
     )
     return PaginatedResponse(
         items=[ClusterResponse.model_validate(c) for c in clusters],

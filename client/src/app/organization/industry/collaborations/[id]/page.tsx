@@ -3,8 +3,10 @@
 import { useParams } from "next/navigation";
 
 import { useCollaborationsList } from "@/hooks/useCollaborationQueries";
+import { useProject } from "@/hooks/useProjectQueries";
 import { CollaborationStatusActions } from "@/components/organization/CollaborationStatusActions";
 import { CommitmentsPanel } from "@/components/organization/CommitmentsPanel";
+import { UniversityUptake } from "@/components/organization/UniversityUptake";
 import { Card } from "@/components/ui/Card";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -41,6 +43,17 @@ export default function CollaborationDetailsPage() {
     );
   }
 
+  return <CollaborationDetailsView collaboration={collaboration} />;
+}
+
+function CollaborationDetailsView({
+  collaboration,
+}: {
+  collaboration: NonNullable<ReturnType<typeof useCollaborationsList>["data"]>["items"][number];
+}) {
+  const projectQuery = useProject(collaboration.project_id);
+  const project = projectQuery.data;
+
   return (
     <div>
       <PageHeader title={`Collaboration — ${collaboration.type.replace(/_/g, " ")}`} actions={<StatusBadge status={collaboration.status} />} />
@@ -49,12 +62,15 @@ export default function CollaborationDetailsPage() {
         <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
             <dt className="text-xs font-medium uppercase text-slate-400">Project</dt>
-            <dd className="mt-1 font-mono text-sm text-slate-700">{collaboration.project_id}</dd>
+            <dd className="mt-1 text-sm text-slate-700">
+              {project ? project.title : projectQuery.isLoading ? "Loading…" : collaboration.project_id}
+            </dd>
           </div>
           <div>
             <dt className="text-xs font-medium uppercase text-slate-400">Last updated</dt>
             <dd className="mt-1 text-sm text-slate-700">{new Date(collaboration.updated_at).toLocaleString()}</dd>
           </div>
+          <UniversityUptake university={project?.university ?? null} />
           {collaboration.proposal ? (
             <div className="sm:col-span-2">
               <dt className="text-xs font-medium uppercase text-slate-400">Proposal</dt>

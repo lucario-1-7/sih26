@@ -71,6 +71,15 @@ export const PROJECT_STATUS_TRANSITIONS: Record<ProjectStatus, ProjectStatus[]> 
   cancelled: [],
 };
 
+/** Minimal organization identity embedded in another resource's response
+ * (e.g. the university that has taken up a project) - see the backend's
+ * OrganizationSummary schema. Not the full OrganizationResponse below. */
+export interface OrganizationSummary {
+  id: string;
+  name: string;
+  type: OrganizationType;
+}
+
 export interface ProjectResponse {
   id: string;
   cluster_id: string;
@@ -79,6 +88,10 @@ export interface ProjectResponse {
   status: ProjectStatus;
   owner_id: string;
   organization_id: string | null;
+  /** The university that has actually taken up this project - null until
+   * the project is accepted (status past "proposed"), never merely because
+   * it was created. See server's project_service.to_response. */
+  university: OrganizationSummary | null;
   created_at: string;
   updated_at: string;
 }
@@ -302,6 +315,7 @@ export interface ChallengeUpdateInput {
   title?: string;
   description?: string;
   severity?: ChallengeSeverity;
+  cluster_id?: string;
 }
 
 // --- Duplicate detection (human-in-the-loop; append-only decisions) ---

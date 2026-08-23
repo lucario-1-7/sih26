@@ -1,15 +1,17 @@
 import { apiFetch } from "@/lib/api/client";
 import type { ClusterCreateInput, ClusterResponse, ClusterStatus, ClusterUpdateInput, PaginatedResponse } from "@/types/api";
 
-/** Active clusters are the closest existing concept to "opportunities" for a
- * university — there is no dedicated opportunity-feed endpoint. See
- * client's project docs / final report for why this endpoint was chosen. */
+/** Active, unclaimed clusters (no Project yet) are "opportunities" - a
+ * cluster a university/coordinator could actually propose a project
+ * against. `unclaimed=true` excludes clusters another organization has
+ * already turned into a project; there is no separate opportunity-feed
+ * endpoint, this is the canonical /clusters listing with that filter. */
 export function listOpportunityClusters(params: {
   cursor?: string | null;
   limit?: number;
 }): Promise<PaginatedResponse<ClusterResponse>> {
   return apiFetch<PaginatedResponse<ClusterResponse>>("/clusters", {
-    query: { status: "active", cursor: params.cursor ?? undefined, limit: params.limit ?? 20 },
+    query: { status: "active", unclaimed: true, cursor: params.cursor ?? undefined, limit: params.limit ?? 20 },
   });
 }
 

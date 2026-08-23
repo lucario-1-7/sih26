@@ -13,7 +13,7 @@ def create_app() -> FastAPI:
     settings = get_settings()
 
     app = FastAPI(
-        title="Sahyog API",
+        title="SocioSolve API",
         version="1.0.0",
         openapi_url="/api/v1/openapi.json",
         docs_url="/api/v1/docs",

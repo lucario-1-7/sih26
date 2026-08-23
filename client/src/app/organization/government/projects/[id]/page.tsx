@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 
 import { useProject } from "@/hooks/useProjectQueries";
 import { ImpactIndicatorsPanel } from "@/components/organization/ImpactIndicatorsPanel";
+import { UniversityUptake } from "@/components/organization/UniversityUptake";
 import { Card } from "@/components/ui/Card";
 import { ErrorState } from "@/components/ui/ErrorState";
 import { PageHeader } from "@/components/ui/PageHeader";
@@ -32,8 +33,13 @@ export default function GovernmentProjectDetailsPage() {
       <PageHeader title={project.title} actions={<StatusBadge status={project.status} />} />
 
       <Card className="mb-6">
-        <dt className="text-xs font-medium uppercase text-slate-400">Description</dt>
-        <dd className="mt-1 text-sm text-slate-700">{project.description ?? "No description provided."}</dd>
+        <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <div>
+            <dt className="text-xs font-medium uppercase text-slate-400">Description</dt>
+            <dd className="mt-1 text-sm text-slate-700">{project.description ?? "No description provided."}</dd>
+          </div>
+          <UniversityUptake university={project.university} />
+        </dl>
       </Card>
 
       <Card>

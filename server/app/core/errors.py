@@ -2,6 +2,7 @@ import logging
 import uuid
 
 from fastapi import FastAPI, HTTPException, Request, status
+from fastapi.encoders import jsonable_encoder
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
@@ -35,7 +36,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(MLServiceError)
     async def ml_service_error_handler(request: Request, exc: MLServiceError):
         # Never leak the underlying httpx exception message (connection
-        # details, internal hostnames) to clients — log it server-side instead.
+        # details, internal hostnames) to clients: log it server-side instead.
         logger.error("ml_service_unavailable request_id=%s error=%s", _request_id(request), exc)
         return JSONResponse(
             status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
@@ -49,7 +50,7 @@ def register_exception_handlers(app: FastAPI) -> None:
     @app.exception_handler(OtpDeliveryError)
     async def otp_delivery_error_handler(request: Request, exc: OtpDeliveryError):
         # Never leak provider response internals, the MSG91 auth key, or a
-        # stack trace to the client — log server-side (already scrubbed by
+        # stack trace to the client: log server-side (already scrubbed by
         # the raiser) and return one generic, safe message.
         logger.error("otp_delivery_failed request_id=%s error=%s", _request_id(request), exc)
         return JSONResponse(
@@ -63,12 +64,17 @@ def register_exception_handlers(app: FastAPI) -> None:
 
     @app.exception_handler(RequestValidationError)
     async def validation_exception_handler(request: Request, exc: RequestValidationError):
+        # jsonable_encoder, not exc.errors() directly: a field_validator that
+        # raises ValueError makes Pydantic attach the raw exception object
+        # under each error's ctx.error for introspection, which plain
+        # json.dumps cannot serialize; this is the same conversion FastAPI's
+        # own default RequestValidationError handler applies.
         return JSONResponse(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
             content={
                 "detail": "Validation failed",
                 "code": "VALIDATION_ERROR",
-                "errors": exc.errors(),
+                "errors": jsonable_encoder(exc.errors()),
                 "request_id": _request_id(request),
             },
         )

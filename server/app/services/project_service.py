@@ -8,8 +8,10 @@ from app.models.project import Project
 from app.models.user import User
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.cluster_repository import ClusterRepository
+from app.repositories.organization_repository import OrganizationRepository
 from app.repositories.project_repository import ProjectRepository
-from app.schemas.project import ProjectCreate, ProjectUpdate
+from app.schemas.organization import OrganizationSummary
+from app.schemas.project import ProjectCreate, ProjectResponse, ProjectUpdate
 
 NOT_FOUND = HTTPException(
     status_code=status.HTTP_404_NOT_FOUND, detail={"detail": "Project not found", "code": "NOT_FOUND"}
@@ -32,6 +34,54 @@ def _invalid_transition(current: ProjectStatus, target: ProjectStatus) -> HTTPEx
             "code": "INVALID_STATUS_TRANSITION",
         },
     )
+
+
+_TAKEN_UP_STATUSES = frozenset(
+    {ProjectStatus.ACCEPTED, ProjectStatus.ACTIVE, ProjectStatus.ON_HOLD, ProjectStatus.COMPLETED}
+)
+
+
+def _has_been_taken_up(project: Project) -> bool:
+    """A university "taking up" a project is the existing accept
+    state-transition (PROPOSED -> ACCEPTED, see PROJECT_STATUS_TRANSITIONS),
+    not the mere existence of organization_id - that column is populated at
+    creation/proposal time already (create_project), before any acceptance
+    has happened. Showing the university while still PROPOSED would
+    misrepresent an open proposal as an accepted uptake.
+
+    Deliberately an allowlist, not `status != PROPOSED`: CANCELLED is
+    reachable directly from PROPOSED too (a rejected proposal that was never
+    accepted), and the current status alone can't distinguish that from
+    "was accepted, later cancelled" - there's no history field. Excluding
+    CANCELLED entirely is the safe choice: it never misreports a rejected
+    proposal as a real uptake, at the acceptable cost of also no longer
+    crediting a university once a previously-accepted project is cancelled."""
+    return project.organization_id is not None and project.status in _TAKEN_UP_STATUSES
+
+
+async def to_response(db: AsyncSession, project: Project) -> ProjectResponse:
+    response = ProjectResponse.model_validate(project)
+    if _has_been_taken_up(project):
+        org = await OrganizationRepository(db).get(project.organization_id)  # type: ignore[arg-type]
+        if org is not None:
+            response.university = OrganizationSummary.model_validate(org)
+    return response
+
+
+async def to_responses(db: AsyncSession, projects: list[Project]) -> list[ProjectResponse]:
+    """Batched equivalent of to_response - one Organization query for the
+    whole list instead of one per project."""
+    org_ids = {p.organization_id for p in projects if _has_been_taken_up(p) and p.organization_id is not None}
+    orgs_by_id = await OrganizationRepository(db).get_many(org_ids)
+    responses = []
+    for project in projects:
+        response = ProjectResponse.model_validate(project)
+        if _has_been_taken_up(project):
+            org = orgs_by_id.get(project.organization_id)  # type: ignore[arg-type]
+            if org is not None:
+                response.university = OrganizationSummary.model_validate(org)
+        responses.append(response)
+    return responses
 
 
 async def create_project(db: AsyncSession, *, data: ProjectCreate, actor: User) -> Project:

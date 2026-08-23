@@ -102,8 +102,8 @@ describe("AuthContext", () => {
       status = 401;
     }
     vi.mocked(getCurrentUser).mockRejectedValue(new ApiErrorStub("expired"));
-    window.localStorage.setItem("sahyog.access_token", "expired-token");
-    window.localStorage.setItem("sahyog.refresh_token", "expired-refresh");
+    window.localStorage.setItem("sociosolve.access_token", "expired-token");
+    window.localStorage.setItem("sociosolve.refresh_token", "expired-refresh");
 
     render(
       <AuthProvider>

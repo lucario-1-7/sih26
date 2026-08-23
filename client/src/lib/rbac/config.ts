@@ -53,6 +53,7 @@ export function facultyNav(): NavItem[] {
 export function validatorNav(): NavItem[] {
   return [
     { label: "Dashboard", href: "/organization/government" },
+    { label: "Pending Triage", href: "/organization/government/challenges/pending-triage" },
     { label: "Challenges", href: "/organization/government/challenges" },
     { label: "Clusters", href: "/organization/government/clusters" },
     { label: "Themes", href: "/organization/government/themes" },

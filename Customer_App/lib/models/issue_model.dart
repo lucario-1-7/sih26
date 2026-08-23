@@ -75,6 +75,11 @@ class IssueItem {
   final String? citizenMobile;
   final String? cityWard;
   final String? pincode;
+  // Not resolved from the challenge alone: a challenge only carries a
+  // cluster_id (once a validator has triaged it); the caller (see
+  // issue_detail_screen.dart) looks up the taken-up project for that
+  // cluster separately via ProjectRepository, the same as areaName above.
+  final String? clusterId;
 
   const IssueItem({
     required this.id,
@@ -91,6 +96,7 @@ class IssueItem {
     this.citizenMobile,
     this.cityWard,
     this.pincode,
+    this.clusterId,
   });
 
   double get progressValue => progress ?? status.defaultProgress;
@@ -114,6 +120,7 @@ class IssueItem {
       dateFiled: _formatDate(challenge.createdAt),
       status: issueStatusFromChallengeStatus(challenge.status),
       pincode: challenge.pinCode,
+      clusterId: challenge.clusterId,
     );
   }
 

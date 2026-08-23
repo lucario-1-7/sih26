@@ -102,6 +102,7 @@ async def list_challenges(
     status_filter: ChallengeStatus | None,
     submitted_by_id: uuid.UUID | None,
     cluster_id: uuid.UUID | None,
+    unclustered: bool,
     limit: int,
     cursor: str | None,
 ) -> tuple[list[Challenge], str | None]:
@@ -109,6 +110,7 @@ async def list_challenges(
         status=status_filter,
         submitted_by_id=submitted_by_id,
         cluster_id=cluster_id,
+        unclustered=unclustered,
         limit=limit,
         cursor=cursor,
     )

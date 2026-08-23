@@ -124,7 +124,7 @@ export default function LoginPage() {
       <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4 py-10">
         <div className="w-full max-w-2xl">
           <div className="mb-6 text-center">
-            <h1 className="text-2xl font-bold text-slate-900">Sahyog</h1>
+            <h1 className="text-2xl font-bold text-slate-900">SocioSolve</h1>
             <span className="mt-2 mb-1 inline-block rounded-full bg-amber-400 px-3 py-1 text-xs font-black uppercase tracking-wider text-black">
               Presentation Demo
             </span>
@@ -173,7 +173,7 @@ export default function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-50 px-4">
       <div className="w-full max-w-sm rounded-lg border border-slate-200 bg-white p-6 shadow-sm">
-        <h1 className="mb-1 text-lg font-semibold text-slate-900">Sign in to Sahyog</h1>
+        <h1 className="mb-1 text-lg font-semibold text-slate-900">Sign in to SocioSolve</h1>
         <p className="mb-6 text-sm text-slate-500">
           {view === "phone" ? "Enter your registered phone number." : "Enter the OTP sent to your phone."}
         </p>

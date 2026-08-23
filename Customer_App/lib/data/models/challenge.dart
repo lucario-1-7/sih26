@@ -12,6 +12,7 @@ class Challenge {
   final String? severity;
   final String administrativeAreaId;
   final String? pinCode;
+  final String? clusterId;
   final String? contentDomain;
   final double? contentDomainConfidence;
   final double? contentFieldIntensity;
@@ -26,6 +27,7 @@ class Challenge {
     required this.severity,
     required this.administrativeAreaId,
     required this.pinCode,
+    required this.clusterId,
     required this.contentDomain,
     required this.contentDomainConfidence,
     required this.contentFieldIntensity,
@@ -41,6 +43,11 @@ class Challenge {
         severity: json['severity'] as String?,
         administrativeAreaId: json['administrative_area_id'] as String,
         pinCode: json['pin_code'] as String?,
+        // Null until a VALIDATOR clusters this challenge (see
+        // server/app/services/challenge_service.py), the join point used
+        // to look up which, if any, university has taken up the project
+        // this challenge eventually became part of.
+        clusterId: json['cluster_id'] as String?,
         contentDomain: json['content_domain'] as String?,
         contentDomainConfidence: (json['content_domain_confidence'] as num?)?.toDouble(),
         contentFieldIntensity: (json['content_field_intensity'] as num?)?.toDouble(),

@@ -1,6 +1,6 @@
-# Sahyog Web Client
+# SocioSolve Web Client
 
-Scaffold only — implementation intentionally deferred until the backend API
+Scaffold only, implementation intentionally deferred until the backend API
 contracts under `/api/v1` are stable (per project instructions).
 
 Planned structure once implementation begins:

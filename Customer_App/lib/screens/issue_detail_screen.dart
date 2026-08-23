@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../models/issue_model.dart';
 import '../theme/app_theme.dart';
+import '../widgets/university_uptake_section.dart';
 
 class IssueDetailScreen extends StatelessWidget {
   final IssueItem issue;
@@ -183,6 +184,8 @@ class IssueDetailScreen extends StatelessWidget {
               ),
 
               const SizedBox(height: 28),
+
+              UniversityUptakeSection(clusterId: issue.clusterId),
 
               // 2. Status & Timeline Section (Lastly Status and timeline)
               Text(

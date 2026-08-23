@@ -7,7 +7,9 @@ import type {
 } from "@/lib/api/challenges";
 import type { ChallengeStatus, ChallengeUpdateInput, DuplicateDecisionCreateInput } from "@/types/api";
 
-export function useChallengesList(params: { status?: ChallengeStatus; cursor?: string } = {}) {
+export function useChallengesList(
+  params: { status?: ChallengeStatus; cluster_id?: string; unclustered?: boolean; cursor?: string } = {},
+) {
   return useQuery({
     queryKey: ["challenges", params],
     queryFn: () => listChallenges(params),

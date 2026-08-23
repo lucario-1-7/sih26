@@ -42,7 +42,7 @@ async def create_project(
     user: User = Depends(require_role(Role.COORDINATOR, Role.SUPERADMIN)),
 ) -> ProjectResponse:
     project = await project_service.create_project(db, data=payload, actor=user)
-    return ProjectResponse.model_validate(project)
+    return await project_service.to_response(db, project)
 
 
 @router.get("", response_model=PaginatedResponse[ProjectResponse], summary="List projects")
@@ -57,7 +57,7 @@ async def list_projects(
         db, cluster_id=cluster_id, status_filter=status_filter, limit=limit, cursor=cursor
     )
     return PaginatedResponse(
-        items=[ProjectResponse.model_validate(p) for p in projects],
+        items=await project_service.to_responses(db, projects),
         next_cursor=next_cursor,
     )
 
@@ -65,7 +65,7 @@ async def list_projects(
 @router.get("/{project_id}", response_model=ProjectResponse, summary="Get a project by id")
 async def get_project(project_id: uuid.UUID, db: AsyncSession = Depends(get_db)) -> ProjectResponse:
     project = await project_service.get_project(db, project_id)
-    return ProjectResponse.model_validate(project)
+    return await project_service.to_response(db, project)
 
 
 @router.patch("/{project_id}", response_model=ProjectResponse, summary="Update a project")
@@ -76,7 +76,7 @@ async def update_project(
     user: User = Depends(require_role(Role.COORDINATOR, Role.FACULTY, Role.SUPERADMIN)),
 ) -> ProjectResponse:
     project = await project_service.update_project(db, project_id, data=payload, actor=user)
-    return ProjectResponse.model_validate(project)
+    return await project_service.to_response(db, project)
 
 
 # --- Project participants (students — no user account, faculty/coordinator managed) ---

@@ -99,6 +99,17 @@ async def test_faculty_cannot_manage_another_universitys_project(client, db, val
 
 
 @pytest.mark.asyncio
+async def test_faculty_cannot_create_a_project_coordinator_privilege_only(client, validator_user, faculty_user):
+    cluster_id = await _make_cluster(client, validator_user)
+    resp = await client.post(
+        "/api/v1/projects",
+        json={"cluster_id": cluster_id, "title": f"Faculty Should Not Create {uuid.uuid4().hex[:8]}"},
+        headers=auth_headers(faculty_user),
+    )
+    assert resp.status_code == 403
+
+
+@pytest.mark.asyncio
 async def test_faculty_can_submit_a_solution_for_own_project(client, validator_user, coordinator_user, faculty_user):
     cluster_id = await _make_cluster(client, validator_user)
     create_resp = await client.post(

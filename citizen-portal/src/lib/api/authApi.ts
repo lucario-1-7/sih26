@@ -19,7 +19,7 @@ const REFRESH_TOKEN_KEY = 'sociosolve_refresh_token';
 export const authApi = {
   /**
    * Exchanges a real MSG91 OTP Widget access-token (already verified
-   * client-side by MSG91 itself) for a Sahyog session. The backend
+   * client-side by MSG91 itself) for a SocioSolve session. The backend
    * independently re-verifies the token with MSG91 server-side before
    * issuing anything — this call genuinely fails if that verification
    * fails, it never falls back to a fabricated session.
@@ -42,7 +42,7 @@ export const authApi = {
 
   /**
    * PRESENTATION-ONLY. Bypasses the OTP challenge entirely — issues a real
-   * Sahyog session for a real, backend-persisted demo citizen. Only ever
+   * SocioSolve session for a real, backend-persisted demo citizen. Only ever
    * called from a UI path gated by NEXT_PUBLIC_DEMO_MODE, and only ever
    * succeeds if the backend's own DEMO_MODE is also explicitly enabled
    * (404 otherwise) — this flag alone can never grant access.

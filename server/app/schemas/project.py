@@ -4,6 +4,7 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict, Field
 
 from app.models.enums import ProjectStatus
+from app.schemas.organization import OrganizationSummary
 
 
 class ProjectCreate(BaseModel):
@@ -29,5 +30,12 @@ class ProjectResponse(BaseModel):
     status: ProjectStatus
     owner_id: uuid.UUID
     organization_id: uuid.UUID | None
+    # The university that has actually taken up this project - populated
+    # only once the project has been accepted (status has moved past
+    # PROPOSED), never merely because it was created/proposed. See
+    # project_service.to_response. Not set by model_validate(project)
+    # directly (Project has no ORM relationship of this name); the service
+    # layer resolves and assigns it explicitly.
+    university: OrganizationSummary | None = None
     created_at: datetime
     updated_at: datetime

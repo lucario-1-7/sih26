@@ -31,6 +31,7 @@ async def list_challenges(
     status_filter: ChallengeStatus | None = Query(default=None, alias="status"),
     submitted_by_id: uuid.UUID | None = None,
     cluster_id: uuid.UUID | None = None,
+    unclustered: bool = Query(default=False),
     limit: int = Query(default=20, ge=1, le=100),
     cursor: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
@@ -40,6 +41,7 @@ async def list_challenges(
         status_filter=status_filter,
         submitted_by_id=submitted_by_id,
         cluster_id=cluster_id,
+        unclustered=unclustered,
         limit=limit,
         cursor=cursor,
     )

@@ -4,6 +4,7 @@ import Link from "next/link";
 
 import { useProjectsList } from "@/hooks/useProjectQueries";
 import { useCursorPagination, useSyncCursorPage } from "@/hooks/useCursorPagination";
+import { UniversityUptakeInline } from "@/components/organization/UniversityUptake";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { ErrorState } from "@/components/ui/ErrorState";
@@ -22,6 +23,11 @@ export default function GovernmentProjectsPage() {
   const columns: Column<ProjectResponse>[] = [
     { key: "title", header: "Title", render: (p) => p.title },
     { key: "status", header: "Status", render: (p) => <StatusBadge status={p.status} /> },
+    {
+      key: "university",
+      header: "Taken up by",
+      render: (p) => <UniversityUptakeInline university={p.university} />,
+    },
     { key: "updated", header: "Last updated", render: (p) => new Date(p.updated_at).toLocaleDateString() },
     {
       key: "details",

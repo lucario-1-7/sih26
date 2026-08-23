@@ -23,6 +23,7 @@ class ChallengeRepository(BaseRepository):
         status: ChallengeStatus | None = None,
         submitted_by_id: uuid.UUID | None = None,
         cluster_id: uuid.UUID | None = None,
+        unclustered: bool = False,
         limit: int = 20,
         cursor: str | None = None,
     ) -> tuple[list[Challenge], str | None]:
@@ -33,6 +34,12 @@ class ChallengeRepository(BaseRepository):
             stmt = stmt.where(Challenge.submitted_by_id == submitted_by_id)
         if cluster_id is not None:
             stmt = stmt.where(Challenge.cluster_id == cluster_id)
+        # `cluster_id=<uuid>` (equals a specific cluster) and `unclustered=true`
+        # (IS NULL) are mutually exclusive filters: a plain equality param can
+        # never express "IS NULL", which is the actual query a validator triage
+        # queue needs (pending challenges with no cluster assigned yet).
+        if unclustered:
+            stmt = stmt.where(Challenge.cluster_id.is_(None))
         return await paginate(self.db, stmt, model=Challenge, limit=limit, cursor=cursor)
 
     async def create(

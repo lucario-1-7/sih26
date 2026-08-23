@@ -20,7 +20,7 @@ export class ApiError extends Error {
 interface RequestOptions {
   method?: "GET" | "POST" | "PATCH" | "DELETE";
   body?: unknown;
-  query?: Record<string, string | number | undefined | null>;
+  query?: Record<string, string | number | boolean | undefined | null>;
   /** Skip the Authorization header (e.g. for the OTP endpoints). */
   unauthenticated?: boolean;
   /** Internal — prevents infinite refresh loops. */

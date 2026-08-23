@@ -6,8 +6,8 @@
 // pub-sub lets the API client and AuthProvider stay in sync without a
 // circular import between them.
 
-const ACCESS_KEY = "sahyog.access_token";
-const REFRESH_KEY = "sahyog.refresh_token";
+const ACCESS_KEY = "sociosolve.access_token";
+const REFRESH_KEY = "sociosolve.refresh_token";
 
 type Listener = () => void;
 const listeners = new Set<Listener>();

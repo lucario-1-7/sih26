@@ -19,11 +19,23 @@ class ClusterRepository(BaseRepository):
         return cluster
 
     async def list(
-        self, *, status: ClusterStatus | None = None, limit: int = 20, cursor: str | None = None
+        self,
+        *,
+        status: ClusterStatus | None = None,
+        unclaimed: bool = False,
+        limit: int = 20,
+        cursor: str | None = None,
     ) -> tuple[list[Cluster], str | None]:
         stmt = select(Cluster).where(Cluster.deleted_at.is_(None))
         if status is not None:
             stmt = stmt.where(Cluster.status == status)
+        if unclaimed:
+            # A cluster that already has a Project is not an "opportunity"
+            # any more - it's been claimed. Same has-project exclusion
+            # find_open_nearest_by_embedding already applies for matching
+            # suggestions, reused here for the opportunities listing.
+            has_project = select(Project.id).where(Project.cluster_id == Cluster.id, Project.deleted_at.is_(None))
+            stmt = stmt.where(~has_project.exists())
         return await paginate(self.db, stmt, model=Cluster, limit=limit, cursor=cursor)
 
     async def create(self, *, title: str, description: str | None, theme_id: uuid.UUID | None) -> Cluster:

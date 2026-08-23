@@ -30,7 +30,7 @@ async def verify_otp(
 @router.post(
     "/customer/msg91/verify",
     response_model=TokenPair,
-    summary="Verify a client-completed MSG91 OTP Widget access-token and issue a Sahyog session",
+    summary="Verify a client-completed MSG91 OTP Widget access-token and issue a SocioSolve session",
 )
 async def verify_msg91_widget(
     payload: Msg91WidgetVerifyIn, request: Request, db: AsyncSession = Depends(get_db)
