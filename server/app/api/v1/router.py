@@ -1,5 +1,6 @@
 from fastapi import APIRouter
 
+from app.api.v1.administrative_areas.routes import router as administrative_areas_router
 from app.api.v1.analytics.routes import router as analytics_router
 from app.api.v1.auth.routes import router as auth_router
 from app.api.v1.challenges.routes import router as challenges_router
@@ -17,6 +18,7 @@ api_router = APIRouter(prefix="/api/v1")
 api_router.include_router(health_router)
 api_router.include_router(auth_router)
 api_router.include_router(users_router)
+api_router.include_router(administrative_areas_router)
 api_router.include_router(challenges_router)
 api_router.include_router(clusters_router)
 api_router.include_router(themes_router)

@@ -17,6 +17,22 @@ export function verifyOtp(phone: string, code: string): Promise<TokenPair> {
   });
 }
 
+/**
+ * PRESENTATION-ONLY. Bypasses the OTP challenge entirely — issues a real
+ * session for a real, backend-persisted demo user with the given
+ * organizational persona. Only ever called from a UI path gated by
+ * NEXT_PUBLIC_DEMO_MODE, and only ever succeeds if the backend's own
+ * DEMO_MODE is also explicitly enabled (404 otherwise) — this flag alone
+ * can never grant access.
+ */
+export function demoLogin(persona: string): Promise<TokenPair> {
+  return apiFetch<TokenPair>("/auth/demo/login", {
+    method: "POST",
+    body: { persona },
+    unauthenticated: true,
+  });
+}
+
 export function refreshTokens(refresh_token: string): Promise<TokenPair> {
   return apiFetch<TokenPair>("/auth/refresh", {
     method: "POST",

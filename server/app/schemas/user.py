@@ -1,8 +1,9 @@
 import uuid
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
+from app.core.validators import validate_indian_phone
 from app.models.enums import Domain, Role
 
 
@@ -18,6 +19,8 @@ class UserCreate(BaseModel):
     domain: Domain
     organization_id: uuid.UUID | None = None
     administrative_area_id: uuid.UUID | None = None
+
+    _validate_phone = field_validator("phone")(validate_indian_phone)
 
 
 class UserUpdate(BaseModel):

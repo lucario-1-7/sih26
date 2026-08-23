@@ -1,5 +1,6 @@
 import pytest
 
+from app.core.config import get_settings
 from app.services import otp_sender
 
 
@@ -70,25 +71,82 @@ async def test_verifying_with_the_most_recently_requested_otp_succeeds(client, m
     the one just issued — a genuinely correct, freshly-requested code would
     then fail verification. Requesting twice and verifying with the second
     (truly latest) code must succeed."""
-    codes: list[str] = []
+    # Resend-cooldown protection would otherwise reject the second request
+    # made back-to-back in this test — disabled here to isolate the
+    # created_at-ordering behavior this test actually targets.
+    monkeypatch.setenv("OTP_RESEND_COOLDOWN_SECONDS", "0")
+    get_settings.cache_clear()
+    try:
+        codes: list[str] = []
 
-    class RecordingSender(otp_sender.OtpSender):
-        async def send(self, phone: str, code: str) -> None:
-            codes.append(code)
+        class RecordingSender(otp_sender.OtpSender):
+            async def send(self, phone: str, code: str) -> None:
+                codes.append(code)
 
-    sender = RecordingSender()
+        sender = RecordingSender()
+        import app.services.auth_service as auth_service
+
+        monkeypatch.setattr(auth_service, "get_otp_sender", lambda: sender)
+
+        phone = "+919876500099"
+        resp = await client.post("/api/v1/auth/otp/request", json={"phone": phone})
+        assert resp.status_code == 202
+        resp = await client.post("/api/v1/auth/otp/request", json={"phone": phone})
+        assert resp.status_code == 202
+        assert len(codes) == 2
+        latest_code = codes[-1]
+
+        resp = await client.post("/api/v1/auth/otp/verify", json={"phone": phone, "code": latest_code})
+        assert resp.status_code == 200
+        assert "access_token" in resp.json()
+    finally:
+        get_settings.cache_clear()
+
+
+@pytest.mark.asyncio
+async def test_resend_within_cooldown_is_rejected_with_429(client, monkeypatch):
+    sender = CapturingSender()
     import app.services.auth_service as auth_service
 
     monkeypatch.setattr(auth_service, "get_otp_sender", lambda: sender)
 
-    phone = "+919876500099"
+    phone = "+919876500100"
     resp = await client.post("/api/v1/auth/otp/request", json={"phone": phone})
     assert resp.status_code == 202
-    resp = await client.post("/api/v1/auth/otp/request", json={"phone": phone})
-    assert resp.status_code == 202
-    assert len(codes) == 2
-    latest_code = codes[-1]
 
-    resp = await client.post("/api/v1/auth/otp/verify", json={"phone": phone, "code": latest_code})
-    assert resp.status_code == 200
-    assert "access_token" in resp.json()
+    resp = await client.post("/api/v1/auth/otp/request", json={"phone": phone})
+    assert resp.status_code == 429
+    body = resp.json()
+    assert body["code"] == "OTP_RESEND_TOO_SOON"
+
+
+@pytest.mark.asyncio
+async def test_resend_after_cooldown_elapses_succeeds(client, monkeypatch):
+    monkeypatch.setenv("OTP_RESEND_COOLDOWN_SECONDS", "0")
+    get_settings.cache_clear()
+    try:
+        sender = CapturingSender()
+        import app.services.auth_service as auth_service
+
+        monkeypatch.setattr(auth_service, "get_otp_sender", lambda: sender)
+
+        phone = "+919876500101"
+        resp = await client.post("/api/v1/auth/otp/request", json={"phone": phone})
+        assert resp.status_code == 202
+        resp = await client.post("/api/v1/auth/otp/request", json={"phone": phone})
+        assert resp.status_code == 202
+    finally:
+        get_settings.cache_clear()
+
+
+@pytest.mark.asyncio
+async def test_resend_cooldown_is_per_phone_not_global(client, monkeypatch):
+    sender = CapturingSender()
+    import app.services.auth_service as auth_service
+
+    monkeypatch.setattr(auth_service, "get_otp_sender", lambda: sender)
+
+    resp = await client.post("/api/v1/auth/otp/request", json={"phone": "+919876500102"})
+    assert resp.status_code == 202
+    resp = await client.post("/api/v1/auth/otp/request", json={"phone": "+919876500103"})
+    assert resp.status_code == 202

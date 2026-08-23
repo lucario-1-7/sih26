@@ -23,8 +23,10 @@ class ChallengeUpdate(BaseModel):
     model_config = ConfigDict(extra="forbid", str_strip_whitespace=True)
     title: str | None = Field(default=None, min_length=5, max_length=200)
     description: str | None = Field(default=None, min_length=20, max_length=5000)
-    # VALIDATOR-only field — see challenge_service.update_challenge for enforcement.
+    # VALIDATOR/SUPERADMIN-only fields — see challenge_service.update_challenge
+    # for enforcement and existence checks.
     severity: ChallengeSeverity | None = None
+    cluster_id: uuid.UUID | None = None
 
 
 class ChallengeResponse(BaseModel):
@@ -41,5 +43,15 @@ class ChallengeResponse(BaseModel):
     duplicate_of_id: uuid.UUID | None
     on_behalf_of_name: str | None
     on_behalf_of_phone: str | None
+    # AI-suggested, advisory only — never authoritative. Null until the
+    # duplicate-candidates job classifies the challenge.
+    content_domain: str | None
+    content_domain_confidence: float | None
+    content_domain_needs_review: bool | None
+    content_domain_source: str | None
+    content_field_intensity: float | None
+    content_field_label: str | None
+    content_field_needs_review: bool | None
+    content_field_source: str | None
     created_at: datetime
     updated_at: datetime

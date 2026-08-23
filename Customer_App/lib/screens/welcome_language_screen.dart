@@ -1,10 +1,12 @@
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import '../core/config/api_config.dart';
 import '../services/language_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/smooth_page_route.dart';
+import 'demo_citizen_auth_screen.dart';
 import 'phone_number_screen.dart';
 
 class WelcomeLanguageScreen extends StatefulWidget {
@@ -18,10 +20,14 @@ class _WelcomeLanguageScreenState extends State<WelcomeLanguageScreen> {
   final _languageService = LanguageService.instance;
 
   void _onContinue() {
+    // DemoConfig.enabled is hardcoded true: language selection always leads
+    // to the real demo-citizen login (a genuine `/auth/demo/login` call and
+    // JWT, not a phone/OTP challenge), so the dashboard afterwards fetches
+    // the real "Demo Citizen" backend user's real records from Postgres.
     Navigator.push(
       context,
       SmoothPageRoute(
-        child: const PhoneNumberScreen(),
+        child: DemoConfig.enabled ? const DemoCitizenAuthScreen() : const PhoneNumberScreen(),
       ),
     );
   }

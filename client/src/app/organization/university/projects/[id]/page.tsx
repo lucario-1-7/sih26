@@ -6,6 +6,7 @@ import { useQuery } from "@tanstack/react-query";
 
 import { getCluster } from "@/lib/api/clusters";
 import { useProject } from "@/hooks/useProjectQueries";
+import { ConsortiumPanel } from "@/components/university/ConsortiumPanel";
 import { DeliverablesPanel } from "@/components/university/DeliverablesPanel";
 import { MilestonesPanel } from "@/components/university/MilestonesPanel";
 import { ParticipantsPanel } from "@/components/university/ParticipantsPanel";
@@ -18,11 +19,12 @@ import { PageHeader } from "@/components/ui/PageHeader";
 import { Spinner } from "@/components/ui/Spinner";
 import { StatusBadge } from "@/components/ui/StatusBadge";
 
-type Tab = "overview" | "participants" | "milestones" | "deliverables" | "solution" | "impact";
+type Tab = "overview" | "participants" | "consortium" | "milestones" | "deliverables" | "solution" | "impact";
 
 const TABS: { key: Tab; label: string }[] = [
   { key: "overview", label: "Overview" },
   { key: "participants", label: "Participants" },
+  { key: "consortium", label: "Consortium" },
   { key: "milestones", label: "Milestones" },
   { key: "deliverables", label: "Deliverables" },
   { key: "solution", label: "Solution" },
@@ -117,6 +119,7 @@ function ProjectDetailsView({
           </Card>
         ) : null}
         {tab === "participants" ? <ParticipantsPanel projectId={project.id} /> : null}
+        {tab === "consortium" ? <ConsortiumPanel projectId={project.id} /> : null}
         {tab === "milestones" ? <MilestonesPanel projectId={project.id} /> : null}
         {tab === "deliverables" ? <DeliverablesPanel projectId={project.id} /> : null}
         {tab === "solution" ? <SolutionPanel projectId={project.id} /> : null}

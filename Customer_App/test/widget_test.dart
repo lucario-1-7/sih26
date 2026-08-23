@@ -2,6 +2,7 @@ import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:customer_app/models/issue_model.dart';
 import 'package:customer_app/screens/main_dashboard_screen.dart';
 import 'package:customer_app/screens/recent_activity_screen.dart';
 import 'package:customer_app/theme/app_theme.dart';
@@ -24,7 +25,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(),
-        home: const MainDashboardScreen(),
+        home: MainDashboardScreen(initialIssues: List.from(MockIssueRepository.initialIssues)),
       ),
     );
     await tester.pump();
@@ -53,7 +54,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(),
-        home: const MainDashboardScreen(),
+        home: MainDashboardScreen(initialIssues: List.from(MockIssueRepository.initialIssues)),
       ),
     );
     await tester.pump();
@@ -92,7 +93,7 @@ void main() {
     await tester.pumpWidget(
       MaterialApp(
         theme: buildAppTheme(),
-        home: const MainDashboardScreen(),
+        home: MainDashboardScreen(initialIssues: List.from(MockIssueRepository.initialIssues)),
       ),
     );
     await tester.pump();

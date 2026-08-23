@@ -1,6 +1,13 @@
 import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import '../core/networking/api_exception.dart';
+import '../data/models/administrative_area.dart';
+import '../data/models/auth_tokens.dart';
+import '../data/repositories/administrative_area_repository.dart';
+import '../data/repositories/auth_repository.dart';
+import '../data/repositories/challenge_repository.dart';
+import '../data/repositories/user_repository.dart';
 import '../models/issue_model.dart';
 import '../services/language_service.dart';
 import '../theme/app_theme.dart';
@@ -13,6 +20,7 @@ import 'issue_detail_screen.dart';
 import 'issue_success_screen.dart';
 import 'recent_activity_screen.dart';
 import 'settings_screen.dart';
+import 'welcome_language_screen.dart';
 
 class MainDashboardScreen extends StatefulWidget {
   final List<IssueItem>? initialIssues;
@@ -27,7 +35,7 @@ class MainDashboardScreen extends StatefulWidget {
 }
 
 class _MainDashboardScreenState extends State<MainDashboardScreen> {
-  late List<IssueItem> _issues;
+  List<IssueItem> _issues = [];
   int _currentTabIndex = 0;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
@@ -43,6 +51,14 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     'Resolved',
   ];
 
+  // -- Real backend state -----------------------------------------------
+  bool _isLoading = true;
+  String? _loadError;
+  CurrentUser? _currentUser;
+  List<AdministrativeArea> _areas = [];
+  final Map<String, String> _areaNamesById = {};
+  AdministrativeArea? _selectedArea;
+
   List<String> get _availableLocations {
     final locs = _issues
         .map((i) => i.location.trim())
@@ -56,7 +72,53 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    _issues = widget.initialIssues ?? List.from(MockIssueRepository.initialIssues);
+    if (widget.initialIssues != null) {
+      _issues = widget.initialIssues!;
+      _isLoading = false;
+    } else {
+      _bootstrap();
+    }
+  }
+
+  /// Loads everything the dashboard needs from the real backend: the
+  /// authenticated citizen's profile, the administrative-area reference list
+  /// (needed both to resolve challenge locations for display and to let the
+  /// grievance form submit a valid `administrative_area_id`), and the
+  /// citizen's own challenges.
+  Future<void> _bootstrap() async {
+    setState(() {
+      _isLoading = true;
+      _loadError = null;
+    });
+    try {
+      final user = await UserRepository.instance.getMe();
+      final areas = await AdministrativeAreaRepository.instance.list();
+      final areaNames = {for (final a in areas) a.id: a.name};
+      final challenges = await ChallengeRepository.instance.listMyChallenges(user.id);
+
+      if (!mounted) return;
+      setState(() {
+        _currentUser = user;
+        _areas = areas;
+        _areaNamesById
+          ..clear()
+          ..addAll(areaNames);
+        _issues = challenges
+            .map((c) => IssueItem.fromChallenge(c, areaName: _areaNamesById[c.administrativeAreaId]))
+            .toList();
+        _isLoading = false;
+        // The backend has no email field for a citizen user — the mobile
+        // number and name are the only real identity fields to prefill.
+        _formMobileController.text = user.phone;
+        if (user.name != user.phone) _formFullNameController.text = user.name;
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() {
+        _loadError = e.userMessage;
+        _isLoading = false;
+      });
+    }
   }
 
   @override
@@ -307,15 +369,19 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         return Scaffold(
           backgroundColor: AppColors.background,
           body: SafeArea(
-            child: IndexedStack(
-              index: _currentTabIndex,
-              children: [
-                _buildHomeTab(),
-                _buildMyIssuesTab(),
-                _buildFileGrievanceTab(),
-                _buildProfileTab(),
-              ],
-            ),
+            child: _isLoading
+                ? const Center(child: CircularProgressIndicator())
+                : _loadError != null
+                    ? _buildLoadErrorState()
+                    : IndexedStack(
+                        index: _currentTabIndex,
+                        children: [
+                          _buildHomeTab(),
+                          _buildMyIssuesTab(),
+                          _buildFileGrievanceTab(),
+                          _buildProfileTab(),
+                        ],
+                      ),
           ),
           bottomNavigationBar: CustomBottomNavbar(
             currentIndex: _currentTabIndex,
@@ -328,6 +394,31 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           ),
         );
       },
+    );
+  }
+
+  Widget _buildLoadErrorState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Icon(FeatherIcons.wifiOff, size: 48, color: AppColors.secondaryText),
+            const SizedBox(height: 16),
+            Text(
+              _loadError ?? 'Something went wrong.',
+              textAlign: TextAlign.center,
+              style: AppTypography.supporting(context).copyWith(color: AppColors.secondaryText),
+            ),
+            const SizedBox(height: 20),
+            SizedBox(
+              width: 160,
+              child: PrimaryButton(text: 'Retry', onPressed: () => _bootstrap()),
+            ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -978,23 +1069,19 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   // ---------------------------------------------------------------------------
   // TAB 2: FILE GRIEVANCE (CHECKOUT-STYLE FORM UX)
   // ---------------------------------------------------------------------------
-  final TextEditingController _formFullNameController =
-      TextEditingController(text: 'Rahul Tiwari');
-  final TextEditingController _formEmailController =
-      TextEditingController(text: 'rahul.tiwari@janseva.gov.in');
-  final TextEditingController _formMobileController =
-      TextEditingController(text: '9876543210');
-  final TextEditingController _formAddressController =
-      TextEditingController(text: 'House 42, Outer Ring Road');
-  final TextEditingController _formCityWardController =
-      TextEditingController(text: 'Sector 12, Ward 4');
-  final TextEditingController _formPincodeController =
-      TextEditingController(text: '600028');
+  final TextEditingController _formFullNameController = TextEditingController();
+  final TextEditingController _formEmailController = TextEditingController();
+  final TextEditingController _formMobileController = TextEditingController();
+  final TextEditingController _formAddressController = TextEditingController();
+  final TextEditingController _formCityWardController = TextEditingController();
+  final TextEditingController _formPincodeController = TextEditingController();
   final TextEditingController _formTitleController = TextEditingController();
   final TextEditingController _formDescriptionController = TextEditingController();
 
   bool _formHasAttachedMedia = false;
   bool _formIsLocationShared = false;
+  bool _isSubmittingForm = false;
+  String? _formError;
 
   Future<void> _requestLocationPermission() async {
     final bool? granted = await showDialog<bool>(
@@ -1116,81 +1203,64 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   }
 
   Future<void> _onFormSubmit() async {
-    final titleText = _formTitleController.text.trim().isEmpty
-        ? 'Civic Grievance Report'
-        : _formTitleController.text.trim();
-    final descriptionText = _formDescriptionController.text.trim().isEmpty
-        ? 'Reported issue submitted for review and resolution.'
-        : _formDescriptionController.text.trim();
-    final locationText = _formAddressController.text.trim().isEmpty
-        ? 'Sector 12, Main Ward'
-        : '${_formAddressController.text.trim()}, ${_formCityWardController.text.trim()}';
+    final titleText = _formTitleController.text.trim();
+    final descriptionText = _formDescriptionController.text.trim();
 
-    // Model auto-classification based on reported content
-    String detectedCategory = 'Roads & Infrastructure';
-    final lower = '$titleText $descriptionText'.toLowerCase();
-    if (lower.contains('water') || lower.contains('pipe') || lower.contains('drain') || lower.contains('leak')) {
-      detectedCategory = 'Water & Utilities';
-    } else if (lower.contains('light') || lower.contains('electric') || lower.contains('wire') || lower.contains('power')) {
-      detectedCategory = 'Electrical & Lighting';
-    } else if (lower.contains('waste') || lower.contains('garbage') || lower.contains('trash') || lower.contains('sanitation') || lower.contains('clean')) {
-      detectedCategory = 'Sanitation & Health';
-    } else if (lower.contains('road') || lower.contains('pothole') || lower.contains('traffic') || lower.contains('street') || lower.contains('bridge')) {
-      detectedCategory = 'Roads & Infrastructure';
-    } else {
-      detectedCategory = 'Civic Infrastructure';
+    setState(() => _formError = null);
+
+    if (titleText.length < 5) {
+      setState(() => _formError = 'Title must be at least 5 characters.');
+      return;
+    }
+    if (descriptionText.length < 20) {
+      setState(() => _formError = 'Please describe the issue in at least 20 characters.');
+      return;
+    }
+    if (_selectedArea == null) {
+      setState(() => _formError = 'Select an area so the report reaches the right office.');
+      return;
     }
 
-    final fullName = _formFullNameController.text.trim().isEmpty
-        ? 'Dhyan Kannoth'
-        : _formFullNameController.text.trim();
-    final emailText = _formEmailController.text.trim().isEmpty
-        ? 'dhyan@janseva.gov.in'
-        : _formEmailController.text.trim();
-    final mobileText = _formMobileController.text.trim().isEmpty
-        ? '+91 98765 43210'
-        : _formMobileController.text.trim();
-    final cityWard = _formCityWardController.text.trim().isEmpty
-        ? 'Chennai'
-        : _formCityWardController.text.trim();
-    final pincode = _formPincodeController.text.trim().isEmpty
-        ? '600001'
-        : _formPincodeController.text.trim();
+    // Media attachment is captured in the UI but the backend has no upload
+    // endpoint for it yet — see the integration report. It is never sent as
+    // if it were part of the submission.
 
-    final newIssue = IssueItem(
-      id: 'ISS-2026-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
-      title: titleText,
-      category: detectedCategory,
-      description: descriptionText,
-      location: locationText,
-      dateFiled: 'Today',
-      status: IssueStatus.underReview,
-      imagePath: _formHasAttachedMedia ? 'mock_evidence.jpg' : null,
-      citizenName: fullName,
-      citizenEmail: emailText,
-      citizenMobile: mobileText,
-      cityWard: cityWard,
-      pincode: pincode,
-    );
+    setState(() => _isSubmittingForm = true);
+    try {
+      final challenge = await ChallengeRepository.instance.createChallenge(
+        title: titleText,
+        description: descriptionText,
+        administrativeAreaId: _selectedArea!.id,
+        pinCode: _formPincodeController.text.trim().isEmpty ? null : _formPincodeController.text.trim(),
+      );
+      final newIssue = IssueItem.fromChallenge(challenge, areaName: _selectedArea!.name);
 
-    final result = await Navigator.push<String>(
-      context,
-      MaterialPageRoute(
-        builder: (context) => IssueSuccessScreen(createdIssue: newIssue),
-      ),
-    );
+      if (!mounted) return;
+      final result = await Navigator.push<String>(
+        context,
+        MaterialPageRoute(
+          builder: (context) => IssueSuccessScreen(createdIssue: newIssue),
+        ),
+      );
 
-    setState(() {
-      _issues.insert(0, newIssue);
-      _formTitleController.clear();
-      _formDescriptionController.clear();
-      _formHasAttachedMedia = false;
-      if (result == 'file_another') {
-        _currentTabIndex = 2; // Stay on File Grievance tab
-      } else {
-        _currentTabIndex = 0; // Switch to Home tab
-      }
-    });
+      if (!mounted) return;
+      setState(() {
+        _issues.insert(0, newIssue);
+        _formTitleController.clear();
+        _formDescriptionController.clear();
+        _formHasAttachedMedia = false;
+        if (result == 'file_another') {
+          _currentTabIndex = 2; // Stay on File Grievance tab
+        } else {
+          _currentTabIndex = 0; // Switch to Home tab
+        }
+      });
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => _formError = e.userMessage);
+    } finally {
+      if (mounted) setState(() => _isSubmittingForm = false);
+    }
   }
 
   Widget _buildFileGrievanceTab() {
@@ -1296,6 +1366,49 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               ),
             ],
           ),
+          const SizedBox(height: 10),
+
+          // Administrative area — required by the backend to route the
+          // report; there is no pincode/GPS-to-area lookup on the server, so
+          // this is a small, explicit picker rather than a guess.
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 2.0),
+            decoration: BoxDecoration(
+              color: AppColors.background,
+              borderRadius: BorderRadius.circular(12.0),
+              border: Border.all(color: AppColors.border, width: 1.0),
+            ),
+            child: Row(
+              children: [
+                const Icon(FeatherIcons.mapPin, size: 18, color: AppColors.secondaryText),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _areas.isEmpty
+                      ? Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 13.0),
+                          child: Text(
+                            'No administrative areas available yet',
+                            style: AppTypography.placeholder(context).copyWith(fontSize: 14, color: AppColors.mutedText),
+                          ),
+                        )
+                      : DropdownButtonHideUnderline(
+                          child: DropdownButton<AdministrativeArea>(
+                            value: _selectedArea,
+                            isExpanded: true,
+                            hint: Text(
+                              'Select area',
+                              style: AppTypography.placeholder(context).copyWith(fontSize: 14, color: AppColors.mutedText),
+                            ),
+                            items: _areas
+                                .map((a) => DropdownMenuItem(value: a, child: Text(a.label, style: AppTypography.inputText(context).copyWith(fontSize: 14))))
+                                .toList(),
+                            onChanged: (a) => setState(() => _selectedArea = a),
+                          ),
+                        ),
+                ),
+              ],
+            ),
+          ),
 
           const SizedBox(height: 24),
 
@@ -1327,12 +1440,28 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               setState(() => _formHasAttachedMedia = hasPhoto);
             },
           ),
+          if (_formHasAttachedMedia) ...[
+            const SizedBox(height: 8),
+            Text(
+              'Photos are not yet sent with the report — the backend does not support attachments yet.',
+              style: AppTypography.supporting(context).copyWith(fontSize: 11.5, color: AppColors.mutedText),
+            ),
+          ],
+
+          if (_formError != null) ...[
+            const SizedBox(height: 16),
+            Text(
+              _formError!,
+              style: AppTypography.supporting(context).copyWith(color: Colors.red, fontSize: 13),
+            ),
+          ],
 
           const SizedBox(height: 24),
 
           PrimaryButton(
-            text: LanguageService.t('submit_grievance'),
-            onPressed: _onFormSubmit,
+            text: _isSubmittingForm ? 'Submitting…' : LanguageService.t('submit_grievance'),
+            isEnabled: !_isSubmittingForm,
+            onPressed: () => _onFormSubmit(),
           ),
 
           const SizedBox(height: 24),
@@ -1485,6 +1614,16 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   // ---------------------------------------------------------------------------
   // TAB 3: PROFILE
   // ---------------------------------------------------------------------------
+  Future<void> _onLogout() async {
+    await AuthRepository.instance.logout();
+    if (!mounted) return;
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const WelcomeLanguageScreen()),
+      (route) => false,
+    );
+  }
+
   Widget _buildProfileTab() {
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -1512,7 +1651,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           ),
           const SizedBox(height: 14),
           Text(
-            'Dhyan Kannoth',
+            _currentUser?.name ?? 'Citizen',
             style: AppTypography.heading(context).copyWith(
               fontSize: 22,
               fontWeight: FontWeight.w700,
@@ -1520,7 +1659,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Verified Citizen • Chennai, TN',
+            'Verified Citizen',
             style: AppTypography.supporting(context).copyWith(
               fontSize: 13,
               color: AppColors.secondaryText,
@@ -1529,14 +1668,20 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
           const SizedBox(height: 24),
 
-          // Stats Row
+          // Stats Row — computed from the citizen's real challenges.
           Row(
             children: [
               _buildStatItem(LanguageService.t('reported'), '${_issues.length}'),
               const SizedBox(width: 10),
-              _buildStatItem(LanguageService.t('in_progress_count'), '2'),
+              _buildStatItem(
+                LanguageService.t('in_progress_count'),
+                '${_issues.where((i) => i.status == IssueStatus.inProgress).length}',
+              ),
               const SizedBox(width: 10),
-              _buildStatItem(LanguageService.t('resolved_count'), '1'),
+              _buildStatItem(
+                LanguageService.t('resolved_count'),
+                '${_issues.where((i) => i.status == IssueStatus.resolved).length}',
+              ),
             ],
           ),
 
@@ -1548,13 +1693,14 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           _buildProfileOption(
             icon: FeatherIcons.phone,
             title: LanguageService.t('phone_number'),
-            subtitle: '+91 98765 43210',
+            subtitle: _currentUser?.phone ?? 'Not available',
             onTap: () {},
           ),
           _buildProfileOption(
             icon: FeatherIcons.mail,
             title: LanguageService.t('email_address'),
-            subtitle: 'dhyan@janseva.gov.in',
+            // The backend citizen account has no email field at all.
+            subtitle: 'Not provided',
             onTap: () {},
           ),
           _buildProfileOption(
@@ -1572,9 +1718,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             icon: FeatherIcons.logOut,
             title: LanguageService.t('logout'),
             subtitle: 'Sign out of Social Serve',
-            onTap: () {
-              Navigator.popUntil(context, (route) => route.isFirst);
-            },
+            onTap: () => _onLogout(),
           ),
         ],
       ),

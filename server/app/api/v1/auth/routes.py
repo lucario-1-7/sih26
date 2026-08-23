@@ -4,7 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.api.v1.auth.dependencies import get_current_user
 from app.db.session import get_db
 from app.models.user import User
-from app.schemas.auth import OtpRequestIn, OtpVerifyIn, RefreshIn, TokenPair
+from app.schemas.auth import DemoLoginIn, Msg91WidgetVerifyIn, OtpRequestIn, OtpVerifyIn, RefreshIn, TokenPair
 from app.services import auth_service
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -24,6 +24,30 @@ async def verify_otp(
 ) -> TokenPair:
     return await auth_service.verify_otp(
         db, phone=payload.phone, code=payload.code, ip_address=request.client.host if request.client else None
+    )
+
+
+@router.post(
+    "/customer/msg91/verify",
+    response_model=TokenPair,
+    summary="Verify a client-completed MSG91 OTP Widget access-token and issue a Sahyog session",
+)
+async def verify_msg91_widget(
+    payload: Msg91WidgetVerifyIn, request: Request, db: AsyncSession = Depends(get_db)
+) -> TokenPair:
+    return await auth_service.verify_msg91_widget_token(
+        db, access_token=payload.access_token, ip_address=request.client.host if request.client else None
+    )
+
+
+@router.post(
+    "/demo/login",
+    response_model=TokenPair,
+    summary="PRESENTATION-ONLY: issue a real demo session, bypassing the OTP challenge. 404 unless DEMO_MODE is on.",
+)
+async def demo_login(payload: DemoLoginIn, request: Request, db: AsyncSession = Depends(get_db)) -> TokenPair:
+    return await auth_service.demo_login(
+        db, persona=payload.persona, ip_address=request.client.host if request.client else None
     )
 
 

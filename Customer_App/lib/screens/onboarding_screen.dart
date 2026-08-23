@@ -73,6 +73,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _onFinish() {
+    // Reached only after a real login (DemoCitizenAuthScreen's real
+    // /auth/demo/login, or the real OTP flow) issued a real JWT — so the
+    // dashboard must always run its real backend bootstrap, never a mock
+    // dataset, or it would show stale/wrong data for whichever account
+    // actually just authenticated.
     Navigator.pushAndRemoveUntil(
       context,
       SmoothPageRoute(

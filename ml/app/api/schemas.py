@@ -106,3 +106,37 @@ class ScoreResponse(BaseModel):
     breakdown: dict[str, float]
     rationale: str
     weight_version: str
+
+
+class DomainClassifyRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    embedding: list[float] = Field(..., min_length=1)
+
+
+class DomainAlternativeOut(BaseModel):
+    domain: str
+    confidence: float
+
+
+class DomainClassifyResponse(BaseModel):
+    domain: str
+    confidence: float
+    alternatives: list[DomainAlternativeOut]
+    needs_review: bool
+    source: str
+    model_version: str
+
+
+class FieldClassifyRequest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+    text: str = Field(..., min_length=1, max_length=10000)
+    domain: str = Field(..., min_length=1, max_length=50)
+    embedding: list[float] = Field(..., min_length=1)
+
+
+class FieldClassifyResponse(BaseModel):
+    field_intensity: float = Field(..., ge=0.0, le=1.0)
+    label: str
+    needs_review: bool
+    source: str
+    model_version: str

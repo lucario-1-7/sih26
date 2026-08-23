@@ -70,7 +70,12 @@ services:
       REDIS_URL: redis://redis:6379
       ML_SERVICE_URL: http://ml:8001
       SECRET_KEY: ${SECRET_KEY}
-      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-["http://localhost:5173"]}
+      ALLOWED_ORIGINS: ${ALLOWED_ORIGINS:-["http://localhost:3000","http://localhost:3001","http://localhost:5173"]}
+      ENVIRONMENT: ${ENVIRONMENT:-development}
+      DEMO_MODE: ${DEMO_MODE:-true}
+      MSG91_WIDGET_ID: ${MSG91_WIDGET_ID:-}
+      MSG91_TOKEN_AUTH: ${MSG91_TOKEN_AUTH:-}
+      MSG91_AUTH_KEY: ${MSG91_AUTH_KEY:-}
     ports:
       - "8000:8000"
     healthcheck:

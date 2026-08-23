@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../core/networking/api_exception.dart';
+import '../data/repositories/auth_repository.dart';
 import '../services/language_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/auth_screen_layout.dart';
@@ -16,6 +18,7 @@ class PhoneNumberScreen extends StatefulWidget {
 
 class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
   final TextEditingController _phoneController = TextEditingController();
+  bool _isSubmitting = false;
 
   @override
   void dispose() {
@@ -23,17 +26,35 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
     super.dispose();
   }
 
-  void _onContinue() {
-    final phoneNumber = _phoneController.text.trim().isNotEmpty
-        ? '+91 ${_phoneController.text.trim()}'
-        : '+91 ••••• •••••';
+  bool get _isValidPhone => _phoneController.text.trim().length == 10;
 
-    Navigator.push(
-      context,
-      SmoothPageRoute(
-        child: OtpVerificationScreen(phoneNumber: phoneNumber),
-      ),
-    );
+  Future<void> _onContinue() async {
+    if (!_isValidPhone) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Enter a valid 10-digit phone number.')),
+      );
+      return;
+    }
+
+    final phoneDigits = _phoneController.text.trim();
+    final backendPhone = '+91$phoneDigits';
+
+    setState(() => _isSubmitting = true);
+    try {
+      await AuthRepository.instance.requestOtp(backendPhone);
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        SmoothPageRoute(
+          child: OtpVerificationScreen(phoneNumber: '+91 $phoneDigits', backendPhone: backendPhone),
+        ),
+      );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.userMessage)));
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
+    }
   }
 
   @override
@@ -56,10 +77,15 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
             countryCode: '+91',
             onSubmitted: (_) => _onContinue(),
           ),
-          bottomCta: PrimaryButton(
-            text: LanguageService.t('continue_btn'),
-            isEnabled: true,
-            onPressed: _onContinue,
+          bottomCta: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              PrimaryButton(
+                text: _isSubmitting ? 'Sending OTP…' : LanguageService.t('continue_btn'),
+                isEnabled: !_isSubmitting,
+                onPressed: _onContinue,
+              ),
+            ],
           ),
         );
       },

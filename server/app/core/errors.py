@@ -6,6 +6,7 @@ from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 
 from app.services.ml_client import MLServiceError
+from app.services.otp_sender import OtpDeliveryError
 
 logger = logging.getLogger("app.errors")
 
@@ -41,6 +42,21 @@ def register_exception_handlers(app: FastAPI) -> None:
             content={
                 "detail": "The ML service is temporarily unavailable. Please try again shortly.",
                 "code": "ML_SERVICE_UNAVAILABLE",
+                "request_id": _request_id(request),
+            },
+        )
+
+    @app.exception_handler(OtpDeliveryError)
+    async def otp_delivery_error_handler(request: Request, exc: OtpDeliveryError):
+        # Never leak provider response internals, the MSG91 auth key, or a
+        # stack trace to the client — log server-side (already scrubbed by
+        # the raiser) and return one generic, safe message.
+        logger.error("otp_delivery_failed request_id=%s error=%s", _request_id(request), exc)
+        return JSONResponse(
+            status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+            content={
+                "detail": "Could not send the verification code right now. Please try again shortly.",
+                "code": "OTP_DELIVERY_UNAVAILABLE",
                 "request_id": _request_id(request),
             },
         )

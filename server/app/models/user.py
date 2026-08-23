@@ -34,7 +34,13 @@ class OtpCode(UUIDPKMixin, Base):
     __tablename__ = "otp_codes"
 
     phone: Mapped[str] = mapped_column(String(20), nullable=False, index=True)
-    code_hash: Mapped[str] = mapped_column(String(128), nullable=False)
+    # Null for a provider-native OTP (MSG91 Widget generates+verifies the
+    # code itself; we never see it) — populated only when we generate and
+    # hash the code ourselves (console/dev sender).
+    code_hash: Mapped[str | None] = mapped_column(String(128), nullable=True)
+    # The provider's own request id (e.g. MSG91 Widget's `reqId`), presented
+    # back on verify. Null for a locally-hashed OTP.
+    provider_ref: Mapped[str | None] = mapped_column(String(100), nullable=True)
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     attempt_count: Mapped[int] = mapped_column(Integer, nullable=False, default=0)

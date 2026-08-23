@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../core/networking/api_exception.dart';
+import '../data/repositories/auth_repository.dart';
 import '../services/language_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/auth_screen_layout.dart';
@@ -10,9 +12,14 @@ import 'onboarding_screen.dart';
 class OtpVerificationScreen extends StatefulWidget {
   final String phoneNumber;
 
+  /// The backend-formatted phone (e.g. "+919876543210") — kept distinct from
+  /// [phoneNumber], which is the "+91 98765 43210" display string.
+  final String backendPhone;
+
   const OtpVerificationScreen({
     super.key,
     required this.phoneNumber,
+    required this.backendPhone,
   });
 
   @override
@@ -20,13 +27,49 @@ class OtpVerificationScreen extends StatefulWidget {
 }
 
 class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
-  void _onVerify() {
-    Navigator.push(
-      context,
-      SmoothPageRoute(
-        child: const OnboardingScreen(),
-      ),
-    );
+  String _enteredOtp = '';
+  bool _isVerifying = false;
+  bool _isResending = false;
+  String? _errorText;
+
+  Future<void> _onVerify() async {
+    if (_enteredOtp.length != 6) {
+      setState(() => _errorText = 'Enter the 6-digit code.');
+      return;
+    }
+    setState(() {
+      _isVerifying = true;
+      _errorText = null;
+    });
+    try {
+      await AuthRepository.instance.verifyOtp(phone: widget.backendPhone, code: _enteredOtp);
+      if (!mounted) return;
+      Navigator.push(
+        context,
+        SmoothPageRoute(
+          child: const OnboardingScreen(),
+        ),
+      );
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      setState(() => _errorText = e.userMessage);
+    } finally {
+      if (mounted) setState(() => _isVerifying = false);
+    }
+  }
+
+  Future<void> _onResend() async {
+    setState(() => _isResending = true);
+    try {
+      await AuthRepository.instance.requestOtp(widget.backendPhone);
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('A new code has been sent.')));
+    } on ApiException catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.userMessage)));
+    } finally {
+      if (mounted) setState(() => _isResending = false);
+    }
   }
 
   @override
@@ -58,9 +101,22 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 6-digit OTP Input
-              const OtpInput(
+              OtpInput(
                 length: 6,
+                onChanged: (value) => setState(() {
+                  _enteredOtp = value;
+                  _errorText = null;
+                }),
+                onCompleted: (_) => _onVerify(),
               ),
+
+              if (_errorText != null) ...[
+                const SizedBox(height: 10),
+                Text(
+                  _errorText!,
+                  style: AppTypography.supporting(context).copyWith(color: Colors.red),
+                ),
+              ],
 
               const SizedBox(height: 24),
 
@@ -74,11 +130,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
                     ),
                     const SizedBox(height: 4),
                     GestureDetector(
-                      onTap: () {
-                        // Visual feedback only for UI demo
-                      },
+                      onTap: _isResending ? null : () => _onResend(),
                       child: Text(
-                        LanguageService.t('resend'),
+                        _isResending ? 'Sending…' : LanguageService.t('resend'),
                         style: AppTypography.link(context),
                       ),
                     ),
@@ -88,9 +142,9 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
             ],
           ),
           bottomCta: PrimaryButton(
-            text: LanguageService.t('verify'),
-            isEnabled: true,
-            onPressed: _onVerify,
+            text: _isVerifying ? 'Verifying…' : LanguageService.t('verify'),
+            isEnabled: !_isVerifying,
+            onPressed: () => _onVerify(),
           ),
         );
       },

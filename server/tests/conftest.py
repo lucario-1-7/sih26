@@ -20,6 +20,7 @@ import pytest_asyncio
 from httpx import ASGITransport, AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.config import get_settings
 from app.core.security import TokenType, create_token
 from app.db.session import AsyncSessionLocal
 from app.main import app
@@ -27,6 +28,41 @@ from app.models.administrative_area import AdministrativeArea
 from app.models.enums import AdministrativeLevel, Domain, OrganizationType, Role
 from app.models.organization import Organization
 from app.models.user import User
+
+
+@pytest.fixture(autouse=True)
+def _no_real_msg91_credentials_by_default(monkeypatch):
+    """Tests must never depend on whatever MSG91 credentials happen to be in
+    the developer's real .env — the whole test suite previously "worked"
+    only because the real .env had no MSG91_TOKEN_AUTH configured yet. Now
+    that this repo has real production MSG91 credentials configured for the
+    live app, every OTP-related test would otherwise silently switch from
+    the local dev-fallback/mocked path onto real, network-dependent calls
+    to MSG91's live API (observed: real sendOtpMobile calls, rejected by
+    MSG91 as IPBlocked, during a plain `pytest` run).
+
+    monkeypatch.setenv(key, "") — not delenv — because pydantic-settings
+    reads the real .env file directly; delenv only touches os.environ and
+    a real .env value would still leak through.
+
+    The same applies to DEMO_MODE — a presentation deployment's real .env
+    sets DEMO_MODE=true, and without this the "demo login is 404 by
+    default" test would silently start failing (or worse, silently start
+    passing for the wrong reason) whenever run against that .env.
+
+    Tests that specifically exercise the MSG91-configured or demo-mode
+    path (e.g. tests/unit/test_services/test_otp_msg91.py,
+    tests/integration/test_api/test_msg91_widget_login_flow.py,
+    tests/integration/test_api/test_demo_login.py) set these explicitly
+    via their own monkeypatch calls within the test body, which run after
+    this fixture and take precedence for that test.
+    """
+    for key in ("MSG91_WIDGET_ID", "MSG91_TOKEN_AUTH", "MSG91_AUTH_KEY"):
+        monkeypatch.setenv(key, "")
+    monkeypatch.setenv("DEMO_MODE", "false")
+    get_settings.cache_clear()
+    yield
+    get_settings.cache_clear()
 
 
 @pytest_asyncio.fixture

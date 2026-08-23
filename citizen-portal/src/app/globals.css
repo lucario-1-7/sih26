@@ -1,0 +1,85 @@
+@import "tailwindcss";
+
+:root {
+  --bg-beige: #FAF8F5;
+  --bg-beige-card: #FFFFFF;
+  --bg-beige-subtle: #F3EFEA;
+  --bg-beige-hover: #ECE6DD;
+  --text-black: #111111;
+  --text-muted: #333333;
+  --border-black: #111111;
+  --border-subtle: #E2DDD5;
+  --font-scale: 1;
+}
+
+[data-font-size="large"] {
+  --font-scale: 1.12;
+}
+
+[data-font-size="larger"] {
+  --font-scale: 1.24;
+}
+
+html {
+  background-color: var(--bg-beige);
+  color: var(--text-black);
+  font-size: calc(16px * var(--font-scale, 1));
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--bg-beige);
+  color: var(--text-black);
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Custom crisp government & editorial styling */
+.font-serif-italic {
+  font-family: var(--font-serif), Georgia, serif;
+  font-style: italic;
+}
+
+.bg-beige {
+  background-color: var(--bg-beige);
+}
+
+.bg-beige-card {
+  background-color: var(--bg-beige-card);
+}
+
+.bg-beige-subtle {
+  background-color: var(--bg-beige-subtle);
+}
+
+.border-black-custom {
+  border-color: var(--border-black);
+}
+
+/* Custom scrollbar for clean aesthetic */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-beige);
+}
+
+::-webkit-scrollbar-thumb {
+  background: #D8D2C6;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #A69E90;
+}
+
+/* Subtle focus ring */
+*:focus-visible {
+  outline: 2px solid #111111;
+  outline-offset: 2px;
+}

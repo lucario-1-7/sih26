@@ -3,10 +3,14 @@ from fastapi import APIRouter
 from app.api.schemas import (
     ConsortiumRequest,
     ConsortiumResponse,
+    DomainClassifyRequest,
+    DomainClassifyResponse,
     DuplicateCandidatesRequest,
     DuplicateCandidatesResponse,
     EmbedRequest,
     EmbedResponse,
+    FieldClassifyRequest,
+    FieldClassifyResponse,
     MatchRankRequest,
     MatchRankResponse,
     ScoreRequestFieldIntensity,
@@ -15,8 +19,10 @@ from app.api.schemas import (
     ScoreResponse,
 )
 from app.core.config import get_settings
+from app.domain_classification.engine import classify_domain
 from app.duplicate_detection.engine import EmbeddingRecord, find_duplicate_candidates
 from app.embeddings.engine import embed
+from app.field_classification.engine import classify_field_intensity
 from app.matching.consortium import suggest_consortium
 from app.matching.engine import MatchCandidate, rank_candidates
 from app.scoring.field_intensity import score_field_intensity
@@ -92,6 +98,39 @@ def matching_consortium(payload: ConsortiumRequest) -> ConsortiumResponse:
             {"organization_id": s.organization_id, "role": s.role, "score": s.score, "rationale": s.rationale}
             for s in suggestions
         ]
+    )
+
+
+@router.post(
+    "/classify-domain",
+    response_model=DomainClassifyResponse,
+    summary="Classify which civic domain a challenge belongs to, from its embedding",
+)
+def classify_domain_route(payload: DomainClassifyRequest) -> DomainClassifyResponse:
+    result = classify_domain(payload.embedding)
+    return DomainClassifyResponse(
+        domain=result.domain,
+        confidence=result.confidence,
+        alternatives=[{"domain": a.domain, "confidence": a.confidence} for a in result.alternatives],
+        needs_review=result.needs_review,
+        source=result.source,
+        model_version=result.model_version,
+    )
+
+
+@router.post(
+    "/classify-field-intensity",
+    response_model=FieldClassifyResponse,
+    summary="Classify how physical (site work) vs remote-analytical a challenge's resolution is",
+)
+def classify_field_intensity_route(payload: FieldClassifyRequest) -> FieldClassifyResponse:
+    result = classify_field_intensity(payload.text, payload.domain, payload.embedding)
+    return FieldClassifyResponse(
+        field_intensity=result.field_intensity,
+        label=result.label,
+        needs_review=result.needs_review,
+        source=result.source,
+        model_version=result.model_version,
     )
 
 

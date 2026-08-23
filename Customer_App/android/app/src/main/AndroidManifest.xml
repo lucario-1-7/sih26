@@ -1,8 +1,15 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <uses-permission android:name="android.permission.INTERNET"/>
     <application
         android:label="customer_app"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:usesCleartextTraffic="true">
+        <!-- DEV-ONLY: the backend is plain http:// during local development
+             (localhost via `adb reverse`, or a LAN IP). Android blocks
+             cleartext HTTP by default on API 28+, which otherwise fails
+             every request on a real device with no clear error. Remove this
+             once the backend is served over https://. -->
         <activity
             android:name=".MainActivity"
             android:exported="true"

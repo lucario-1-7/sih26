@@ -1,7 +1,35 @@
+import '../data/models/challenge.dart';
+
 enum IssueStatus {
   underReview,
   inProgress,
   resolved,
+  duplicate,
+}
+
+/// Maps the backend's real `ChallengeStatus` ("submitted" | "open" |
+/// "duplicate" | "resolved" — see server/app/models/enums.py) onto this
+/// screen-facing enum. Every backend value has an explicit, named
+/// counterpart here — none are silently folded into an unrelated meaning:
+///   submitted -> underReview   (not yet triaged by a validator)
+///   open      -> inProgress    (triaged, visible to institutions, being worked)
+///   duplicate -> duplicate     (its own state, never disguised as resolved/in-progress)
+///   resolved  -> resolved      (exact match)
+IssueStatus issueStatusFromChallengeStatus(String backendStatus) {
+  switch (backendStatus) {
+    case 'submitted':
+      return IssueStatus.underReview;
+    case 'open':
+      return IssueStatus.inProgress;
+    case 'duplicate':
+      return IssueStatus.duplicate;
+    case 'resolved':
+      return IssueStatus.resolved;
+    default:
+      // Unknown value from the backend: surface as "under review" (the most
+      // conservative, least-committal state) rather than guessing further.
+      return IssueStatus.underReview;
+  }
 }
 
 extension IssueStatusExtension on IssueStatus {
@@ -13,6 +41,8 @@ extension IssueStatusExtension on IssueStatus {
         return 'In Progress';
       case IssueStatus.resolved:
         return 'Resolved';
+      case IssueStatus.duplicate:
+        return 'Marked Duplicate';
     }
   }
 
@@ -24,6 +54,8 @@ extension IssueStatusExtension on IssueStatus {
         return 0.65;
       case IssueStatus.resolved:
         return 1.0;
+      case IssueStatus.duplicate:
+        return 0.30;
     }
   }
 }
@@ -63,6 +95,34 @@ class IssueItem {
 
   double get progressValue => progress ?? status.defaultProgress;
   int get progressPercent => (progressValue * 100).round();
+
+  /// The single place a real backend `Challenge` becomes the UI-facing
+  /// `IssueItem` these widgets already render. `areaName` is resolved by the
+  /// caller (via AdministrativeAreaRepository) since the backend response
+  /// only carries the area's id, not its display name.
+  factory IssueItem.fromChallenge(Challenge challenge, {String? areaName}) {
+    return IssueItem(
+      id: challenge.id,
+      title: challenge.title,
+      // Real AI domain classification when available; the worker job that
+      // populates it runs asynchronously after submission, so it is
+      // legitimately absent for a few seconds on a freshly-filed issue —
+      // shown as such rather than guessed at client-side.
+      category: challenge.contentDomain ?? 'Classifying…',
+      description: challenge.description,
+      location: [areaName, challenge.pinCode].whereType<String>().join(', '),
+      dateFiled: _formatDate(challenge.createdAt),
+      status: issueStatusFromChallengeStatus(challenge.status),
+      pincode: challenge.pinCode,
+    );
+  }
+
+  static String _formatDate(DateTime date) {
+    const months = [
+      'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', //
+    ];
+    return '${date.day} ${months[date.month - 1]} ${date.year}';
+  }
 }
 
 // Global mock dataset for UI demonstration

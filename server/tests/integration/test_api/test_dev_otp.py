@@ -99,28 +99,51 @@ async def test_request_otp_logs_the_plaintext_code_in_development(db, caplog):
 
 @pytest.mark.asyncio
 async def test_request_otp_never_logs_the_plaintext_code_in_production(db, caplog, monkeypatch):
-    from app.services import auth_service
+    """In production, OTP delivery goes through MSG91 (see test_otp_msg91.py
+    for the sender's own unit tests) — this test only asserts the
+    no-plaintext-logging invariant, against a mocked MSG91 call so it never
+    touches the real network."""
+    import httpx
+
+    from app.services import auth_service, otp_msg91
 
     monkeypatch.setenv("ENVIRONMENT", "production")
+    monkeypatch.setenv("MSG91_WIDGET_ID", "test-widget-id")
+    monkeypatch.setenv("MSG91_TOKEN_AUTH", "test-token-auth-must-never-appear-in-logs")
     get_settings.cache_clear()
+    import app.services.otp_sender as otp_sender_module
+
+    otp_sender_module._sender = None
     try:
+
+        def handler(request: httpx.Request) -> httpx.Response:
+            return httpx.Response(200, json={"type": "success", "message": "req-id-123"})
+
+        monkeypatch.setattr(
+            otp_msg91,
+            "_client",
+            lambda: httpx.AsyncClient(transport=httpx.MockTransport(handler), base_url="http://mock"),
+        )
+
         caplog.set_level(logging.DEBUG)
         phone = "+919812300005"
 
         await auth_service.request_otp(db, phone=phone, ip_address=None)
 
         # otp_dev_store itself is also a no-op outside development — the
-        # code isn't retrievable through it either, only via a real SMS
-        # gateway (not present in this codebase).
+        # code isn't retrievable through it either (moot here anyway: MSG91
+        # generated the code itself, we never had it).
         assert otp_dev_store.get_dev_otp(phone) is None
 
         for record in caplog.records:
             message = record.getMessage()
             assert "otp=" not in message
+            assert "test-token-auth-must-never-appear-in-logs" not in message
             assert len(message) < 200  # sanity: no accidental huge dump containing the code
 
     finally:
         get_settings.cache_clear()
+        otp_sender_module._sender = None
 
 
 @pytest.mark.asyncio

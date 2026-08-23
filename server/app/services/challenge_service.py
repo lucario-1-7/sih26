@@ -10,6 +10,7 @@ from app.models.user import User
 from app.repositories.administrative_area_repository import AdministrativeAreaRepository
 from app.repositories.audit_repository import AuditRepository
 from app.repositories.challenge_repository import ChallengeRepository
+from app.repositories.cluster_repository import ClusterRepository
 from app.schemas.challenge import ChallengeCreate, ChallengeUpdate
 from app.services.job_queue import enqueue_duplicate_candidate_generation
 
@@ -34,6 +35,14 @@ NOT_OWNER = HTTPException(
 SEVERITY_REQUIRES_VALIDATOR = HTTPException(
     status_code=status.HTTP_403_FORBIDDEN,
     detail={"detail": "Only a VALIDATOR can set challenge severity", "code": "FORBIDDEN"},
+)
+CLUSTERING_REQUIRES_VALIDATOR = HTTPException(
+    status_code=status.HTTP_403_FORBIDDEN,
+    detail={"detail": "Only a VALIDATOR or SUPERADMIN can assign a challenge to a cluster", "code": "FORBIDDEN"},
+)
+CLUSTER_NOT_FOUND = HTTPException(
+    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+    detail={"detail": "cluster_id does not reference an existing cluster", "code": "INVALID_CLUSTER"},
 )
 
 logger = logging.getLogger("app.challenges")
@@ -109,9 +118,10 @@ async def update_challenge(
     db: AsyncSession, challenge_id: uuid.UUID, *, data: ChallengeUpdate, actor: User
 ) -> Challenge:
     """Content fields (title/description) are owner-only — a CITIZEN or
-    FIELD_ASSISTANT may only edit their own submission. `severity` is a
-    VALIDATOR-only field (government review responsibility) and is not
-    subject to the owner/status checks that gate content edits."""
+    FIELD_ASSISTANT may only edit their own submission. `severity` and
+    `cluster_id` are VALIDATOR/SUPERADMIN-only fields (government review
+    responsibility) and are not subject to the owner/status checks that gate
+    content edits."""
     challenge = await ChallengeRepository(db).get(challenge_id)
     if challenge is None:
         raise NOT_FOUND
@@ -131,6 +141,14 @@ async def update_challenge(
         if actor.role != Role.VALIDATOR:
             raise SEVERITY_REQUIRES_VALIDATOR
         challenge.severity = data.severity
+
+    if data.cluster_id is not None:
+        if actor.role not in (Role.VALIDATOR, Role.SUPERADMIN):
+            raise CLUSTERING_REQUIRES_VALIDATOR
+        cluster = await ClusterRepository(db).get(data.cluster_id)
+        if cluster is None:
+            raise CLUSTER_NOT_FOUND
+        challenge.cluster_id = data.cluster_id
 
     await AuditRepository(db).log(
         user_id=actor.id, action="challenge.update", entity_type="challenge", entity_id=challenge.id

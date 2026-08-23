@@ -27,6 +27,21 @@ class Challenge(UUIDPKMixin, TimestampMixin, SoftDeleteMixin, Base):
     )
     pin_code: Mapped[str | None] = mapped_column(String(6), nullable=True)
     embedding: Mapped[list[float] | None] = mapped_column(Vector(384), nullable=True)
+    # AI-suggested civic domain (water/sanitation/health/...), classified from
+    # `embedding` by ml/app/domain_classification. Advisory only — never
+    # authoritative; a human never has to accept it. Null until the
+    # generate_duplicate_candidates job classifies the challenge.
+    content_domain: Mapped[str | None] = mapped_column(String(50), nullable=True)
+    content_domain_confidence: Mapped[float | None] = mapped_column(nullable=True)
+    content_domain_needs_review: Mapped[bool | None] = mapped_column(nullable=True)
+    content_domain_source: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    # AI-suggested physical-vs-remote work intensity in [0, 1], classified from
+    # (text, content_domain, embedding) by ml/app/field_classification.
+    # Advisory only — same rules as content_domain above.
+    content_field_intensity: Mapped[float | None] = mapped_column(nullable=True)
+    content_field_label: Mapped[str | None] = mapped_column(String(30), nullable=True)
+    content_field_needs_review: Mapped[bool | None] = mapped_column(nullable=True)
+    content_field_source: Mapped[str | None] = mapped_column(String(30), nullable=True)
     cluster_id: Mapped[uuid.UUID | None] = mapped_column(
         ForeignKey("clusters.id", ondelete="RESTRICT"), nullable=True, index=True
     )

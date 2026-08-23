@@ -39,6 +39,24 @@ async def generate_duplicate_candidates(ctx, challenge_id: str) -> None:
             else:
                 embedding = challenge.embedding
 
+            if challenge.content_domain is None:
+                classification = await ml_client.classify_domain(embedding)
+                challenge.content_domain = classification["domain"]
+                challenge.content_domain_confidence = classification["confidence"]
+                challenge.content_domain_needs_review = classification["needs_review"]
+                challenge.content_domain_source = classification["source"]
+
+            if challenge.content_field_intensity is None:
+                # Chains the (possibly fallback) domain result as the prior,
+                # exactly as ai/models/train_field.py evaluates the pipeline.
+                field = await ml_client.classify_field_intensity(
+                    f"{challenge.title}\n{challenge.description}", challenge.content_domain, embedding
+                )
+                challenge.content_field_intensity = field["field_intensity"]
+                challenge.content_field_label = field["label"]
+                challenge.content_field_needs_review = field["needs_review"]
+                challenge.content_field_source = field["source"]
+
             neighbors = await challenge_repo.find_nearest_by_embedding(
                 embedding=embedding, exclude_id=challenge.id, limit=settings.DUPLICATE_CANDIDATE_LIMIT
             )

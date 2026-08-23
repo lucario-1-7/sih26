@@ -3,7 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import type { ReactNode } from "react";
 
-import { getCurrentUser, logout as apiLogout, verifyOtp as apiVerifyOtp } from "@/lib/api/auth";
+import { demoLogin as apiDemoLogin, getCurrentUser, logout as apiLogout, verifyOtp as apiVerifyOtp } from "@/lib/api/auth";
 import { ApiError } from "@/lib/api/client";
 import { clearTokens, getAccessToken, getRefreshToken, onTokensChanged, setTokens } from "@/lib/auth/tokenStore";
 import type { UserResponse } from "@/types/api";
@@ -12,6 +12,8 @@ interface AuthState {
   user: UserResponse | null;
   status: "loading" | "authenticated" | "unauthenticated";
   login: (phone: string, code: string) => Promise<UserResponse>;
+  /** PRESENTATION-ONLY — see lib/api/auth.ts demoLogin. */
+  loginDemo: (persona: string) => Promise<UserResponse>;
   logout: () => Promise<void>;
   refetchUser: () => Promise<void>;
 }
@@ -61,6 +63,15 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return me;
   }, []);
 
+  const loginDemo = useCallback(async (persona: string) => {
+    const pair = await apiDemoLogin(persona);
+    setTokens(pair.access_token, pair.refresh_token);
+    const me = await getCurrentUser();
+    setUser(me);
+    setStatus("authenticated");
+    return me;
+  }, []);
+
   const logout = useCallback(async () => {
     const refreshToken = getRefreshToken();
     try {
@@ -74,7 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, status, login, logout, refetchUser: loadUser }}>
+    <AuthContext.Provider value={{ user, status, login, loginDemo, logout, refetchUser: loadUser }}>
       {children}
     </AuthContext.Provider>
   );

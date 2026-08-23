@@ -67,6 +67,56 @@ export default function ChallengeDetailsPage() {
             <dt className="text-xs font-medium uppercase text-slate-400">Submitted</dt>
             <dd className="mt-1 text-sm text-slate-700">{new Date(challenge.created_at).toLocaleString()}</dd>
           </div>
+          <div>
+            <dt className="text-xs font-medium uppercase text-slate-400">AI-suggested domain</dt>
+            <dd className="mt-1 text-sm text-slate-700">
+              {challenge.content_domain ? (
+                <>
+                  {challenge.content_domain}
+                  {challenge.content_domain_confidence != null
+                    ? ` (${Math.round(challenge.content_domain_confidence * 100)}% confidence)`
+                    : ""}
+                  {challenge.content_domain_needs_review ? (
+                    <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800">
+                      needs review
+                    </span>
+                  ) : null}
+                  {challenge.content_domain_source === "zero_shot_fallback" ? (
+                    <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">
+                      degraded model
+                    </span>
+                  ) : null}
+                </>
+              ) : (
+                "Not yet classified"
+              )}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs font-medium uppercase text-slate-400">AI-suggested work intensity</dt>
+            <dd className="mt-1 text-sm text-slate-700">
+              {challenge.content_field_label ? (
+                <>
+                  {challenge.content_field_label.replace("_", " ").toLowerCase()}
+                  {challenge.content_field_intensity != null
+                    ? ` (${challenge.content_field_intensity.toFixed(2)})`
+                    : ""}
+                  {challenge.content_field_needs_review ? (
+                    <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs text-amber-800">
+                      needs review
+                    </span>
+                  ) : null}
+                  {challenge.content_field_source === "rules_fallback" ? (
+                    <span className="ml-2 rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600">
+                      degraded model
+                    </span>
+                  ) : null}
+                </>
+              ) : (
+                "Not yet classified"
+              )}
+            </dd>
+          </div>
           {challenge.on_behalf_of_name ? (
             <div className="sm:col-span-2">
               <dt className="text-xs font-medium uppercase text-slate-400">Assisted submission — on behalf of</dt>

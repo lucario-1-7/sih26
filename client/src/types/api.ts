@@ -277,6 +277,14 @@ export interface ChallengeResponse {
   duplicate_of_id: string | null;
   on_behalf_of_name: string | null;
   on_behalf_of_phone: string | null;
+  content_domain: string | null;
+  content_domain_confidence: number | null;
+  content_domain_needs_review: boolean | null;
+  content_domain_source: string | null;
+  content_field_intensity: number | null;
+  content_field_label: string | null;
+  content_field_needs_review: boolean | null;
+  content_field_source: string | null;
   created_at: string;
   updated_at: string;
 }

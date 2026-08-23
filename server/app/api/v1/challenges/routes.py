@@ -60,7 +60,7 @@ async def update_challenge(
     challenge_id: uuid.UUID,
     payload: ChallengeUpdate,
     db: AsyncSession = Depends(get_db),
-    user: User = Depends(require_role(Role.CITIZEN, Role.FIELD_ASSISTANT, Role.VALIDATOR)),
+    user: User = Depends(require_role(Role.CITIZEN, Role.FIELD_ASSISTANT, Role.VALIDATOR, Role.SUPERADMIN)),
 ) -> ChallengeResponse:
     challenge = await challenge_service.update_challenge(db, challenge_id, data=payload, actor=user)
     return ChallengeResponse.model_validate(challenge)
