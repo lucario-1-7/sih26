@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../services/language_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/auth_screen_layout.dart';
 import '../widgets/phone_number_input.dart';
@@ -37,26 +38,32 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return AuthScreenLayout(
-      currentStep: 1,
-      totalSteps: 6,
-      showBack: true,
-      onBack: () => Navigator.pop(context),
-      heading: 'Enter your phone number',
-      supportingWidget: Text(
-        "We'll send you a verification code",
-        style: AppTypography.supporting(context),
-      ),
-      middleContent: PhoneNumberInput(
-        controller: _phoneController,
-        countryCode: '+91',
-        onSubmitted: (_) => _onContinue(),
-      ),
-      bottomCta: PrimaryButton(
-        text: 'Continue',
-        isEnabled: true, // Allow tapping for visual demonstration
-        onPressed: _onContinue,
-      ),
+    return AnimatedBuilder(
+      animation: LanguageService.instance,
+      builder: (context, _) {
+        return AuthScreenLayout(
+          currentStep: 1,
+          totalSteps: 6,
+          showBack: true,
+          onBack: () => Navigator.pop(context),
+          heading: LanguageService.t('enter_phone'),
+          supportingWidget: Text(
+            LanguageService.t('phone_sub'),
+            style: AppTypography.supporting(context),
+          ),
+          middleContent: PhoneNumberInput(
+            controller: _phoneController,
+            countryCode: '+91',
+            onSubmitted: (_) => _onContinue(),
+          ),
+          bottomCta: PrimaryButton(
+            text: LanguageService.t('continue_btn'),
+            isEnabled: true,
+            onPressed: _onContinue,
+          ),
+        );
+      },
     );
   }
 }
+

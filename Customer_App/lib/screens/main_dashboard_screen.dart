@@ -2,6 +2,7 @@ import 'package:feather_icons/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../models/issue_model.dart';
+import '../services/language_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/custom_bottom_navbar.dart';
 import '../widgets/dashboard_issue_card.dart';
@@ -9,6 +10,7 @@ import '../widgets/issue_card.dart';
 import '../widgets/media_upload_card.dart';
 import '../widgets/primary_button.dart';
 import 'issue_detail_screen.dart';
+import 'issue_success_screen.dart';
 import 'recent_activity_screen.dart';
 import 'settings_screen.dart';
 
@@ -299,28 +301,33 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: IndexedStack(
-          index: _currentTabIndex,
-          children: [
-            _buildHomeTab(),
-            _buildMyIssuesTab(),
-            _buildFileGrievanceTab(),
-            _buildProfileTab(),
-          ],
-        ),
-      ),
-      bottomNavigationBar: CustomBottomNavbar(
-        currentIndex: _currentTabIndex,
-        onTabSelected: (index) {
-          setState(() {
-            _currentTabIndex = index;
-          });
-        },
-        onAddPressed: _onFileIssuePressed,
-      ),
+    return AnimatedBuilder(
+      animation: LanguageService.instance,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          body: SafeArea(
+            child: IndexedStack(
+              index: _currentTabIndex,
+              children: [
+                _buildHomeTab(),
+                _buildMyIssuesTab(),
+                _buildFileGrievanceTab(),
+                _buildProfileTab(),
+              ],
+            ),
+          ),
+          bottomNavigationBar: CustomBottomNavbar(
+            currentIndex: _currentTabIndex,
+            onTabSelected: (index) {
+              setState(() {
+                _currentTabIndex = index;
+              });
+            },
+            onAddPressed: _onFileIssuePressed,
+          ),
+        );
+      },
     );
   }
 
@@ -397,7 +404,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Welcome Back',
+                      LanguageService.t('welcome_back'),
                       style: AppTypography.supporting(context).copyWith(
                         fontSize: 13,
                         fontWeight: FontWeight.w500,
@@ -406,7 +413,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      'Hi Dhyan',
+                      LanguageService.t('hi_user'),
                       style: AppTypography.heading(context).copyWith(
                         fontSize: 20,
                         fontWeight: FontWeight.w800,
@@ -502,7 +509,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                       fontSize: 14,
                     ),
                     decoration: InputDecoration(
-                      hintText: 'Search',
+                      hintText: LanguageService.t('search_hint'),
                       hintStyle: AppTypography.placeholder(context).copyWith(
                         fontSize: 14,
                       ),
@@ -549,7 +556,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Welcome!',
+                        LanguageService.t('welcome_card_title'),
                         style: AppTypography.heading(context).copyWith(
                           fontSize: 18,
                           fontWeight: FontWeight.w700,
@@ -557,7 +564,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                       ),
                       const SizedBox(height: 6),
                       Text(
-                        "Let's schedule your civic grievance resolution.",
+                        LanguageService.t('welcome_card_sub'),
                         style: AppTypography.supporting(context).copyWith(
                           fontSize: 13,
                           color: AppColors.secondaryText,
@@ -603,7 +610,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Ongoing Issues',
+                LanguageService.t('ongoing_issues'),
                 style: AppTypography.heading(context).copyWith(
                   fontSize: 18,
                   fontWeight: FontWeight.w700,
@@ -616,7 +623,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   });
                 },
                 child: Text(
-                  'View all',
+                  LanguageService.t('view_all'),
                   style: AppTypography.supporting(context).copyWith(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -632,9 +639,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           // 2x2 Grid of Issue Cards matching reference
           if (filteredIssues.isEmpty)
             _buildEmptyState(
-              title: 'No Ongoing Issues',
-              subtitle: 'No active grievances found in this area. Notice a problem in your neighborhood?',
-              buttonText: 'File a Grievance',
+              title: LanguageService.t('no_issues_found'),
+              subtitle: LanguageService.t('no_issues_sub'),
+              buttonText: LanguageService.t('file_grievance_btn'),
             )
           else
             GridView.builder(
@@ -1108,7 +1115,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     }
   }
 
-  void _onFormSubmit() {
+  Future<void> _onFormSubmit() async {
     final titleText = _formTitleController.text.trim().isEmpty
         ? 'Civic Grievance Report'
         : _formTitleController.text.trim();
@@ -1134,6 +1141,22 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       detectedCategory = 'Civic Infrastructure';
     }
 
+    final fullName = _formFullNameController.text.trim().isEmpty
+        ? 'Dhyan Kannoth'
+        : _formFullNameController.text.trim();
+    final emailText = _formEmailController.text.trim().isEmpty
+        ? 'dhyan@janseva.gov.in'
+        : _formEmailController.text.trim();
+    final mobileText = _formMobileController.text.trim().isEmpty
+        ? '+91 98765 43210'
+        : _formMobileController.text.trim();
+    final cityWard = _formCityWardController.text.trim().isEmpty
+        ? 'Chennai'
+        : _formCityWardController.text.trim();
+    final pincode = _formPincodeController.text.trim().isEmpty
+        ? '600001'
+        : _formPincodeController.text.trim();
+
     final newIssue = IssueItem(
       id: 'ISS-2026-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
       title: titleText,
@@ -1143,19 +1166,31 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       dateFiled: 'Today',
       status: IssueStatus.underReview,
       imagePath: _formHasAttachedMedia ? 'mock_evidence.jpg' : null,
+      citizenName: fullName,
+      citizenEmail: emailText,
+      citizenMobile: mobileText,
+      cityWard: cityWard,
+      pincode: pincode,
+    );
+
+    final result = await Navigator.push<String>(
+      context,
+      MaterialPageRoute(
+        builder: (context) => IssueSuccessScreen(createdIssue: newIssue),
+      ),
     );
 
     setState(() {
       _issues.insert(0, newIssue);
-      _currentTabIndex = 1; // Switch to My Issues tab
       _formTitleController.clear();
       _formDescriptionController.clear();
       _formHasAttachedMedia = false;
+      if (result == 'file_another') {
+        _currentTabIndex = 2; // Stay on File Grievance tab
+      } else {
+        _currentTabIndex = 0; // Switch to Home tab
+      }
     });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Grievance filed! Auto-classified as: $detectedCategory')),
-    );
   }
 
   Widget _buildFileGrievanceTab() {
@@ -1170,50 +1205,44 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
           const SizedBox(height: 18),
 
-          // SECTION 1: Contact Information
-          _buildFormSectionHeader(1, 'Contact Information'),
+          // SECTION 1: Personal Info
+          _buildFormSectionHeader(1, LanguageService.t('step1_title')),
           const SizedBox(height: 12),
+
           _buildFormInputField(
             controller: _formFullNameController,
-            placeholder: 'Full Name',
+            placeholder: 'Full Name (e.g. Dhyan Kannoth)',
             icon: FeatherIcons.user,
           ),
           const SizedBox(height: 10),
           _buildFormInputField(
             controller: _formEmailController,
-            placeholder: 'Email Address',
+            placeholder: 'Email Address (e.g. citizen@example.com)',
             icon: FeatherIcons.mail,
             keyboardType: TextInputType.emailAddress,
           ),
           const SizedBox(height: 10),
           _buildFormInputField(
             controller: _formMobileController,
-            placeholder: 'Phone Number',
+            placeholder: 'Mobile Number (+91 XXXXX XXXXX)',
             icon: FeatherIcons.phone,
             keyboardType: TextInputType.phone,
           ),
 
           const SizedBox(height: 24),
 
-          // SECTION 2: Grievance Location
+          // SECTION 2: Location
           _buildFormSectionHeader(
             2,
-            'Grievance Location',
+            LanguageService.t('step2_title'),
             trailing: GestureDetector(
               onTap: _requestLocationPermission,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 5.0),
+                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 decoration: BoxDecoration(
-                  color: _formIsLocationShared
-                      ? AppColors.inputBackground
-                      : AppColors.background,
-                  borderRadius: BorderRadius.circular(20.0),
-                  border: Border.all(
-                    color: _formIsLocationShared
-                        ? AppColors.primaryText
-                        : AppColors.border,
-                    width: 1.0,
-                  ),
+                  color: AppColors.inputBackground,
+                  borderRadius: BorderRadius.circular(6.0),
+                  border: Border.all(color: AppColors.border, width: 0.8),
                 ),
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -1271,7 +1300,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           const SizedBox(height: 24),
 
           // SECTION 3: Issue Details
-          _buildFormSectionHeader(3, 'Issue Details'),
+          _buildFormSectionHeader(3, LanguageService.t('step3_title')),
           const SizedBox(height: 12),
 
           _buildFormInputField(
@@ -1287,7 +1316,11 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             maxLines: 4,
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
+
+          // SECTION 4: Upload or Click Photo (Optional)
+          _buildFormSectionHeader(4, LanguageService.t('step4_title')),
+          const SizedBox(height: 12),
 
           MediaUploadCard(
             onMediaSelected: (hasPhoto) {
@@ -1298,7 +1331,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           const SizedBox(height: 24),
 
           PrimaryButton(
-            text: 'Submit Grievance',
+            text: LanguageService.t('submit_grievance'),
             onPressed: _onFormSubmit,
           ),
 
@@ -1333,7 +1366,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         Expanded(
           child: Center(
             child: Text(
-              'File Grievance',
+              LanguageService.t('nav_file'),
               style: AppTypography.heading(context).copyWith(
                 fontSize: 18,
                 fontWeight: FontWeight.w700,
@@ -1499,11 +1532,11 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           // Stats Row
           Row(
             children: [
-              _buildStatItem('Reported', '${_issues.length}'),
+              _buildStatItem(LanguageService.t('reported'), '${_issues.length}'),
               const SizedBox(width: 10),
-              _buildStatItem('In Progress', '2'),
+              _buildStatItem(LanguageService.t('in_progress_count'), '2'),
               const SizedBox(width: 10),
-              _buildStatItem('Resolved', '1'),
+              _buildStatItem(LanguageService.t('resolved_count'), '1'),
             ],
           ),
 
@@ -1514,19 +1547,19 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           // Profile Actions
           _buildProfileOption(
             icon: FeatherIcons.phone,
-            title: 'Phone Number',
+            title: LanguageService.t('phone_number'),
             subtitle: '+91 98765 43210',
             onTap: () {},
           ),
           _buildProfileOption(
             icon: FeatherIcons.mail,
-            title: 'Email Address',
+            title: LanguageService.t('email_address'),
             subtitle: 'dhyan@janseva.gov.in',
             onTap: () {},
           ),
           _buildProfileOption(
             icon: FeatherIcons.settings,
-            title: 'Settings & Notifications',
+            title: LanguageService.t('settings_notif'),
             subtitle: 'Configure SMS and email updates',
             onTap: () {
               Navigator.push(
@@ -1537,7 +1570,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           ),
           _buildProfileOption(
             icon: FeatherIcons.logOut,
-            title: 'Logout',
+            title: LanguageService.t('logout'),
             subtitle: 'Sign out of Social Serve',
             onTap: () {
               Navigator.popUntil(context, (route) => route.isFirst);

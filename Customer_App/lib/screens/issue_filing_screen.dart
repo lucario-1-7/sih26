@@ -152,7 +152,7 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
     }
   }
 
-  void _onSubmit() {
+  Future<void> _onSubmit() async {
     final titleText = _titleController.text.trim().isEmpty
         ? 'Civic Grievance Report'
         : _titleController.text.trim();
@@ -178,6 +178,22 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
       detectedCategory = 'Civic Infrastructure';
     }
 
+    final fullName = _fullNameController.text.trim().isEmpty
+        ? 'Dhyan Kannoth'
+        : _fullNameController.text.trim();
+    final emailText = _emailController.text.trim().isEmpty
+        ? 'dhyan@janseva.gov.in'
+        : _emailController.text.trim();
+    final mobileText = _mobileController.text.trim().isEmpty
+        ? '+91 98765 43210'
+        : _mobileController.text.trim();
+    final cityWard = _cityWardController.text.trim().isEmpty
+        ? 'Chennai'
+        : _cityWardController.text.trim();
+    final pincode = _pincodeController.text.trim().isEmpty
+        ? '600001'
+        : _pincodeController.text.trim();
+
     final newIssue = IssueItem(
       id: 'ISS-2026-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
       title: titleText,
@@ -187,14 +203,31 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
       dateFiled: 'Today',
       status: IssueStatus.underReview,
       imagePath: _hasAttachedMedia ? 'mock_evidence.jpg' : null,
+      citizenName: fullName,
+      citizenEmail: emailText,
+      citizenMobile: mobileText,
+      cityWard: cityWard,
+      pincode: pincode,
     );
 
-    Navigator.pushReplacement(
+    final result = await Navigator.push<String>(
       context,
       MaterialPageRoute(
         builder: (context) => IssueSuccessScreen(createdIssue: newIssue),
       ),
     );
+
+    if (!mounted) return;
+
+    if (result == 'file_another') {
+      _titleController.clear();
+      _descriptionController.clear();
+      setState(() {
+        _hasAttachedMedia = false;
+      });
+    } else {
+      Navigator.pop(context, newIssue);
+    }
   }
 
   @override
@@ -343,7 +376,11 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
                 maxLines: 4,
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
+
+              // SECTION 4: Upload or Click Photo (Optional)
+              _buildSectionHeader(4, 'Upload or Click Photo (Optional)'),
+              const SizedBox(height: 12),
 
               MediaUploadCard(
                 onMediaSelected: (hasPhoto) {

@@ -38,6 +38,11 @@ class IssueItem {
   final IssueStatus status;
   final double? progress;
   final String? imagePath;
+  final String? citizenName;
+  final String? citizenEmail;
+  final String? citizenMobile;
+  final String? cityWard;
+  final String? pincode;
 
   const IssueItem({
     required this.id,
@@ -49,6 +54,11 @@ class IssueItem {
     required this.status,
     this.progress,
     this.imagePath,
+    this.citizenName,
+    this.citizenEmail,
+    this.citizenMobile,
+    this.cityWard,
+    this.pincode,
   });
 
   double get progressValue => progress ?? status.defaultProgress;

@@ -79,6 +79,7 @@ flutter:
     - assets/animations/file_loading.json
     - assets/animations/progress.json
     - assets/animations/reporting.json
+    - assets/animations/successful.json
     - lib/assets/
     - lib/assets/Agriculture.json
     - lib/assets/accesibility.json
@@ -96,6 +97,7 @@ flutter:
     - lib/assets/file_loading.json
     - lib/assets/progress.json
     - lib/assets/reporting.json
+    - lib/assets/successful.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
