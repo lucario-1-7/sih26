@@ -87,12 +87,12 @@ python ai\models\train_field.py
 To use the real transformer instead of tfidf, set the backend first:
 
 ```powershell
-$env:SAHYOG_BACKEND="transformer"
+$env:SOCIOSOLVE_BACKEND="transformer"
 python ai\models\train_domain.py
 python ai\models\train_field.py
 ```
 
-(Without setting `SAHYOG_BACKEND`, both scripts default to `tfidf`.)
+(Without setting `SOCIOSOLVE_BACKEND`, both scripts default to `tfidf`.)
 
 ---
 
@@ -136,4 +136,4 @@ If your numbers are wildly different, something in the folder layout or run orde
 | `FileNotFoundError: ai/data/domain_train.csv` | CSV not renamed / not in `ai/data/` | Check exact filename and location |
 | field model's macro-F1 looks worse than 0.769 | Ran `train_field.py` before `train_domain.py` | Delete `ai\artifacts\*.joblib`, re-run in the correct order |
 | `httpx.ProxyError` / connection errors on the transformer backend | Can't reach huggingface.co | Use `tfidf` backend instead (default), or check your network/proxy |
-| Everything works but capability extraction returns nothing | Expected on the tfidf backend — it requires the real transformer | Switch to `SAHYOG_BACKEND=transformer`, or ignore for now (domain + field intensity still work fully on tfidf) |
+| Everything works but capability extraction returns nothing | Expected on the tfidf backend — it requires the real transformer | Switch to `SOCIOSOLVE_BACKEND=transformer`, or ignore for now (domain + field intensity still work fully on tfidf) |

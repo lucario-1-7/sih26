@@ -7,8 +7,8 @@ class TokenStorage {
   TokenStorage._();
 
   static const _storage = FlutterSecureStorage();
-  static const _accessKey = 'sahyog_access_token';
-  static const _refreshKey = 'sahyog_refresh_token';
+  static const _accessKey = 'sociosolve_access_token';
+  static const _refreshKey = 'sociosolve_refresh_token';
 
   static Future<void> save({required String accessToken, required String refreshToken}) async {
     await _storage.write(key: _accessKey, value: accessToken);

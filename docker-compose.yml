@@ -1,7 +1,7 @@
 services:
   postgres:
     image: pgvector/pgvector:pg16
-    container_name: sahyog-postgres
+    container_name: sociosolve-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -22,7 +22,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: sahyog-redis
+    container_name: sociosolve-redis
     restart: unless-stopped
     ports:
       - "${REDIS_PORT:-6379}:6379"
@@ -39,7 +39,7 @@ services:
 
   ml:
     build: ./ml
-    container_name: sahyog-ml
+    container_name: sociosolve-ml
     restart: unless-stopped
     # No postgres dependency and no `backend` network — the ML engine is
     # database-independent and must not be able to reach postgres.
@@ -56,7 +56,7 @@ services:
 
   server:
     build: ./server
-    container_name: sahyog-server
+    container_name: sociosolve-server
     restart: unless-stopped
     depends_on:
       postgres:
@@ -90,7 +90,7 @@ services:
 
   worker:
     build: ./server
-    container_name: sahyog-worker
+    container_name: sociosolve-worker
     restart: unless-stopped
     command: ["python", "-m", "arq", "app.workers.settings.WorkerSettings"]
     depends_on:

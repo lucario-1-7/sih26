@@ -33,9 +33,9 @@ OFFLINE IS NON-NEGOTIABLE
       python -c "from ai.models.embedder import Embedder; Embedder().warm()"
 
 TWO BACKENDS
-  SAHYOG_BACKEND=transformer   (default) the real encoder, described above.
-  SAHYOG_BACKEND=tfidf         TF-IDF over character n-grams -> TruncatedSVD
-                               -> 384 dims. Pure scikit-learn, NO DOWNLOAD.
+  SOCIOSOLVE_BACKEND=transformer   (default) the real encoder, described above.
+  SOCIOSOLVE_BACKEND=tfidf         TF-IDF over character n-grams -> TruncatedSVD
+                                -> 384 dims. Pure scikit-learn, NO DOWNLOAD.
 
   The tfidf backend exists for two reasons, and neither is laziness:
     1. It is the emergency fallback. If the venue machine cannot load the
@@ -63,8 +63,8 @@ from pathlib import Path
 
 import numpy as np
 
-MODEL_NAME = os.getenv("SAHYOG_ENCODER", "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
-BACKEND = os.getenv("SAHYOG_BACKEND", "transformer")     # transformer | tfidf
+MODEL_NAME = os.getenv("SOCIOSOLVE_ENCODER", "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2")
+BACKEND = os.getenv("SOCIOSOLVE_BACKEND", "transformer")     # transformer | tfidf
 EMBED_DIM = 384
 ARTIFACTS = Path(__file__).resolve().parent.parent / "artifacts"
 CACHE_DIR = ARTIFACTS / "embed_cache"

@@ -10,7 +10,7 @@ MODEL 3 of 3 - FIELD INTENSITY (physical vs remote).
 
 Run:
     python ai/models/train_field.py
-    SAHYOG_BACKEND=tfidf python ai/models/train_field.py
+    SOCIOSOLVE_BACKEND=tfidf python ai/models/train_field.py
 
 WHY THE OUTPUT IS CONTINUOUS AND NOT A LABEL
   field_intensity is not consumed by a human - it is consumed by three

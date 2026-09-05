@@ -11,7 +11,7 @@ MODEL 2 of 3 - DOMAIN CLASSIFICATION.
 
 Run:
     python ai/models/train_domain.py                 # transformer encoder
-    SAHYOG_BACKEND=tfidf python ai/models/train_domain.py    # offline baseline
+    SOCIOSOLVE_BACKEND=tfidf python ai/models/train_domain.py    # offline baseline
 
 WHY LOGISTIC REGRESSION AND NOT SOMETHING BIGGER
   Fine-tuning a transformer head would buy maybe 2-4 points of macro-F1 for

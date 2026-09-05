@@ -1,6 +1,6 @@
 """domain/role alignment: government/university/industry/superadmin
 
-Aligns the user role model with the final Sahyog architecture:
+Aligns the user role model with the final SocioSolve architecture:
 
   - `Role.OFFICER`  -> `Role.VALIDATOR`     (government challenge/duplicate review)
   - `Role.ANALYST`  -> `Role.VALIDATOR`     (read-only review access folded into VALIDATOR)

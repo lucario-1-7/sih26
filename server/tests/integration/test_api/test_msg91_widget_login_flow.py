@@ -27,7 +27,7 @@ def _clear_settings_cache():
 
 
 @pytest.mark.asyncio
-async def test_widget_login_round_trip_issues_a_normal_sahyog_session(client, monkeypatch):
+async def test_widget_login_round_trip_issues_a_normal_sociosolve_session(client, monkeypatch):
     _configure_auth_key(monkeypatch)
 
     def handler(request: httpx.Request) -> httpx.Response:

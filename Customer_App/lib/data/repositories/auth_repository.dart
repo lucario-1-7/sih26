@@ -2,7 +2,7 @@ import '../../core/networking/api_client.dart';
 import '../../core/storage/token_storage.dart';
 import '../models/auth_tokens.dart';
 
-/// Owns the real Sahyog OTP auth flow — this is the app's only authentication
+/// Owns the real SocioSolve OTP auth flow — this is the app's only authentication
 /// path. There is no separate/parallel login system and no bypass: every
 /// screen that needs a session goes through here.
 class AuthRepository {
@@ -26,7 +26,7 @@ class AuthRepository {
   }
 
   /// PRESENTATION-ONLY. Bypasses the OTP challenge entirely — issues a real
-  /// Sahyog session for a real, backend-persisted demo citizen. Only ever
+  /// SocioSolve session for a real, backend-persisted demo citizen. Only ever
   /// called from a UI path gated by DemoConfig.enabled, and only ever
   /// succeeds if the backend's own DEMO_MODE is also explicitly enabled
   /// (404 otherwise) — this flag alone can never grant access.

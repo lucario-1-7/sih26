@@ -56,7 +56,7 @@ python seed/validate_seed.py          # seed integrity, no deps
 | **Output** | `np.ndarray (n, 384)`, float32, **L2-normalised** |
 | **Artifacts** | reads/writes `artifacts/embed_cache/*.pkl`; `artifacts/tfidf_encoder.joblib` on the fallback backend |
 
-Two backends, selected by `SAHYOG_BACKEND`:
+Two backends, selected by `SOCIOSOLVE_BACKEND`:
 
 - `transformer` (default) — `paraphrase-multilingual-MiniLM-L12-v2`, 384-d, CPU, ~20 ms/doc.
   Needs the weights on disk.
@@ -326,7 +326,7 @@ capabilities with no provider, and a missing taxonomy code.
 |---|---|
 | `README.md` | Project overview, the thesis, repo map, the five differentiators, honest scope statement |
 | `.gitignore` | Excludes `__pycache__`, `.env`, `node_modules`, `*.bundle`, and the two large regenerable ML artifacts |
-| `sahyog-plan.bundle` | **Not tracked.** A git bundle created to hand the work over while push access was unavailable. Restore with `git clone sahyog-plan.bundle sih26`. Regenerate: `git bundle create sahyog-plan.bundle <branch>` |
+| `sociosolve-plan.bundle` | **Not tracked.** A git bundle created to hand the work over while push access was unavailable. Restore with `git clone sociosolve-plan.bundle sih26`. Regenerate: `git bundle create sociosolve-plan.bundle <branch>` |
 | `ai/__init__.py`, `ai/models/__init__.py` | Empty. They exist only so `from ai.models.x import y` resolves when scripts are run from the repo root — which is how every training script imports its siblings. Deleting them breaks all four. |
 
 ---

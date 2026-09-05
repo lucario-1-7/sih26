@@ -38,7 +38,7 @@ DEGRADATION IS PART OF THE CONTRACT
 
 Run standalone:
     python ai/models/predict.py                      # demo on sample texts
-    SAHYOG_BACKEND=tfidf python ai/models/predict.py
+    SOCIOSOLVE_BACKEND=tfidf python ai/models/predict.py
 """
 
 from __future__ import annotations
