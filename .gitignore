@@ -1,33 +1,176 @@
+# =============================================================================
+# SocioSolve — Comprehensive Git Ignore Rules
+# =============================================================================
+
+# --- Environment & Secret Files (CRITICAL: Zero leaks) -----------------------
 .env
-
-# Claude Code local tooling / project instructions — not part of the repo
-.claude/
-.mcp.json
-CLAUDE.md
-CLAUDE.pdf
-
-# Python
-.venv/
-__pycache__/
-*.pyc
-.pytest_cache/
-*.egg-info/
-
-# Alembic
-database/alembic/versions/__pycache__/
-
-# Node / client
-node_modules/
-dist/
-build/
-
-# Flutter / mobile
-mobile/.dart_tool/
-mobile/.flutter-plugins
-mobile/.flutter-plugins-dependencies
-mobile/build/
-
-# Logs and local artifacts
-*.log
+.env.*
+!.env.example
+!.env.*.example
+*.env
+*.env.local
+*.env.*.local
+*.pem
+*.key
+*.cert
+*.crt
+*.pfx
+*.p12
+credentials.json
+secrets/
 tokens.txt
 
+# --- Operating System & Editor / IDE Files ----------------------------------
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+[Dd]esktop.ini
+
+# JetBrains / IntelliJ / WebStorm / PyCharm
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea_modules/
+
+# VS Code / VSCodium
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+*.code-workspace
+
+# Subversion, Vim, Emacs, Atom
+.svn/
+*.swp
+*.swo
+*~
+.history/
+.atom/
+
+# --- Node.js / Web Frontend (citizen-portal, client) -------------------------
+node_modules/
+*/node_modules/
+*/*/node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+.pnpm-store/
+.pnpm-debug.log*
+
+# Next.js & Web Build Artifacts
+.next/
+*/.next/
+out/
+*/out/
+dist/
+*/dist/
+build/
+*/build/
+.turbo/
+*/.turbo/
+*.tsbuildinfo
+next-env.d.ts
+*/next-env.d.ts
+
+# Auto-generated agent docs from tooling
+AGENTS.md
+*/AGENTS.md
+CLAUDE.md
+*/CLAUDE.md
+CLAUDE.pdf
+.claude/
+.mcp.json
+
+# --- Python / Backend & ML (server, ml) --------------------------------------
+__pycache__/
+*/__pycache__/
+*/*/__pycache__/
+*/*/*/__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+*/.venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Testing & Coverage
+.pytest_cache/
+*/.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+coverage/
+*/coverage/
+
+# Packaging & Distribution
+*.egg-info/
+*/.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# ML Cache & Large Model Artifacts
+*.joblib
+*.pkl
+ml/ai/artifacts/embed_cache/
+*.bundle
+sociosolve-plan.bundle
+
+# --- Database & Migrations ---------------------------------------------------
+database/alembic/versions/__pycache__/
+*.sqlite
+*.sqlite3
+*.db
+pgdata/
+redisdata/
+
+# --- Mobile (Customer_App & mobile) ------------------------------------------
+.dart_tool/
+*/.dart_tool/
+.flutter-plugins
+*/.flutter-plugins
+.flutter-plugins-dependencies
+*/.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+Customer_App/build/
+Customer_App/.dart_tool/
+Customer_App/.flutter-plugins
+Customer_App/.flutter-plugins-dependencies
+Customer_App/android/.gradle/
+Customer_App/android/local.properties
+Customer_App/android/app/debug/
+Customer_App/android/app/profile/
+Customer_App/android/app/release/
+Customer_App/ios/Flutter/Generated.xcconfig
+Customer_App/ios/Flutter/app.framework
+Customer_App/ios/Flutter/Flutter.framework
+Customer_App/ios/Flutter/Flutter.podspec
+Customer_App/ios/Pods/
+Customer_App/ios/.symlinks/
+Customer_App/ios/Flutter/.last_build_id
+app.*.symbols
+app.*.map.json
+
+# --- General Logs & Diagnostics ---------------------------------------------
+*.log
+logs/
+*/logs/
