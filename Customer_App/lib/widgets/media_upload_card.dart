@@ -1,8 +1,9 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import '../services/language_service.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 
 class MediaUploadCard extends StatefulWidget {
@@ -53,7 +54,7 @@ class _MediaUploadCardState extends State<MediaUploadCard> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: LanguageService.instance,
+      animation: Listenable.merge([ThemeService.instance, LanguageService.instance]),
       builder: (context, _) {
         if (widget.showHeading) {
           return Column(
@@ -111,7 +112,7 @@ class _MediaUploadCardState extends State<MediaUploadCard> {
                   'assets/animations/file_loading.json',
                   fit: BoxFit.contain,
                   errorBuilder: (context, err2, stack2) {
-                    return const CircularProgressIndicator(
+                    return CircularProgressIndicator(
                       valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryText),
                       strokeWidth: 2.5,
                     );
@@ -167,7 +168,7 @@ class _MediaUploadCardState extends State<MediaUploadCard> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   FeatherIcons.image,
                   size: 26,
                   color: AppColors.secondaryText,
@@ -191,7 +192,7 @@ class _MediaUploadCardState extends State<MediaUploadCard> {
         // Divider with "or"
         Row(
           children: [
-            const Expanded(
+            Expanded(
               child: Divider(
                 color: AppColors.border,
                 thickness: 1.0,
@@ -209,7 +210,7 @@ class _MediaUploadCardState extends State<MediaUploadCard> {
                 ),
               ),
             ),
-            const Expanded(
+            Expanded(
               child: Divider(
                 color: AppColors.border,
                 thickness: 1.0,
@@ -239,7 +240,7 @@ class _MediaUploadCardState extends State<MediaUploadCard> {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(
+                Icon(
                   FeatherIcons.camera,
                   size: 16,
                   color: AppColors.primaryText,
@@ -293,7 +294,7 @@ class _MediaUploadCardState extends State<MediaUploadCard> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(
+                      Icon(
                         FeatherIcons.image,
                         size: 40,
                         color: AppColors.primaryText,
@@ -355,7 +356,7 @@ class _MediaUploadCardState extends State<MediaUploadCard> {
                     backgroundColor: AppColors.inputBackground,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
-                      side: const BorderSide(color: AppColors.border),
+                      side: BorderSide(color: AppColors.border),
                     ),
                     padding: const EdgeInsets.all(8),
                   ),
@@ -370,7 +371,7 @@ class _MediaUploadCardState extends State<MediaUploadCard> {
                     backgroundColor: AppColors.inputBackground,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8),
-                      side: const BorderSide(color: AppColors.border),
+                      side: BorderSide(color: AppColors.border),
                     ),
                     padding: const EdgeInsets.all(8),
                   ),

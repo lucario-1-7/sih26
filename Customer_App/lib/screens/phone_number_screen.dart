@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../core/networking/api_exception.dart';
 import '../data/repositories/auth_repository.dart';
 import '../services/language_service.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/auth_screen_layout.dart';
 import '../widgets/phone_number_input.dart';
@@ -18,6 +19,7 @@ class PhoneNumberScreen extends StatefulWidget {
 
 class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
   final TextEditingController _phoneController = TextEditingController();
+  final _authRepo = AuthRepository.instance;
   bool _isSubmitting = false;
 
   @override
@@ -26,32 +28,41 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
     super.dispose();
   }
 
-  bool get _isValidPhone => _phoneController.text.trim().length == 10;
-
   Future<void> _onContinue() async {
-    if (!_isValidPhone) {
+    final rawPhone = _phoneController.text.trim();
+    if (rawPhone.length < 10) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Enter a valid 10-digit phone number.')),
+        SnackBar(content: Text(LanguageService.t('enter_phone'))),
       );
       return;
     }
 
-    final phoneDigits = _phoneController.text.trim();
-    final backendPhone = '+91$phoneDigits';
+    final backendPhone = rawPhone.startsWith('+') ? rawPhone : '+91$rawPhone';
+    final displayPhone = rawPhone.startsWith('+') ? rawPhone : '+91 $rawPhone';
 
     setState(() => _isSubmitting = true);
     try {
-      await AuthRepository.instance.requestOtp(backendPhone);
+      await _authRepo.requestOtp(backendPhone);
       if (!mounted) return;
       Navigator.push(
         context,
         SmoothPageRoute(
-          child: OtpVerificationScreen(phoneNumber: '+91 $phoneDigits', backendPhone: backendPhone),
+          child: OtpVerificationScreen(
+            phoneNumber: displayPhone,
+            backendPhone: backendPhone,
+          ),
         ),
       );
     } on ApiException catch (e) {
       if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.userMessage)));
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.userMessage)),
+      );
+    } catch (_) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(LanguageService.t('enter_phone'))),
+      );
     } finally {
       if (mounted) setState(() => _isSubmitting = false);
     }
@@ -60,7 +71,7 @@ class _PhoneNumberScreenState extends State<PhoneNumberScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: LanguageService.instance,
+      animation: Listenable.merge([ThemeService.instance, LanguageService.instance]),
       builder: (context, _) {
         return AuthScreenLayout(
           currentStep: 1,

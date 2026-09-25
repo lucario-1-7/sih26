@@ -1,9 +1,10 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:lottie/lottie.dart';
 import '../models/issue_model.dart';
 import '../services/language_service.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/primary_button.dart';
 
@@ -18,7 +19,7 @@ class IssueSuccessScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: LanguageService.instance,
+      animation: Listenable.merge([ThemeService.instance, LanguageService.instance]),
       builder: (context, _) {
         final citizenName = createdIssue.citizenName ?? 'Dhyan Kannoth';
         final citizenEmail = createdIssue.citizenEmail ?? 'dhyan@janseva.gov.in';
@@ -33,7 +34,7 @@ class IssueSuccessScreen extends StatelessWidget {
             backgroundColor: AppColors.background,
             elevation: 0,
             leading: IconButton(
-              icon: const Icon(FeatherIcons.arrowLeft, color: AppColors.primaryText, size: 20),
+              icon: Icon(FeatherIcons.arrowLeft, color: AppColors.primaryText, size: 20),
               onPressed: () => Navigator.pop(context, 'go_home'),
             ),
             title: Text(
@@ -47,7 +48,7 @@ class IssueSuccessScreen extends StatelessWidget {
             centerTitle: true,
             actions: [
               IconButton(
-                icon: const Icon(FeatherIcons.x, color: AppColors.primaryText, size: 20),
+                icon: Icon(FeatherIcons.x, color: AppColors.primaryText, size: 20),
                 onPressed: () => Navigator.pop(context, 'go_home'),
               ),
             ],
@@ -128,12 +129,12 @@ class IssueSuccessScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // Overview Header with Ref ID
-                              Container(
+                                Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
-                                decoration: const BoxDecoration(
+                                decoration: BoxDecoration(
                                   color: AppColors.inputBackground,
-                                  borderRadius: BorderRadius.only(
+                                  borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(15.0),
                                     topRight: Radius.circular(15.0),
                                   ),
@@ -179,8 +180,8 @@ class IssueSuccessScreen extends StatelessWidget {
                                     const SizedBox(height: 6),
                                     _buildInfoRow(FeatherIcons.phone, 'Mobile', citizenMobile),
 
-                                    const Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 12.0),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 12.0),
                                       child: Divider(height: 1, color: AppColors.divider),
                                     ),
 
@@ -191,8 +192,8 @@ class IssueSuccessScreen extends StatelessWidget {
                                     const SizedBox(height: 6),
                                     _buildInfoRow(FeatherIcons.compass, 'Ward / PIN', '$cityWard • $pincode'),
 
-                                    const Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 12.0),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 12.0),
                                       child: Divider(height: 1, color: AppColors.divider),
                                     ),
 
@@ -205,8 +206,8 @@ class IssueSuccessScreen extends StatelessWidget {
                                     const SizedBox(height: 6),
                                     _buildInfoRow(FeatherIcons.alignLeft, 'Description', createdIssue.description),
 
-                                    const Padding(
-                                      padding: EdgeInsets.symmetric(vertical: 12.0),
+                                    Padding(
+                                      padding: const EdgeInsets.symmetric(vertical: 12.0),
                                       child: Divider(height: 1, color: AppColors.divider),
                                     ),
 
@@ -247,7 +248,7 @@ class IssueSuccessScreen extends StatelessWidget {
                 // Bottom Action Buttons
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 14.0),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.background,
                     border: Border(
                       top: BorderSide(color: AppColors.border, width: 1.0),
@@ -278,7 +279,7 @@ class IssueSuccessScreen extends StatelessWidget {
                           },
                           style: OutlinedButton.styleFrom(
                             backgroundColor: AppColors.inputBackground,
-                            side: const BorderSide(color: AppColors.border, width: 1.2),
+                            side: BorderSide(color: AppColors.border, width: 1.2),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(27.0),
                             ),
@@ -287,7 +288,7 @@ class IssueSuccessScreen extends StatelessWidget {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              const Icon(FeatherIcons.home, size: 17, color: AppColors.primaryText),
+                              Icon(FeatherIcons.home, size: 17, color: AppColors.primaryText),
                               const SizedBox(width: 8),
                               Text(
                                 LanguageService.instance.currentLanguageCode == 'en'
@@ -321,7 +322,7 @@ class IssueSuccessScreen extends StatelessWidget {
         Container(
           width: 18,
           height: 18,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.primaryText,
             shape: BoxShape.circle,
           ),
@@ -331,7 +332,7 @@ class IssueSuccessScreen extends StatelessWidget {
               style: GoogleFonts.inter(
                 fontSize: 10.5,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.background,
               ),
             ),
           ),

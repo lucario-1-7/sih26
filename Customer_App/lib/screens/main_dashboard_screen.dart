@@ -1,15 +1,17 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../core/networking/api_exception.dart';
 import '../data/models/administrative_area.dart';
 import '../data/models/auth_tokens.dart';
+import '../data/models/challenge.dart';
 import '../data/repositories/administrative_area_repository.dart';
 import '../data/repositories/auth_repository.dart';
 import '../data/repositories/challenge_repository.dart';
 import '../data/repositories/user_repository.dart';
 import '../models/issue_model.dart';
 import '../services/language_service.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/custom_bottom_navbar.dart';
 import '../widgets/dashboard_issue_card.dart';
@@ -19,16 +21,17 @@ import '../widgets/primary_button.dart';
 import 'issue_detail_screen.dart';
 import 'issue_success_screen.dart';
 import 'recent_activity_screen.dart';
-import 'settings_screen.dart';
 import 'welcome_language_screen.dart';
+import 'profile_screen.dart';
+import '../widgets/smooth_page_route.dart';
+import '../models/community_issue_model.dart';
+import '../widgets/community_issue_card.dart';
+import 'community_discussion_screen.dart';
 
 class MainDashboardScreen extends StatefulWidget {
   final List<IssueItem>? initialIssues;
 
-  const MainDashboardScreen({
-    super.key,
-    this.initialIssues,
-  });
+  const MainDashboardScreen({super.key, this.initialIssues});
 
   @override
   State<MainDashboardScreen> createState() => _MainDashboardScreenState();
@@ -39,10 +42,31 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   int _currentTabIndex = 0;
   String _searchQuery = '';
   final TextEditingController _searchController = TextEditingController();
-  final TextEditingController _myIssuesSearchController = TextEditingController();
+  final TextEditingController _myIssuesSearchController =
+      TextEditingController();
   String _myIssuesStatusFilter = 'All';
   String _myIssuesLocationFilter = 'All';
   String _myIssuesCategoryFilter = 'All';
+
+  // -- Community Reddit-style Dashboard state ----------------------------
+  List<CommunityIssue> _communityIssues = [];
+  String _communitySelectedCategory = 'All';
+  String _communitySortBy = 'trending'; // 'trending' | 'recent' | 'upvoted'
+  final TextEditingController _communitySearchController =
+      TextEditingController();
+  String _communityStatusFilter = 'All';
+
+  static const List<String> _communityCategories = [
+    'All',
+    'Roads & Infrastructure',
+    'Water Scarcity',
+    'Sanitation & Waste',
+    'Accessibility',
+    'Public Safety',
+    'Environmental Pollution',
+    'Education & Literacy',
+    'Healthcare Access',
+  ];
 
   final List<String> _myIssuesStatusSections = [
     'All',
@@ -72,6 +96,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   @override
   void initState() {
     super.initState();
+    _communityIssues = MockCommunityRepository.getInitialTrendingIssues();
     if (widget.initialIssues != null) {
       _issues = widget.initialIssues!;
       _isLoading = false;
@@ -80,11 +105,6 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     }
   }
 
-  /// Loads everything the dashboard needs from the real backend: the
-  /// authenticated citizen's profile, the administrative-area reference list
-  /// (needed both to resolve challenge locations for display and to let the
-  /// grievance form submit a valid `administrative_area_id`), and the
-  /// citizen's own challenges.
   Future<void> _bootstrap() async {
     setState(() {
       _isLoading = true;
@@ -94,7 +114,33 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       final user = await UserRepository.instance.getMe();
       final areas = await AdministrativeAreaRepository.instance.list();
       final areaNames = {for (final a in areas) a.id: a.name};
-      final challenges = await ChallengeRepository.instance.listMyChallenges(user.id);
+      final challenges = await ChallengeRepository.instance.listMyChallenges(
+        user.id,
+      );
+
+      List<Challenge> allBackendChallenges = [];
+      try {
+        allBackendChallenges =
+            await ChallengeRepository.instance.listAllChallenges(limit: 50);
+      } catch (_) {
+        // Fallback gracefully if API is offline
+      }
+
+      final liveCommunityIssues = allBackendChallenges
+          .map(
+            (c) => CommunityIssue.fromChallenge(
+              c,
+              areaName: areaNames[c.administrativeAreaId],
+            ),
+          )
+          .toList();
+
+      final initialTrending =
+          MockCommunityRepository.getInitialTrendingIssues();
+      final existingIds = {for (final l in liveCommunityIssues) l.id};
+      final dedupedInitial = initialTrending
+          .where((m) => !existingIds.contains(m.id))
+          .toList();
 
       if (!mounted) return;
       setState(() {
@@ -104,11 +150,18 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           ..clear()
           ..addAll(areaNames);
         _issues = challenges
-            .map((c) => IssueItem.fromChallenge(c, areaName: _areaNamesById[c.administrativeAreaId]))
+            .map(
+              (c) => IssueItem.fromChallenge(
+                c,
+                areaName: _areaNamesById[c.administrativeAreaId],
+              ),
+            )
             .toList();
+        _communityIssues = [
+          ...liveCommunityIssues,
+          ...dedupedInitial,
+        ];
         _isLoading = false;
-        // The backend has no email field for a citizen user — the mobile
-        // number and name are the only real identity fields to prefill.
         _formMobileController.text = user.phone;
         if (user.name != user.phone) _formFullNameController.text = user.name;
       });
@@ -125,6 +178,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   void dispose() {
     _searchController.dispose();
     _myIssuesSearchController.dispose();
+    _communitySearchController.dispose();
     _formFullNameController.dispose();
     _formEmailController.dispose();
     _formMobileController.dispose();
@@ -135,6 +189,57 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
     _formDescriptionController.dispose();
     super.dispose();
   }
+
+  void _toggleCommunityUpvote(CommunityIssue issue) {
+    setState(() {
+      if (issue.isUpvoted) {
+        issue.upvotes--;
+        issue.isUpvoted = false;
+      } else {
+        if (issue.isDownvoted) {
+          issue.upvotes += 2;
+          issue.isDownvoted = false;
+        } else {
+          issue.upvotes++;
+        }
+        issue.isUpvoted = true;
+      }
+    });
+  }
+
+  void _toggleCommunityDownvote(CommunityIssue issue) {
+    setState(() {
+      if (issue.isDownvoted) {
+        issue.upvotes++;
+        issue.isDownvoted = false;
+      } else {
+        if (issue.isUpvoted) {
+          issue.upvotes -= 2;
+          issue.isUpvoted = false;
+        } else {
+          issue.upvotes--;
+        }
+        issue.isDownvoted = true;
+      }
+    });
+  }
+
+  void _openCommentsSheet(CommunityIssue issue) {
+    _navigateToCommunityDetail(issue);
+  }
+
+  void _navigateToCommunityDetail(CommunityIssue commIssue) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => CommunityDiscussionScreen(
+          issue: commIssue,
+          onIssueUpdated: () => setState(() {}),
+        ),
+      ),
+    );
+  }
+
 
   void _openFilterBottomSheet() {
     String tempStatus = _myIssuesStatusFilter;
@@ -173,10 +278,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     children: [
                       Text(
                         'Filter Grievances',
-                        style: AppTypography.heading(context).copyWith(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: AppTypography.heading(
+                          context,
+                        ).copyWith(fontSize: 18, fontWeight: FontWeight.w700),
                       ),
                       GestureDetector(
                         onTap: () {
@@ -202,16 +306,17 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   // STATUS FILTER
                   Text(
                     'Status',
-                    style: AppTypography.heading(context).copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: AppTypography.heading(
+                      context,
+                    ).copyWith(fontSize: 14, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: ['All', 'Issued', 'In Progress', 'Resolved'].map((st) {
+                    children: ['All', 'Issued', 'In Progress', 'Resolved'].map((
+                      st,
+                    ) {
                       final sel = tempStatus == st;
                       return ChoiceChip(
                         label: Text(st),
@@ -229,7 +334,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(16.0),
                           side: BorderSide(
-                            color: sel ? AppColors.primaryButton : AppColors.border,
+                            color: sel
+                                ? AppColors.primaryButton
+                                : AppColors.border,
                           ),
                         ),
                       );
@@ -240,14 +347,16 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   // LOCATION FILTER
                   Text(
                     'Location / Ward',
-                    style: AppTypography.heading(context).copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: AppTypography.heading(
+                      context,
+                    ).copyWith(fontSize: 14, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 2.0),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 14.0,
+                      vertical: 2.0,
+                    ),
                     decoration: BoxDecoration(
                       color: AppColors.inputBackground,
                       borderRadius: BorderRadius.circular(12.0),
@@ -255,11 +364,22 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     ),
                     child: DropdownButtonHideUnderline(
                       child: DropdownButton<String>(
-                        value: _availableLocations.contains(tempLocation == 'All' ? 'All Locations' : tempLocation)
-                            ? (tempLocation == 'All' ? 'All Locations' : tempLocation)
+                        value:
+                            _availableLocations.contains(
+                              tempLocation == 'All'
+                                  ? 'All Locations'
+                                  : tempLocation,
+                            )
+                            ? (tempLocation == 'All'
+                                  ? 'All Locations'
+                                  : tempLocation)
                             : 'All Locations',
                         isExpanded: true,
-                        icon: const Icon(FeatherIcons.chevronDown, size: 16, color: AppColors.secondaryText),
+                        icon: Icon(
+                          FeatherIcons.chevronDown,
+                          size: 16,
+                          color: AppColors.secondaryText,
+                        ),
                         dropdownColor: AppColors.background,
                         borderRadius: BorderRadius.circular(12.0),
                         items: _availableLocations.map((loc) {
@@ -278,7 +398,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                         onChanged: (val) {
                           if (val != null) {
                             setModalState(() {
-                              tempLocation = val == 'All Locations' ? 'All' : val;
+                              tempLocation = val == 'All Locations'
+                                  ? 'All'
+                                  : val;
                             });
                           }
                         },
@@ -290,38 +412,48 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   // CATEGORY FILTER
                   Text(
                     'Department Category',
-                    style: AppTypography.heading(context).copyWith(
-                      fontSize: 14,
-                      fontWeight: FontWeight.w700,
-                    ),
+                    style: AppTypography.heading(
+                      context,
+                    ).copyWith(fontSize: 14, fontWeight: FontWeight.w700),
                   ),
                   const SizedBox(height: 8),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
-                    children: ['All', 'Roads', 'Water', 'Electrical', 'Sanitation'].map((cat) {
-                      final sel = tempCategory == cat;
-                      return ChoiceChip(
-                        label: Text(cat),
-                        selected: sel,
-                        onSelected: (val) {
-                          if (val) setModalState(() => tempCategory = cat);
-                        },
-                        selectedColor: AppColors.primaryButton,
-                        backgroundColor: AppColors.inputBackground,
-                        labelStyle: TextStyle(
-                          fontSize: 12,
-                          fontWeight: sel ? FontWeight.w700 : FontWeight.w500,
-                          color: sel ? Colors.white : AppColors.primaryText,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(16.0),
-                          side: BorderSide(
-                            color: sel ? AppColors.primaryButton : AppColors.border,
-                          ),
-                        ),
-                      );
-                    }).toList(),
+                    children:
+                        [
+                          'All',
+                          'Roads',
+                          'Water',
+                          'Electrical',
+                          'Sanitation',
+                        ].map((cat) {
+                          final sel = tempCategory == cat;
+                          return ChoiceChip(
+                            label: Text(cat),
+                            selected: sel,
+                            onSelected: (val) {
+                              if (val) setModalState(() => tempCategory = cat);
+                            },
+                            selectedColor: AppColors.primaryButton,
+                            backgroundColor: AppColors.inputBackground,
+                            labelStyle: TextStyle(
+                              fontSize: 12,
+                              fontWeight: sel
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
+                              color: sel ? Colors.white : AppColors.primaryText,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16.0),
+                              side: BorderSide(
+                                color: sel
+                                    ? AppColors.primaryButton
+                                    : AppColors.border,
+                              ),
+                            ),
+                          );
+                        }).toList(),
                   ),
                   const SizedBox(height: 24),
 
@@ -348,23 +480,21 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
   void _onFileIssuePressed() {
     setState(() {
-      _currentTabIndex = 2; // Jump to File Grievance tab
+      _currentTabIndex = 3; // Jump to File Grievance tab
     });
   }
 
   void _navigateToDetail(IssueItem issue) {
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) => IssueDetailScreen(issue: issue),
-      ),
+      MaterialPageRoute(builder: (context) => IssueDetailScreen(issue: issue)),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: LanguageService.instance,
+      animation: Listenable.merge([ThemeService.instance, LanguageService.instance]),
       builder: (context, _) {
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -372,16 +502,16 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             child: _isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : _loadError != null
-                    ? _buildLoadErrorState()
-                    : IndexedStack(
-                        index: _currentTabIndex,
-                        children: [
-                          _buildHomeTab(),
-                          _buildMyIssuesTab(),
-                          _buildFileGrievanceTab(),
-                          _buildProfileTab(),
-                        ],
-                      ),
+                ? _buildLoadErrorState()
+                : IndexedStack(
+                    index: _currentTabIndex,
+                    children: [
+                      _buildHomeTab(),
+                      _buildCommunityDashboardTab(),
+                      _buildMyIssuesTab(),
+                      _buildFileGrievanceTab(),
+                    ],
+                  ),
           ),
           bottomNavigationBar: CustomBottomNavbar(
             currentIndex: _currentTabIndex,
@@ -398,23 +528,479 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   }
 
   Widget _buildLoadErrorState() {
+    final isAuthError = _loadError?.toLowerCase().contains('session') == true ||
+        _loadError?.toLowerCase().contains('log in') == true ||
+        _loadError?.toLowerCase().contains('unauthorized') == true;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(24.0),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Icon(FeatherIcons.wifiOff, size: 48, color: AppColors.secondaryText),
+            Icon(
+              isAuthError ? FeatherIcons.lock : FeatherIcons.wifiOff,
+              size: 48,
+              color: AppColors.secondaryText,
+            ),
             const SizedBox(height: 16),
             Text(
               _loadError ?? 'Something went wrong.',
               textAlign: TextAlign.center,
-              style: AppTypography.supporting(context).copyWith(color: AppColors.secondaryText),
+              style: AppTypography.supporting(
+                context,
+              ).copyWith(color: AppColors.secondaryText),
             ),
             const SizedBox(height: 20),
+            if (isAuthError)
+              SizedBox(
+                width: 180,
+                child: PrimaryButton(
+                  text: 'Log In Again',
+                  onPressed: () async {
+                    await AuthRepository.instance.logout();
+                    if (!mounted) return;
+                    Navigator.pushAndRemoveUntil(
+                      context,
+                      SmoothPageRoute(
+                        child: const WelcomeLanguageScreen(),
+                      ),
+                      (route) => false,
+                    );
+                  },
+                ),
+              )
+            else
+              SizedBox(
+                width: 160,
+                child: PrimaryButton(
+                  text: 'Retry',
+                  onPressed: () => _bootstrap(),
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // TAB 0: COMMUNITY DASHBOARD (REDDIT-STYLE CIVIC SOCIAL PROBLEMS FEED)
+  // ---------------------------------------------------------------------------
+  Widget _buildCommunityDashboardTab() {
+    final query = _communitySearchController.text.trim().toLowerCase();
+    final filtered = _communityIssues.where((issue) {
+      if (_communitySelectedCategory != 'All' &&
+          issue.category != _communitySelectedCategory) {
+        return false;
+      }
+      if (_communityStatusFilter != 'All' &&
+          issue.status.label != _communityStatusFilter) {
+        return false;
+      }
+      if (query.isNotEmpty) {
+        final matchTitle = issue.title.toLowerCase().contains(query);
+        final matchDesc = issue.description.toLowerCase().contains(query);
+        final matchLoc = issue.location.toLowerCase().contains(query);
+        final matchCat = issue.category.toLowerCase().contains(query);
+        final matchAuth = issue.responsibleAuthority.toLowerCase().contains(query);
+        if (!matchTitle && !matchDesc && !matchLoc && !matchCat && !matchAuth) {
+          return false;
+        }
+      }
+      return true;
+    }).toList();
+
+    // Sort
+    if (_communitySortBy == 'trending') {
+      filtered.sort((a, b) {
+        final aScore = a.upvotes + (a.comments.length * 3);
+        final bScore = b.upvotes + (b.comments.length * 3);
+        return bScore.compareTo(aScore);
+      });
+    } else if (_communitySortBy == 'upvoted') {
+      filtered.sort((a, b) => b.upvotes.compareTo(a.upvotes));
+    } else if (_communitySortBy == 'recent') {
+      filtered.sort((a, b) => b.id.compareTo(a.id));
+    }
+
+    final isDark = ThemeService.instance.isDark;
+
+    return RefreshIndicator(
+      onRefresh: () => _bootstrap(),
+      color: AppColors.primaryButton,
+      child: SingleChildScrollView(
+        physics: const AlwaysScrollableScrollPhysics(parent: BouncingScrollPhysics()),
+        padding: const EdgeInsets.only(top: 10.0, bottom: 24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Top App Bar: Citizen Avatar + Civic Feed Title + Actions (Theme toggle & Notification Bell)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Row(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                      );
+                    },
+                    child: Stack(
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: AppColors.inputBackground,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: AppColors.border, width: 1.2),
+                          ),
+                          child: Center(
+                            child: Icon(FeatherIcons.user, size: 20, color: AppColors.primaryText),
+                          ),
+                        ),
+                        Positioned(
+                          right: 1,
+                          bottom: 1,
+                          child: Container(
+                            width: 10,
+                            height: 10,
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF10B981),
+                              shape: BoxShape.circle,
+                              border: Border.all(color: AppColors.background, width: 2),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Civic Feed',
+                          style: AppTypography.heading(context).copyWith(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.3,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          (_currentUser?.name.isNotEmpty == true) ? 'Welcome, ${_currentUser!.name} • Civic Community' : 'Trending Social Problems • Community Feed',
+                          style: AppTypography.supporting(context).copyWith(
+                            fontSize: 11.5,
+                            color: AppColors.secondaryText,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  // Theme Toggle
+                  IconButton(
+                    icon: Icon(
+                      isDark ? FeatherIcons.sun : FeatherIcons.moon,
+                      size: 19,
+                      color: AppColors.primaryText,
+                    ),
+                    onPressed: () => ThemeService.instance.toggleTheme(),
+                  ),
+                  // Notification Bell
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const RecentActivityScreen()),
+                      );
+                    },
+                    child: Container(
+                      width: 38,
+                      height: 38,
+                      decoration: BoxDecoration(
+                        color: AppColors.inputBackground,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: AppColors.border, width: 1.0),
+                      ),
+                      child: Center(
+                        child: Icon(FeatherIcons.bell, size: 18, color: AppColors.primaryText),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 14),
+
+            // Search Bar (Full Screen Width)
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: AppColors.inputBackground,
+                  borderRadius: BorderRadius.circular(12.0),
+                  border: Border.all(color: AppColors.border, width: 1.0),
+                ),
+                padding: const EdgeInsets.symmetric(horizontal: 14.0),
+                child: Row(
+                  children: [
+                    Icon(FeatherIcons.search, size: 16, color: AppColors.secondaryText),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: TextField(
+                        controller: _communitySearchController,
+                        style: AppTypography.inputText(context).copyWith(fontSize: 13.5),
+                        decoration: InputDecoration(
+                          hintText: 'Search community issues, departments, locations...',
+                          hintStyle: AppTypography.placeholder(context).copyWith(fontSize: 13),
+                          border: InputBorder.none,
+                          isDense: true,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
+                        ),
+                        onChanged: (val) => setState(() {}),
+                      ),
+                    ),
+                    if (_communitySearchController.text.isNotEmpty)
+                      GestureDetector(
+                        onTap: () {
+                          _communitySearchController.clear();
+                          setState(() {});
+                        },
+                        child: Icon(FeatherIcons.x, size: 16, color: AppColors.secondaryText),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Category Filter Pills (Edge-to-edge scroll)
             SizedBox(
-              width: 160,
-              child: PrimaryButton(text: 'Retry', onPressed: () => _bootstrap()),
+              height: 36,
+              child: ListView.separated(
+                scrollDirection: Axis.horizontal,
+                physics: const BouncingScrollPhysics(),
+                padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                itemCount: _communityCategories.length,
+                separatorBuilder: (context, index) => const SizedBox(width: 8),
+                itemBuilder: (context, index) {
+                  final cat = _communityCategories[index];
+                  final isSelected = _communitySelectedCategory == cat;
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _communitySelectedCategory = cat;
+                      });
+                    },
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 180),
+                      padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 8.0),
+                      decoration: BoxDecoration(
+                        color: isSelected ? AppColors.primaryButton : AppColors.inputBackground,
+                        borderRadius: BorderRadius.circular(20.0),
+                        border: Border.all(
+                          color: isSelected ? AppColors.primaryButton : AppColors.border,
+                          width: 1.0,
+                        ),
+                      ),
+                      child: Center(
+                        child: Text(
+                          cat,
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                            color: isSelected ? AppColors.buttonText : AppColors.primaryText,
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // Reddit-style Sort & Filter Bar (Edge-to-edge full width)
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 4.0),
+              decoration: BoxDecoration(
+                color: AppColors.inputBackground,
+                border: Border(
+                  top: BorderSide(color: AppColors.border, width: 0.8),
+                  bottom: BorderSide(color: AppColors.border, width: 0.8),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      physics: const BouncingScrollPhysics(),
+                      child: Row(
+                        children: [
+                          _buildSortTab(
+                            label: 'Trending',
+                            icon: '🔥',
+                            id: 'trending',
+                            isActive: _communitySortBy == 'trending',
+                          ),
+                          const SizedBox(width: 4),
+                          _buildSortTab(
+                            label: 'Recent',
+                            icon: '⚡',
+                            id: 'recent',
+                            isActive: _communitySortBy == 'recent',
+                          ),
+                          const SizedBox(width: 4),
+                          _buildSortTab(
+                            label: 'Top Upvoted',
+                            icon: '🏆',
+                            id: 'upvoted',
+                            isActive: _communitySortBy == 'upvoted',
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 6),
+                  PopupMenuButton<String>(
+                    initialValue: _communityStatusFilter,
+                    tooltip: 'Filter by Status',
+                    onSelected: (val) {
+                      setState(() {
+                        _communityStatusFilter = val;
+                      });
+                    },
+                    itemBuilder: (context) => [
+                      'All',
+                      'Under Review',
+                      'In Progress',
+                      'Resolved',
+                    ].map((s) => PopupMenuItem(value: s, child: Text(s, style: const TextStyle(fontSize: 13)))).toList(),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 6.0),
+                      child: Row(
+                        children: [
+                          Icon(FeatherIcons.sliders, size: 14, color: AppColors.secondaryText),
+                          const SizedBox(width: 4),
+                          Text(
+                            _communityStatusFilter == 'All' ? 'Status' : _communityStatusFilter,
+                            style: TextStyle(
+                              fontSize: 11.5,
+                              fontWeight: FontWeight.w600,
+                              color: _communityStatusFilter == 'All' ? AppColors.secondaryText : const Color(0xFFFF4500),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 10),
+
+            // Feed List
+            if (filtered.isEmpty)
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 40.0),
+                child: Center(
+                  child: Column(
+                    children: [
+                      Icon(FeatherIcons.search, size: 42, color: AppColors.mutedText),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No matching community issues',
+                        style: AppTypography.heading(context).copyWith(fontSize: 16),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'Try clearing search filters or report a new grievance.',
+                        style: AppTypography.supporting(context).copyWith(
+                          fontSize: 12.5,
+                          color: AppColors.secondaryText,
+                        ),
+                      ),
+                      const SizedBox(height: 16),
+                      PrimaryButton(
+                        text: 'Report This Problem',
+                        onPressed: () {
+                          setState(() {
+                            _currentTabIndex = 3; // Jump to File Grievance
+                          });
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              )
+            else
+              ListView.builder(
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                itemCount: filtered.length,
+                itemBuilder: (context, index) {
+                  final issue = filtered[index];
+                  return CommunityIssueCard(
+                    issue: issue,
+                    onUpvote: () => _toggleCommunityUpvote(issue),
+                    onDownvote: () => _toggleCommunityDownvote(issue),
+                    onCommentTap: () => _openCommentsSheet(issue),
+                    onTap: () => _navigateToCommunityDetail(issue),
+                  );
+                },
+              ),
+
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSortTab({
+    required String label,
+    required String icon,
+    required String id,
+    required bool isActive,
+  }) {
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _communitySortBy = id;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10.0, vertical: 6.0),
+        decoration: BoxDecoration(
+          color: isActive
+              ? (id == 'trending' ? const Color(0xFFFF4500).withValues(alpha: 0.15) : AppColors.primaryButton.withValues(alpha: 0.12))
+              : Colors.transparent,
+          borderRadius: BorderRadius.circular(8.0),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(icon, style: const TextStyle(fontSize: 12)),
+            const SizedBox(width: 4),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 11.5,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w500,
+                color: isActive
+                    ? (id == 'trending' ? const Color(0xFFFF4500) : AppColors.primaryText)
+                    : AppColors.secondaryText,
+              ),
             ),
           ],
         ),
@@ -423,17 +1009,26 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   }
 
   // ---------------------------------------------------------------------------
-  // TAB 0: HOME / DASHBOARD
+  // TAB 1: CITIZEN OVERVIEW / HUB
   // ---------------------------------------------------------------------------
   Widget _buildHomeTab() {
+
     final filteredIssues = _searchQuery.isEmpty
         ? _issues
         : _issues
-            .where((i) =>
-                i.title.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                i.category.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-                i.location.toLowerCase().contains(_searchQuery.toLowerCase()))
-            .toList();
+              .where(
+                (i) =>
+                    i.title.toLowerCase().contains(
+                      _searchQuery.toLowerCase(),
+                    ) ||
+                    i.category.toLowerCase().contains(
+                      _searchQuery.toLowerCase(),
+                    ) ||
+                    i.location.toLowerCase().contains(
+                      _searchQuery.toLowerCase(),
+                    ),
+              )
+              .toList();
 
     return SingleChildScrollView(
       physics: const BouncingScrollPhysics(),
@@ -448,9 +1043,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               // Citizen Avatar with Online Status
               GestureDetector(
                 onTap: () {
-                  setState(() {
-                    _currentTabIndex = 3; // Jump to Profile
-                  });
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => const ProfileScreen()),
+                  );
                 },
                 child: Stack(
                   children: [
@@ -462,7 +1058,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                         shape: BoxShape.circle,
                         border: Border.all(color: AppColors.border, width: 1.2),
                       ),
-                      child: const Center(
+                      child: Center(
                         child: Icon(
                           FeatherIcons.user,
                           size: 20,
@@ -479,7 +1075,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                         decoration: BoxDecoration(
                           color: const Color(0xFF10B981),
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.background, width: 2),
+                          border: Border.all(
+                            color: AppColors.background,
+                            width: 2,
+                          ),
                         ),
                       ),
                     ),
@@ -517,6 +1116,39 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 ),
               ),
 
+              // Quick Theme Toggle Button
+              Material(
+                color: Colors.transparent,
+                shape: const CircleBorder(),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  customBorder: const CircleBorder(),
+                  onTap: () => ThemeService.instance.toggleTheme(),
+                  child: Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: AppColors.inputBackground,
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: AppColors.border,
+                        width: 1.0,
+                      ),
+                    ),
+                    child: Center(
+                      child: Icon(
+                        ThemeService.instance.isDark
+                            ? FeatherIcons.sun
+                            : FeatherIcons.moon,
+                        size: 18,
+                        color: AppColors.primaryText,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 8),
+
               // Notification Bell
               Material(
                 color: Colors.transparent,
@@ -528,7 +1160,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => RecentActivityScreen(issues: _issues),
+                        builder: (context) =>
+                            RecentActivityScreen(issues: _issues),
                       ),
                     );
                   },
@@ -541,9 +1174,12 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                         decoration: BoxDecoration(
                           color: AppColors.inputBackground,
                           shape: BoxShape.circle,
-                          border: Border.all(color: AppColors.border, width: 1.0),
+                          border: Border.all(
+                            color: AppColors.border,
+                            width: 1.0,
+                          ),
                         ),
-                        child: const Center(
+                        child: Center(
                           child: Icon(
                             FeatherIcons.bell,
                             size: 18,
@@ -582,7 +1218,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   FeatherIcons.search,
                   size: 18,
                   color: AppColors.mutedText,
@@ -596,18 +1232,19 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                         _searchQuery = val;
                       });
                     },
-                    style: AppTypography.inputText(context).copyWith(
-                      fontSize: 14,
-                    ),
+                    style: AppTypography.inputText(
+                      context,
+                    ).copyWith(fontSize: 14),
                     decoration: InputDecoration(
                       hintText: LanguageService.t('search_hint'),
-                      hintStyle: AppTypography.placeholder(context).copyWith(
-                        fontSize: 14,
-                      ),
+                      hintStyle: AppTypography.placeholder(
+                        context,
+                      ).copyWith(fontSize: 14),
                       border: InputBorder.none,
                       isDense: true,
-                      contentPadding:
-                          const EdgeInsets.symmetric(vertical: 14.0),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 14.0,
+                      ),
                     ),
                   ),
                 ),
@@ -619,7 +1256,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                         _searchQuery = '';
                       });
                     },
-                    child: const Icon(
+                    child: Icon(
                       FeatherIcons.x,
                       size: 16,
                       color: AppColors.secondaryText,
@@ -648,10 +1285,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     children: [
                       Text(
                         LanguageService.t('welcome_card_title'),
-                        style: AppTypography.heading(context).copyWith(
-                          fontSize: 18,
-                          fontWeight: FontWeight.w700,
-                        ),
+                        style: AppTypography.heading(
+                          context,
+                        ).copyWith(fontSize: 18, fontWeight: FontWeight.w700),
                       ),
                       const SizedBox(height: 6),
                       Text(
@@ -680,7 +1316,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(color: AppColors.border),
                           ),
-                          child: const Icon(
+                          child: Icon(
                             FeatherIcons.edit3,
                             size: 32,
                             color: AppColors.primaryText,
@@ -702,15 +1338,14 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             children: [
               Text(
                 LanguageService.t('ongoing_issues'),
-                style: AppTypography.heading(context).copyWith(
-                  fontSize: 18,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: AppTypography.heading(
+                  context,
+                ).copyWith(fontSize: 18, fontWeight: FontWeight.w700),
               ),
               GestureDetector(
                 onTap: () {
                   setState(() {
-                    _currentTabIndex = 1; // Switch to My Issues Tab
+                    _currentTabIndex = 2; // Switch to My Issues Tab
                   });
                 },
                 child: Text(
@@ -733,6 +1368,11 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               title: LanguageService.t('no_issues_found'),
               subtitle: LanguageService.t('no_issues_sub'),
               buttonText: LanguageService.t('file_grievance_btn'),
+              animationHeight: 140,
+              iconSize: 50,
+              verticalPadding: 14.0,
+              titleFontSize: 18,
+              subtitleFontSize: 13.5,
             )
           else
             GridView.builder(
@@ -766,7 +1406,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   Widget _buildMyIssuesTab() {
     final query = _myIssuesSearchController.text.trim().toLowerCase();
     final filteredIssues = _issues.where((issue) {
-      final matchesQuery = query.isEmpty ||
+      final matchesQuery =
+          query.isEmpty ||
           issue.title.toLowerCase().contains(query) ||
           issue.description.toLowerCase().contains(query) ||
           issue.location.toLowerCase().contains(query) ||
@@ -786,23 +1427,27 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       // Location filter
       bool matchesLocation = true;
       if (_myIssuesLocationFilter != 'All') {
-        matchesLocation = issue.location
-            .toLowerCase()
-            .contains(_myIssuesLocationFilter.toLowerCase());
+        matchesLocation = issue.location.toLowerCase().contains(
+          _myIssuesLocationFilter.toLowerCase(),
+        );
       }
 
       // Category filter
       bool matchesCategory = true;
       if (_myIssuesCategoryFilter != 'All') {
-        matchesCategory = issue.category
-            .toLowerCase()
-            .contains(_myIssuesCategoryFilter.toLowerCase());
+        matchesCategory = issue.category.toLowerCase().contains(
+          _myIssuesCategoryFilter.toLowerCase(),
+        );
       }
 
-      return matchesQuery && matchesStatus && matchesLocation && matchesCategory;
+      return matchesQuery &&
+          matchesStatus &&
+          matchesLocation &&
+          matchesCategory;
     }).toList();
 
-    final hasActiveFilter = _myIssuesStatusFilter != 'All' ||
+    final hasActiveFilter =
+        _myIssuesStatusFilter != 'All' ||
         _myIssuesLocationFilter != 'All' ||
         _myIssuesCategoryFilter != 'All';
 
@@ -819,10 +1464,13 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               borderRadius: BorderRadius.circular(30.0),
               border: Border.all(color: AppColors.border, width: 1.0),
             ),
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 2.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16.0,
+              vertical: 2.0,
+            ),
             child: Row(
               children: [
-                const Icon(
+                Icon(
                   FeatherIcons.search,
                   size: 18,
                   color: AppColors.secondaryText,
@@ -832,24 +1480,23 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   child: TextField(
                     controller: _myIssuesSearchController,
                     onChanged: (val) => setState(() {}),
-                    style: AppTypography.inputText(context).copyWith(fontSize: 14),
+                    style: AppTypography.inputText(
+                      context,
+                    ).copyWith(fontSize: 14),
                     decoration: InputDecoration(
                       hintText: 'Search grievances, ID, location...',
-                      hintStyle: AppTypography.placeholder(context).copyWith(
-                        fontSize: 14,
-                        color: AppColors.mutedText,
-                      ),
+                      hintStyle: AppTypography.placeholder(
+                        context,
+                      ).copyWith(fontSize: 14, color: AppColors.mutedText),
                       border: InputBorder.none,
                       isDense: true,
-                      contentPadding: const EdgeInsets.symmetric(vertical: 12.0),
+                      contentPadding: const EdgeInsets.symmetric(
+                        vertical: 12.0,
+                      ),
                     ),
                   ),
                 ),
-                Container(
-                  width: 1.0,
-                  height: 20.0,
-                  color: AppColors.border,
-                ),
+                Container(width: 1.0, height: 20.0, color: AppColors.border),
                 const SizedBox(width: 10),
                 GestureDetector(
                   behavior: HitTestBehavior.opaque,
@@ -904,8 +1551,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                         textAlign: TextAlign.center,
                         style: AppTypography.supporting(context).copyWith(
                           fontSize: 12,
-                          fontWeight:
-                              isSelected ? FontWeight.w700 : FontWeight.w500,
+                          fontWeight: isSelected
+                              ? FontWeight.w700
+                              : FontWeight.w500,
                           color: isSelected
                               ? AppColors.buttonText
                               : AppColors.secondaryText,
@@ -922,7 +1570,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
 
           // 2b. Location Filter Dropdown (Locations where issues have been filed)
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 2.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14.0,
+              vertical: 2.0,
+            ),
             decoration: BoxDecoration(
               color: AppColors.background,
               borderRadius: BorderRadius.circular(12.0),
@@ -930,11 +1581,18 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             ),
             child: DropdownButtonHideUnderline(
               child: DropdownButton<String>(
-                value: _availableLocations.contains(_myIssuesLocationFilter == 'All' ? 'All Locations' : _myIssuesLocationFilter)
-                    ? (_myIssuesLocationFilter == 'All' ? 'All Locations' : _myIssuesLocationFilter)
+                value:
+                    _availableLocations.contains(
+                      _myIssuesLocationFilter == 'All'
+                          ? 'All Locations'
+                          : _myIssuesLocationFilter,
+                    )
+                    ? (_myIssuesLocationFilter == 'All'
+                          ? 'All Locations'
+                          : _myIssuesLocationFilter)
                     : 'All Locations',
                 isExpanded: true,
-                icon: const Icon(
+                icon: Icon(
                   FeatherIcons.chevronDown,
                   size: 16,
                   color: AppColors.secondaryText,
@@ -943,7 +1601,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 dropdownColor: AppColors.background,
                 items: _availableLocations.map((loc) {
                   final isAll = loc == 'All Locations';
-                  final isSelected = (_myIssuesLocationFilter == 'All' && isAll) ||
+                  final isSelected =
+                      (_myIssuesLocationFilter == 'All' && isAll) ||
                       _myIssuesLocationFilter == loc;
                   return DropdownMenuItem<String>(
                     value: loc,
@@ -952,7 +1611,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                         Icon(
                           isAll ? FeatherIcons.map : FeatherIcons.mapPin,
                           size: 14,
-                          color: isSelected ? AppColors.primaryText : AppColors.secondaryText,
+                          color: isSelected
+                              ? AppColors.primaryText
+                              : AppColors.secondaryText,
                         ),
                         const SizedBox(width: 10),
                         Expanded(
@@ -960,7 +1621,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                             loc,
                             style: AppTypography.supporting(context).copyWith(
                               fontSize: 13.5,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w500,
                               color: AppColors.primaryText,
                             ),
                           ),
@@ -972,7 +1635,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 onChanged: (val) {
                   if (val != null) {
                     setState(() {
-                      _myIssuesLocationFilter = val == 'All Locations' ? 'All' : val;
+                      _myIssuesLocationFilter = val == 'All Locations'
+                          ? 'All'
+                          : val;
                     });
                   }
                 },
@@ -991,10 +1656,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   _myIssuesLocationFilter != 'All'
                       ? _myIssuesLocationFilter
                       : 'All Reported Locations',
-                  style: AppTypography.heading(context).copyWith(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: AppTypography.heading(
+                    context,
+                  ).copyWith(fontSize: 18, fontWeight: FontWeight.w700),
                   overflow: TextOverflow.ellipsis,
                 ),
               ),
@@ -1076,7 +1740,8 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
   final TextEditingController _formCityWardController = TextEditingController();
   final TextEditingController _formPincodeController = TextEditingController();
   final TextEditingController _formTitleController = TextEditingController();
-  final TextEditingController _formDescriptionController = TextEditingController();
+  final TextEditingController _formDescriptionController =
+      TextEditingController();
 
   bool _formHasAttachedMedia = false;
   bool _formIsLocationShared = false;
@@ -1105,7 +1770,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     shape: BoxShape.circle,
                     border: Border.all(color: AppColors.border),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     FeatherIcons.mapPin,
                     size: 22,
                     color: AppColors.primaryText,
@@ -1115,10 +1780,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 Text(
                   'Allow JanSeva to access this device\'s location?',
                   textAlign: TextAlign.center,
-                  style: AppTypography.heading(context).copyWith(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: AppTypography.heading(
+                    context,
+                  ).copyWith(fontSize: 16, fontWeight: FontWeight.w700),
                 ),
                 const SizedBox(height: 8),
                 Text(
@@ -1146,7 +1810,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     onPressed: () => Navigator.pop(ctx, true),
                     child: const Text(
                       'While Using the App',
-                      style: TextStyle(fontWeight: FontWeight.w600, fontSize: 13.5),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 13.5,
+                      ),
                     ),
                   ),
                 ),
@@ -1164,7 +1831,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     onPressed: () => Navigator.pop(ctx, false),
                     child: const Text(
                       'Don\'t Allow',
-                      style: TextStyle(fontWeight: FontWeight.w500, fontSize: 13.5),
+                      style: TextStyle(
+                        fontWeight: FontWeight.w500,
+                        fontSize: 13.5,
+                      ),
                     ),
                   ),
                 ),
@@ -1185,7 +1855,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Location permission granted! Address details auto-filled from GPS.'),
+            content: Text(
+              'Location permission granted! Address details auto-filled from GPS.',
+            ),
             duration: Duration(seconds: 3),
           ),
         );
@@ -1194,7 +1866,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Location permission denied. Please enter address manually.'),
+            content: Text(
+              'Location permission denied. Please enter address manually.',
+            ),
             duration: Duration(seconds: 3),
           ),
         );
@@ -1213,11 +1887,17 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
       return;
     }
     if (descriptionText.length < 20) {
-      setState(() => _formError = 'Please describe the issue in at least 20 characters.');
+      setState(
+        () =>
+            _formError = 'Please describe the issue in at least 20 characters.',
+      );
       return;
     }
     if (_selectedArea == null) {
-      setState(() => _formError = 'Select an area so the report reaches the right office.');
+      setState(
+        () => _formError =
+            'Select an area so the report reaches the right office.',
+      );
       return;
     }
 
@@ -1231,9 +1911,14 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         title: titleText,
         description: descriptionText,
         administrativeAreaId: _selectedArea!.id,
-        pinCode: _formPincodeController.text.trim().isEmpty ? null : _formPincodeController.text.trim(),
+        pinCode: _formPincodeController.text.trim().isEmpty
+            ? null
+            : _formPincodeController.text.trim(),
       );
-      final newIssue = IssueItem.fromChallenge(challenge, areaName: _selectedArea!.name);
+      final newIssue = IssueItem.fromChallenge(
+        challenge,
+        areaName: _selectedArea!.name,
+      );
 
       if (!mounted) return;
       final result = await Navigator.push<String>(
@@ -1243,16 +1928,24 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         ),
       );
 
+      final newComm = CommunityIssue.fromChallenge(
+        challenge,
+        areaName: _selectedArea!.name,
+      );
+      newComm.upvotes = 1;
+      newComm.isUpvoted = true;
+
       if (!mounted) return;
       setState(() {
         _issues.insert(0, newIssue);
+        _communityIssues.insert(0, newComm);
         _formTitleController.clear();
         _formDescriptionController.clear();
         _formHasAttachedMedia = false;
         if (result == 'file_another') {
-          _currentTabIndex = 2; // Stay on File Grievance tab
+          _currentTabIndex = 3; // Stay on File Grievance tab
         } else {
-          _currentTabIndex = 0; // Switch to Home tab
+          _currentTabIndex = 0; // Switch to Community Dashboard
         }
       });
     } on ApiException catch (e) {
@@ -1308,7 +2001,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             trailing: GestureDetector(
               onTap: _requestLocationPermission,
               child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 8.0,
+                  vertical: 4.0,
+                ),
                 decoration: BoxDecoration(
                   color: AppColors.inputBackground,
                   borderRadius: BorderRadius.circular(6.0),
@@ -1318,7 +2014,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Icon(
-                      _formIsLocationShared ? FeatherIcons.check : FeatherIcons.mapPin,
+                      _formIsLocationShared
+                          ? FeatherIcons.check
+                          : FeatherIcons.mapPin,
                       size: 13,
                       color: AppColors.primaryText,
                     ),
@@ -1372,7 +2070,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           // report; there is no pincode/GPS-to-area lookup on the server, so
           // this is a small, explicit picker rather than a guess.
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 14.0, vertical: 2.0),
+            padding: const EdgeInsets.symmetric(
+              horizontal: 14.0,
+              vertical: 2.0,
+            ),
             decoration: BoxDecoration(
               color: AppColors.background,
               borderRadius: BorderRadius.circular(12.0),
@@ -1380,7 +2081,11 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             ),
             child: Row(
               children: [
-                const Icon(FeatherIcons.mapPin, size: 18, color: AppColors.secondaryText),
+                Icon(
+                  FeatherIcons.mapPin,
+                  size: 18,
+                  color: AppColors.secondaryText,
+                ),
                 const SizedBox(width: 12),
                 Expanded(
                   child: _areas.isEmpty
@@ -1388,7 +2093,10 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 13.0),
                           child: Text(
                             'No administrative areas available yet',
-                            style: AppTypography.placeholder(context).copyWith(fontSize: 14, color: AppColors.mutedText),
+                            style: AppTypography.placeholder(context).copyWith(
+                              fontSize: 14,
+                              color: AppColors.mutedText,
+                            ),
                           ),
                         )
                       : DropdownButtonHideUnderline(
@@ -1397,10 +2105,24 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                             isExpanded: true,
                             hint: Text(
                               'Select area',
-                              style: AppTypography.placeholder(context).copyWith(fontSize: 14, color: AppColors.mutedText),
+                              style: AppTypography.placeholder(context)
+                                  .copyWith(
+                                    fontSize: 14,
+                                    color: AppColors.mutedText,
+                                  ),
                             ),
                             items: _areas
-                                .map((a) => DropdownMenuItem(value: a, child: Text(a.label, style: AppTypography.inputText(context).copyWith(fontSize: 14))))
+                                .map(
+                                  (a) => DropdownMenuItem(
+                                    value: a,
+                                    child: Text(
+                                      a.label,
+                                      style: AppTypography.inputText(
+                                        context,
+                                      ).copyWith(fontSize: 14),
+                                    ),
+                                  ),
+                                )
                                 .toList(),
                             onChanged: (a) => setState(() => _selectedArea = a),
                           ),
@@ -1444,7 +2166,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             const SizedBox(height: 8),
             Text(
               'Photos are not yet sent with the report — the backend does not support attachments yet.',
-              style: AppTypography.supporting(context).copyWith(fontSize: 11.5, color: AppColors.mutedText),
+              style: AppTypography.supporting(
+                context,
+              ).copyWith(fontSize: 11.5, color: AppColors.mutedText),
             ),
           ],
 
@@ -1452,14 +2176,18 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             const SizedBox(height: 16),
             Text(
               _formError!,
-              style: AppTypography.supporting(context).copyWith(color: Colors.red, fontSize: 13),
+              style: AppTypography.supporting(
+                context,
+              ).copyWith(color: Colors.red, fontSize: 13),
             ),
           ],
 
           const SizedBox(height: 24),
 
           PrimaryButton(
-            text: _isSubmittingForm ? 'Submitting…' : LanguageService.t('submit_grievance'),
+            text: _isSubmittingForm
+                ? 'Submitting…'
+                : LanguageService.t('submit_grievance'),
             isEnabled: !_isSubmittingForm,
             onPressed: () => _onFormSubmit(),
           ),
@@ -1485,7 +2213,7 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
             width: 36,
             height: 36,
             alignment: Alignment.centerLeft,
-            child: const Icon(
+            child: Icon(
               FeatherIcons.arrowLeft,
               size: 20,
               color: AppColors.primaryText,
@@ -1496,14 +2224,15 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
           child: Center(
             child: Text(
               LanguageService.t('nav_file'),
-              style: AppTypography.heading(context).copyWith(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
+              style: AppTypography.heading(
+                context,
+              ).copyWith(fontSize: 18, fontWeight: FontWeight.w700),
             ),
           ),
         ),
-        const SizedBox(width: 36), // Balances the leading back button for true centering
+        const SizedBox(
+          width: 36,
+        ), // Balances the leading back button for true centering
       ],
     );
   }
@@ -1515,17 +2244,17 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         Container(
           width: 22,
           height: 22,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.primaryButton,
             shape: BoxShape.circle,
           ),
           child: Center(
             child: Text(
               '$step',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.buttonText,
               ),
             ),
           ),
@@ -1534,10 +2263,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         Expanded(
           child: Text(
             title,
-            style: AppTypography.heading(context).copyWith(
-              fontSize: 15,
-              fontWeight: FontWeight.w700,
-            ),
+            style: AppTypography.heading(
+              context,
+            ).copyWith(fontSize: 15, fontWeight: FontWeight.w700),
           ),
         ),
         ?trailing,
@@ -1563,16 +2291,13 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
         border: Border.all(color: AppColors.border, width: 1.0),
       ),
       child: Row(
-        crossAxisAlignment:
-            maxLines > 1 ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+        crossAxisAlignment: maxLines > 1
+            ? CrossAxisAlignment.start
+            : CrossAxisAlignment.center,
         children: [
           Padding(
             padding: EdgeInsets.only(top: maxLines > 1 ? 12.0 : 0.0),
-            child: Icon(
-              icon,
-              size: 18,
-              color: AppColors.secondaryText,
-            ),
+            child: Icon(icon, size: 18, color: AppColors.secondaryText),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -1583,10 +2308,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               style: AppTypography.inputText(context).copyWith(fontSize: 14),
               decoration: InputDecoration(
                 hintText: placeholder,
-                hintStyle: AppTypography.placeholder(context).copyWith(
-                  fontSize: 14,
-                  color: AppColors.mutedText,
-                ),
+                hintStyle: AppTypography.placeholder(
+                  context,
+                ).copyWith(fontSize: 14, color: AppColors.mutedText),
                 border: InputBorder.none,
                 isDense: true,
                 contentPadding: const EdgeInsets.symmetric(vertical: 13.0),
@@ -1599,230 +2323,29 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
               onTap: onSuffixTap,
               child: Padding(
                 padding: const EdgeInsets.only(left: 6.0),
-                child: Icon(
-                  suffixIcon,
-                  size: 18,
-                  color: AppColors.primaryText,
-                ),
+                child: Icon(suffixIcon, size: 18, color: AppColors.primaryText),
               ),
             ),
         ],
-      ),
-    );
-  }
-
-  // ---------------------------------------------------------------------------
-  // TAB 3: PROFILE
-  // ---------------------------------------------------------------------------
-  Future<void> _onLogout() async {
-    await AuthRepository.instance.logout();
-    if (!mounted) return;
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const WelcomeLanguageScreen()),
-      (route) => false,
-    );
-  }
-
-  Widget _buildProfileTab() {
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          const SizedBox(height: 12),
-          // User Avatar & Name
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              color: AppColors.inputBackground,
-              shape: BoxShape.circle,
-              border: Border.all(color: AppColors.border, width: 1.5),
-            ),
-            child: const Center(
-              child: Icon(
-                FeatherIcons.user,
-                size: 38,
-                color: AppColors.primaryText,
-              ),
-            ),
-          ),
-          const SizedBox(height: 14),
-          Text(
-            _currentUser?.name ?? 'Citizen',
-            style: AppTypography.heading(context).copyWith(
-              fontSize: 22,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Verified Citizen',
-            style: AppTypography.supporting(context).copyWith(
-              fontSize: 13,
-              color: AppColors.secondaryText,
-            ),
-          ),
-
-          const SizedBox(height: 24),
-
-          // Stats Row — computed from the citizen's real challenges.
-          Row(
-            children: [
-              _buildStatItem(LanguageService.t('reported'), '${_issues.length}'),
-              const SizedBox(width: 10),
-              _buildStatItem(
-                LanguageService.t('in_progress_count'),
-                '${_issues.where((i) => i.status == IssueStatus.inProgress).length}',
-              ),
-              const SizedBox(width: 10),
-              _buildStatItem(
-                LanguageService.t('resolved_count'),
-                '${_issues.where((i) => i.status == IssueStatus.resolved).length}',
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 24),
-          const Divider(height: 1, thickness: 1, color: AppColors.divider),
-          const SizedBox(height: 20),
-
-          // Profile Actions
-          _buildProfileOption(
-            icon: FeatherIcons.phone,
-            title: LanguageService.t('phone_number'),
-            subtitle: _currentUser?.phone ?? 'Not available',
-            onTap: () {},
-          ),
-          _buildProfileOption(
-            icon: FeatherIcons.mail,
-            title: LanguageService.t('email_address'),
-            // The backend citizen account has no email field at all.
-            subtitle: 'Not provided',
-            onTap: () {},
-          ),
-          _buildProfileOption(
-            icon: FeatherIcons.settings,
-            title: LanguageService.t('settings_notif'),
-            subtitle: 'Configure SMS and email updates',
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const SettingsScreen()),
-              );
-            },
-          ),
-          _buildProfileOption(
-            icon: FeatherIcons.logOut,
-            title: LanguageService.t('logout'),
-            subtitle: 'Sign out of Social Serve',
-            onTap: () => _onLogout(),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatItem(String label, String value) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 14.0),
-        decoration: BoxDecoration(
-          color: AppColors.inputBackground,
-          borderRadius: BorderRadius.circular(14.0),
-          border: Border.all(color: AppColors.border, width: 1.0),
-        ),
-        child: Column(
-          children: [
-            Text(
-              value,
-              style: AppTypography.heading(context).copyWith(
-                fontSize: 18,
-                fontWeight: FontWeight.w700,
-              ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              label,
-              style: AppTypography.supporting(context).copyWith(
-                fontSize: 11,
-                color: AppColors.mutedText,
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileOption({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 10.0),
-      decoration: BoxDecoration(
-        color: AppColors.background,
-        borderRadius: BorderRadius.circular(14.0),
-        border: Border.all(color: AppColors.border, width: 1.0),
-      ),
-      child: InkWell(
-        onTap: onTap,
-        borderRadius: BorderRadius.circular(14.0),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 14.0),
-          child: Row(
-            children: [
-              Icon(icon, size: 18, color: AppColors.primaryText),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: AppTypography.heading(context).copyWith(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 2),
-                    Text(
-                      subtitle,
-                      style: AppTypography.supporting(context).copyWith(
-                        fontSize: 12,
-                        color: AppColors.secondaryText,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const Icon(
-                FeatherIcons.chevronRight,
-                size: 16,
-                color: AppColors.mutedText,
-              ),
-            ],
-          ),
-        ),
       ),
     );
   }
 
   Widget _buildEmptyState({
     String title = 'No Issues Found',
-    String subtitle = 'All clear in your selected area. Have a municipal concern to report?',
+    String subtitle =
+        'All clear in your selected area. Have a community or social problem to report?',
     String buttonText = 'File a Grievance',
     bool showButton = true,
     double animationHeight = 280,
+    double iconSize = 80,
+    double verticalPadding = 28.0,
+    double titleFontSize = 22,
+    double subtitleFontSize = 14.5,
   }) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 28.0, horizontal: 20.0),
+        padding: EdgeInsets.symmetric(vertical: verticalPadding, horizontal: 20.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -1838,9 +2361,9 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                     'assets/animations/no_issues_found.json',
                     fit: BoxFit.contain,
                     errorBuilder: (context, err2, stack2) {
-                      return const Icon(
+                      return Icon(
                         FeatherIcons.checkCircle,
-                        size: 80,
+                        size: iconSize,
                         color: AppColors.primaryText,
                       );
                     },
@@ -1848,35 +2371,35 @@ class _MainDashboardScreenState extends State<MainDashboardScreen> {
                 },
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
 
             // Headline Message
             Text(
               title,
               textAlign: TextAlign.center,
               style: AppTypography.heading(context).copyWith(
-                fontSize: 22,
+                fontSize: titleFontSize,
                 fontWeight: FontWeight.w700,
-                letterSpacing: -0.4,
+                letterSpacing: -0.3,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 6),
 
             // Sub-Message
             Text(
               subtitle,
               textAlign: TextAlign.center,
               style: AppTypography.supporting(context).copyWith(
-                fontSize: 14.5,
+                fontSize: subtitleFontSize,
                 color: AppColors.secondaryText,
                 height: 1.35,
               ),
             ),
 
             if (showButton) ...[
-              const SizedBox(height: 20),
+              const SizedBox(height: 16),
               SizedBox(
-                width: 220,
+                width: 200,
                 child: PrimaryButton(
                   text: buttonText,
                   onPressed: _onFileIssuePressed,

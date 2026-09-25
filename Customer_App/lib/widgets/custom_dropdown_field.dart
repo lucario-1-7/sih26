@@ -1,4 +1,4 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -56,7 +56,7 @@ class CustomDropdownField extends StatelessWidget {
             child: DropdownButton<String>(
               value: items.contains(value) ? value : items.first,
               isExpanded: true,
-              icon: const Icon(
+              icon: Icon(
                 FeatherIcons.chevronDown,
                 color: AppColors.secondaryText,
                 size: 18,

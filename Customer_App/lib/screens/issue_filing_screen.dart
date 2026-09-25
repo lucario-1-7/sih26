@@ -1,6 +1,7 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import '../models/issue_model.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/media_upload_card.dart';
 import '../widgets/primary_button.dart';
@@ -55,7 +56,7 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
                     shape: BoxShape.circle,
                     border: Border.all(color: AppColors.border),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     FeatherIcons.mapPin,
                     size: 22,
                     color: AppColors.primaryText,
@@ -245,9 +246,12 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
+    return AnimatedBuilder(
+      animation: ThemeService.instance,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          body: SafeArea(
         child: SingleChildScrollView(
           physics: const BouncingScrollPhysics(),
           padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
@@ -401,6 +405,8 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
         ),
       ),
     );
+      },
+    );
   }
 
   Widget _buildTopBar() {
@@ -413,7 +419,7 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
             width: 36,
             height: 36,
             alignment: Alignment.centerLeft,
-            child: const Icon(
+            child: Icon(
               FeatherIcons.arrowLeft,
               size: 20,
               color: AppColors.primaryText,
@@ -442,17 +448,17 @@ class _IssueFilingScreenState extends State<IssueFilingScreen> {
         Container(
           width: 22,
           height: 22,
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.primaryButton,
             shape: BoxShape.circle,
           ),
           child: Center(
             child: Text(
               '$step',
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 12,
                 fontWeight: FontWeight.w700,
-                color: Colors.white,
+                color: AppColors.buttonText,
               ),
             ),
           ),

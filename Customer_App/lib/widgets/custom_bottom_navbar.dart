@@ -1,6 +1,7 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import '../services/language_service.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 
 class CustomBottomNavbar extends StatelessWidget {
@@ -18,10 +19,10 @@ class CustomBottomNavbar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: LanguageService.instance,
+      animation: Listenable.merge([ThemeService.instance, LanguageService.instance]),
       builder: (context, _) {
         return Container(
-          decoration: const BoxDecoration(
+          decoration: BoxDecoration(
             color: AppColors.background,
             border: Border(
               top: BorderSide(color: AppColors.border, width: 1.0),
@@ -43,20 +44,22 @@ class CustomBottomNavbar extends StatelessWidget {
                   ),
                   _buildNavItem(
                     index: 1,
+                    icon: FeatherIcons.layoutDashboard,
+                    label: LanguageService.t('nav_dashboard').isNotEmpty && LanguageService.t('nav_dashboard') != 'nav_dashboard'
+                        ? LanguageService.t('nav_dashboard')
+                        : 'Dashboard',
+                    context: context,
+                  ),
+                  _buildNavItem(
+                    index: 2,
                     icon: FeatherIcons.fileText,
                     label: LanguageService.t('nav_issues'),
                     context: context,
                   ),
                   _buildNavItem(
-                    index: 2,
-                    icon: FeatherIcons.edit3,
-                    label: LanguageService.t('nav_file'),
-                    context: context,
-                  ),
-                  _buildNavItem(
                     index: 3,
-                    icon: FeatherIcons.user,
-                    label: LanguageService.t('nav_profile'),
+                    icon: FeatherIcons.plusCircle,
+                    label: LanguageService.t('nav_file'),
                     context: context,
                   ),
                 ],
@@ -64,6 +67,7 @@ class CustomBottomNavbar extends StatelessWidget {
             ),
           ),
         );
+
       },
     );
   }

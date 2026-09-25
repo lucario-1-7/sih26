@@ -15,7 +15,7 @@
       "short": "BIT Mesra",
       "kind": "UNIVERSITY",
       "type_detail": "Deemed University (Private)",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.4126,
       "lng": 85.44,
@@ -225,10 +225,10 @@
     {
       "id": "U-CUJ",
       "name": "Central University, Brambe",
-      "short": "CUJ Ranchi",
+      "short": "CUJ Metro Central",
       "kind": "UNIVERSITY",
       "type_detail": "Central University",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.423,
       "lng": 85.158,
@@ -409,10 +409,10 @@
     {
       "id": "U-BAU",
       "name": "Birsa Agricultural University, Kanke",
-      "short": "BAU Ranchi",
+      "short": "BAU Metro Central",
       "kind": "UNIVERSITY",
       "type_detail": "State Agricultural University",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.433,
       "lng": 85.32,
@@ -498,11 +498,11 @@
     },
     {
       "id": "U-RU",
-      "name": "Ranchi University",
-      "short": "Ranchi University",
+      "name": "Metro Central University",
+      "short": "Metro Central University",
       "kind": "UNIVERSITY",
       "type_detail": "State University",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.37,
       "lng": 85.335,
@@ -578,17 +578,17 @@
       },
       "coordinator": {
         "name": "Registrar, Research Cell",
-        "email": "research@demo-ranchiuniv.invalid",
+        "email": "research@demo-metro centraluniv.invalid",
         "provenance": "SYNTHETIC_DEMO"
       }
     },
     {
       "id": "U-XISS",
-      "name": "Xavier Institute of Social Service, Ranchi",
-      "short": "XISS Ranchi",
+      "name": "Xavier Institute of Social Service, Metro Central",
+      "short": "XISS Metro Central",
       "kind": "UNIVERSITY",
       "type_detail": "Autonomous Institute (Social Work / Management)",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.376,
       "lng": 85.33,
@@ -785,11 +785,11 @@
     },
     {
       "id": "U-JUT",
-      "name": "Technical University, Ranchi",
-      "short": "JUT Ranchi",
+      "name": "Technical University, Metro Central",
+      "short": "JUT Metro Central",
       "kind": "UNIVERSITY",
       "type_detail": "State Technical University (affiliating)",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.355,
       "lng": 85.326,
@@ -1115,11 +1115,11 @@
     },
     {
       "id": "U-RIMS",
-      "name": "Rajendra Institute of Medical Sciences, Ranchi",
-      "short": "RIMS Ranchi",
+      "name": "Rajendra Institute of Medical Sciences, Metro Central",
+      "short": "RIMS Metro Central",
       "kind": "UNIVERSITY",
       "type_detail": "State Medical Institute and Teaching Hospital",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.362,
       "lng": 85.334,
@@ -1250,7 +1250,7 @@
         "East Singhbhum",
         "West Singhbhum",
         "Seraikela",
-        "Ranchi",
+        "Metro Central",
         "Khunti"
       ]
     },
@@ -1259,7 +1259,7 @@
       "name": "Community Livelihood Promotion Society (JSLPS)",
       "kind": "GOV_MISSION",
       "sector": "State Rural Livelihoods Mission",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.36,
       "lng": 85.33,
@@ -1312,7 +1312,7 @@
       "name": "Central Coalfields Limited (CSR Division)",
       "kind": "PSU",
       "sector": "Mining / Public Sector Undertaking",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.373,
       "lng": 85.33,
@@ -1358,7 +1358,7 @@
       "annual_csr_capacity_inr": 18000000,
       "mentors_available": 3,
       "geographic_reach": [
-        "Ranchi",
+        "Metro Central",
         "Hazaribagh",
         "Ramgarh",
         "Chatra",
@@ -1368,10 +1368,10 @@
     },
     {
       "id": "I-HEC",
-      "name": "Heavy Engineering Corporation Ltd, Ranchi",
+      "name": "Heavy Engineering Corporation Ltd, Metro Central",
       "kind": "PSU",
       "sector": "Heavy Engineering / Manufacturing",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.386,
       "lng": 85.28,
@@ -1415,7 +1415,7 @@
       "annual_csr_capacity_inr": 4000000,
       "mentors_available": 5,
       "geographic_reach": [
-        "Ranchi",
+        "Metro Central",
         "Khunti",
         "Lohardaga"
       ]
@@ -1425,7 +1425,7 @@
       "name": "JalTech Sensors Pvt Ltd",
       "kind": "STARTUP",
       "sector": "Water technology / IoT hardware",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.3441,
       "lng": 85.3096,
@@ -1465,7 +1465,7 @@
       "annual_csr_capacity_inr": 0,
       "mentors_available": 2,
       "geographic_reach": [
-        "Ranchi",
+        "Metro Central",
         "Khunti",
         "Gumla",
         "Lohardaga",
@@ -1528,7 +1528,7 @@
       "name": "AgriSetu Analytics LLP",
       "kind": "MSME",
       "sector": "AgriTech / Data services",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.35,
       "lng": 85.32,
@@ -1568,7 +1568,7 @@
       "annual_csr_capacity_inr": 0,
       "mentors_available": 2,
       "geographic_reach": [
-        "Ranchi",
+        "Metro Central",
         "Khunti",
         "Gumla",
         "Simdega",
@@ -1577,10 +1577,10 @@
     },
     {
       "id": "I-STPI",
-      "name": "STPI Ranchi Incubation Centre",
+      "name": "STPI Metro Central Incubation Centre",
       "kind": "INCUBATOR",
       "sector": "Technology incubation",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.354,
       "lng": 85.312,
@@ -1617,7 +1617,7 @@
       "annual_csr_capacity_inr": 3000000,
       "mentors_available": 6,
       "geographic_reach": [
-        "Ranchi"
+        "Metro Central"
       ]
     },
     {
@@ -1625,7 +1625,7 @@
       "name": "Usha Martin Limited",
       "kind": "COMPANY",
       "sector": "Wire ropes / Specialty steel",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.32,
       "lng": 85.43,
@@ -1666,7 +1666,7 @@
       "annual_csr_capacity_inr": 6000000,
       "mentors_available": 3,
       "geographic_reach": [
-        "Ranchi",
+        "Metro Central",
         "Khunti",
         "Ramgarh"
       ]
@@ -1676,7 +1676,7 @@
       "name": "Drinking Water and Sanitation Department, Public Utilities Board",
       "kind": "GOV_DEPT",
       "sector": "State Government Line Department",
-      "district": "Ranchi",
+      "district": "Metro Central",
       "state": "National Civic Region",
       "lat": 23.369,
       "lng": 85.328,

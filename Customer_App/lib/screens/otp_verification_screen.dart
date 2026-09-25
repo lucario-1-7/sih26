@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../core/networking/api_exception.dart';
 import '../data/repositories/auth_repository.dart';
 import '../services/language_service.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/auth_screen_layout.dart';
 import '../widgets/otp_input.dart';
@@ -75,7 +76,7 @@ class _OtpVerificationScreenState extends State<OtpVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: LanguageService.instance,
+      animation: Listenable.merge([ThemeService.instance, LanguageService.instance]),
       builder: (context, _) {
         return AuthScreenLayout(
           currentStep: 2,

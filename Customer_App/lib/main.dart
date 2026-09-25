@@ -1,21 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'data/repositories/auth_repository.dart';
 import 'screens/main_dashboard_screen.dart';
 import 'screens/welcome_language_screen.dart';
+import 'services/theme_service.dart';
 import 'theme/app_theme.dart';
 
-void main() {
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      statusBarBrightness: Brightness.light,
-      systemNavigationBarColor: AppColors.background,
-      systemNavigationBarIconBrightness: Brightness.dark,
-    ),
-  );
+  await ThemeService.instance.init();
+  ThemeService.instance.updateSystemUi();
   runApp(const SocialServeApp());
 }
 
@@ -24,11 +17,18 @@ class SocialServeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Social Serve',
-      debugShowCheckedModeBanner: false,
-      theme: buildAppTheme(),
-      home: const _SessionGate(),
+    return AnimatedBuilder(
+      animation: ThemeService.instance,
+      builder: (context, _) {
+        return MaterialApp(
+          title: 'Social Serve',
+          debugShowCheckedModeBanner: false,
+          theme: buildLightTheme(),
+          darkTheme: buildDarkTheme(),
+          themeMode: ThemeService.instance.themeMode,
+          home: const _SessionGate(),
+        );
+      },
     );
   }
 }
@@ -48,9 +48,9 @@ class _SessionGate extends StatelessWidget {
       future: AuthRepository.instance.hasSession(),
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
-          return const Scaffold(
+          return Scaffold(
             backgroundColor: AppColors.background,
-            body: Center(child: CircularProgressIndicator()),
+            body: const Center(child: CircularProgressIndicator()),
           );
         }
         return snapshot.data == true ? const MainDashboardScreen() : const WelcomeLanguageScreen();

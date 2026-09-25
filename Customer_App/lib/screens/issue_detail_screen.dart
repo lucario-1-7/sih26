@@ -1,7 +1,8 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../models/issue_model.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/university_uptake_section.dart';
 
@@ -88,13 +89,16 @@ class IssueDetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
+    return AnimatedBuilder(
+      animation: ThemeService.instance,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: AppBar(
         backgroundColor: AppColors.background,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(FeatherIcons.arrowLeft, color: AppColors.primaryText),
+          icon: Icon(FeatherIcons.arrowLeft, color: AppColors.primaryText),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
@@ -127,7 +131,7 @@ class IssueDetailScreen extends StatelessWidget {
               // Location and Date Row
               Row(
                 children: [
-                  const Icon(
+                  Icon(
                     FeatherIcons.mapPin,
                     size: 14,
                     color: AppColors.secondaryText,
@@ -206,7 +210,7 @@ class IssueDetailScreen extends StatelessWidget {
               _buildTimelineStep(
                 context: context,
                 title: 'Under Departmental Review',
-                subtitle: 'Triaged and routed to Municipal Field Engineering Team',
+                subtitle: 'Triaged and assigned to Field Operations Team',
                 isCompleted: issue.status == IssueStatus.inProgress ||
                     issue.status == IssueStatus.resolved,
                 isCurrent: issue.status == IssueStatus.underReview,
@@ -232,6 +236,8 @@ class IssueDetailScreen extends StatelessWidget {
           ),
         ),
       ),
+    );
+      },
     );
   }
 
@@ -276,7 +282,7 @@ class IssueDetailScreen extends StatelessWidget {
                           child: Container(
                             width: 6,
                             height: 6,
-                            decoration: const BoxDecoration(
+                            decoration: BoxDecoration(
                               shape: BoxShape.circle,
                               color: AppColors.primaryText,
                             ),

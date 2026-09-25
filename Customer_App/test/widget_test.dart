@@ -1,4 +1,4 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -33,10 +33,11 @@ void main() {
 
     // Verify 4 navbar tabs exist
     expect(find.byType(CustomBottomNavbar), findsOneWidget);
+    expect(find.text('Dashboard'), findsWidgets);
     expect(find.text('Home'), findsWidgets);
     expect(find.text('My Issues'), findsWidgets);
     expect(find.text('File Grievance'), findsWidgets);
-    expect(find.text('Profile'), findsWidgets);
+    expect(find.text('Profile'), findsNothing);
 
     // Verify Activity tab is NOT in the bottom navigation bar
     expect(find.text('Activity'), findsNothing);
@@ -62,8 +63,8 @@ void main() {
 
     // Find and tap notification bell
     final bellFinder = find.byIcon(FeatherIcons.bell);
-    expect(bellFinder, findsOneWidget);
-    await tester.tap(bellFinder);
+    expect(bellFinder, findsWidgets);
+    await tester.tap(bellFinder.first);
     await tester.pump();
     await tester.pump(const Duration(milliseconds: 400));
 

@@ -1,4 +1,4 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 
@@ -26,7 +26,7 @@ class AuthHeader extends StatelessWidget {
                 width: 40,
                 height: 40,
                 alignment: Alignment.centerLeft,
-                child: const Icon(
+                child: Icon(
                   FeatherIcons.arrowLeft,
                   size: 20,
                   color: AppColors.primaryText,

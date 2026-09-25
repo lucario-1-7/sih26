@@ -1,7 +1,8 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../models/issue_model.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 
 class NotificationItemData {
@@ -71,7 +72,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
         id: 'notif-3',
         title: 'Grievance Resolved',
         description:
-            'Streetlight outage on 5th Cross marked as resolved by the Municipal Electrical Division.',
+            'Streetlight outage on 5th Cross marked as resolved by the Electrical Maintenance Division.',
         time: '2 days ago',
         icon: FeatherIcons.checkCircle,
         iconColor: const Color(0xFF10B981),
@@ -93,7 +94,7 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
         id: 'notif-5',
         title: 'Grievance Registered',
         description:
-            'Your grievance ISS-2026-001 has been received and routed to the municipal triage desk.',
+            'Your grievance ISS-2026-001 has been received and routed to our civic resolution team.',
         time: '5 days ago',
         icon: FeatherIcons.fileText,
         iconColor: const Color(0xFF8B5CF6),
@@ -161,49 +162,54 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.background,
-        elevation: 0,
-        centerTitle: true,
-        leading: IconButton(
-          icon: const Icon(
-            FeatherIcons.arrowLeft,
-            color: AppColors.primaryText,
-            size: 22,
-          ),
-          onPressed: () => Navigator.pop(context),
-        ),
-        title: Text(
-          'NOTIFICATIONS',
-          style: GoogleFonts.inter(
-            fontSize: 16,
-            fontWeight: FontWeight.w800,
-            letterSpacing: 0.8,
-            color: AppColors.primaryText,
-          ),
-        ),
-      ),
-      body: SafeArea(
-        child: _notifications.isEmpty
-            ? _buildEmptyState()
-            : ListView.builder(
-                physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
-                itemCount: _notifications.length,
-                itemBuilder: (context, index) {
-                  final item = _notifications[index];
-                  return _SwipeableNotificationTile(
-                    key: ValueKey(item.id),
-                    item: item,
-                    onMarkAsRead: () => _markAsRead(item.id),
-                    onToggleRead: () => _toggleRead(item.id),
-                    onDelete: () => _deleteNotification(item.id),
-                  );
-                },
+    return AnimatedBuilder(
+      animation: ThemeService.instance,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          appBar: AppBar(
+            backgroundColor: AppColors.background,
+            elevation: 0,
+            centerTitle: true,
+            leading: IconButton(
+              icon: Icon(
+                FeatherIcons.arrowLeft,
+                color: AppColors.primaryText,
+                size: 22,
               ),
-      ),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: Text(
+              'NOTIFICATIONS',
+              style: GoogleFonts.inter(
+                fontSize: 16,
+                fontWeight: FontWeight.w800,
+                letterSpacing: 0.8,
+                color: AppColors.primaryText,
+              ),
+            ),
+          ),
+          body: SafeArea(
+            child: _notifications.isEmpty
+                ? _buildEmptyState()
+                : ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0),
+                    itemCount: _notifications.length,
+                    itemBuilder: (context, index) {
+                      final item = _notifications[index];
+                      return _SwipeableNotificationTile(
+                        key: ValueKey(item.id),
+                        item: item,
+                        onMarkAsRead: () => _markAsRead(item.id),
+                        onToggleRead: () => _toggleRead(item.id),
+                        onDelete: () => _deleteNotification(item.id),
+                      );
+                    },
+                  ),
+          ),
+        );
+      },
     );
   }
 
@@ -215,11 +221,11 @@ class _RecentActivityScreenState extends State<RecentActivityScreen> {
           Container(
             width: 72,
             height: 72,
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               color: AppColors.inputBackground,
               shape: BoxShape.circle,
             ),
-            child: const Center(
+            child: Center(
               child: Icon(
                 FeatherIcons.bell,
                 size: 32,
@@ -456,7 +462,7 @@ class _SwipeableNotificationTileState extends State<_SwipeableNotificationTile>
 
                         // 3-dots popup menu
                         PopupMenuButton<String>(
-                          icon: const Icon(
+                          icon: Icon(
                             FeatherIcons.moreVertical,
                             size: 18,
                             color: AppColors.primaryText,

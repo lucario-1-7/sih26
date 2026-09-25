@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../core/networking/api_exception.dart';
 import '../data/repositories/auth_repository.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/primary_button.dart';
 import 'onboarding_screen.dart';
@@ -53,41 +54,46 @@ class _DemoCitizenAuthScreenState extends State<DemoCitizenAuthScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.background,
-      body: SafeArea(
-        child: Center(
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 32.0),
-            child: _errorText == null
-                ? Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: const [
-                      CircularProgressIndicator(),
-                      SizedBox(height: 16),
-                      Text(
-                        'Starting demo citizen session…',
-                        style: TextStyle(color: AppColors.secondaryText, fontSize: 13),
+    return AnimatedBuilder(
+      animation: ThemeService.instance,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: AppColors.background,
+          body: SafeArea(
+            child: Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0),
+                child: _errorText == null
+                    ? Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const CircularProgressIndicator(),
+                          const SizedBox(height: 16),
+                          Text(
+                            'Starting demo citizen session…',
+                            style: TextStyle(color: AppColors.secondaryText, fontSize: 13),
+                          ),
+                        ],
+                      )
+                    : Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.error_outline, color: Colors.redAccent, size: 40),
+                          const SizedBox(height: 12),
+                          Text(
+                            _errorText!,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: AppColors.secondaryText, fontSize: 13),
+                          ),
+                          const SizedBox(height: 20),
+                          PrimaryButton(text: 'Retry', onPressed: _authenticate),
+                        ],
                       ),
-                    ],
-                  )
-                : Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      const Icon(Icons.error_outline, color: Colors.redAccent, size: 40),
-                      const SizedBox(height: 12),
-                      Text(
-                        _errorText!,
-                        textAlign: TextAlign.center,
-                        style: const TextStyle(color: AppColors.secondaryText, fontSize: 13),
-                      ),
-                      const SizedBox(height: 20),
-                      PrimaryButton(text: 'Retry', onPressed: _authenticate),
-                    ],
-                  ),
+              ),
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

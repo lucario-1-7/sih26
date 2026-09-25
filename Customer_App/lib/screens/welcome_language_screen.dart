@@ -1,8 +1,9 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 import '../core/config/api_config.dart';
 import '../services/language_service.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/primary_button.dart';
 import '../widgets/smooth_page_route.dart';
@@ -35,7 +36,7 @@ class _WelcomeLanguageScreenState extends State<WelcomeLanguageScreen> {
   @override
   Widget build(BuildContext context) {
     return AnimatedBuilder(
-      animation: _languageService,
+      animation: Listenable.merge([ThemeService.instance, _languageService]),
       builder: (context, _) {
         final selectedLang = _languageService.currentLanguage;
 
@@ -69,7 +70,7 @@ class _WelcomeLanguageScreenState extends State<WelcomeLanguageScreen> {
                                     shape: BoxShape.circle,
                                     border: Border.all(color: AppColors.border),
                                   ),
-                                  child: const Icon(
+                                  child: Icon(
                                     FeatherIcons.globe,
                                     size: 64,
                                     color: AppColors.primaryText,
@@ -100,7 +101,7 @@ class _WelcomeLanguageScreenState extends State<WelcomeLanguageScreen> {
                         ),
 
                         const SizedBox(height: 24),
-                        const Divider(height: 1, thickness: 1, color: AppColors.divider),
+                        Divider(height: 1, thickness: 1, color: AppColors.divider),
                         const SizedBox(height: 20),
 
                         // Section Title in translated language
@@ -221,7 +222,7 @@ class _WelcomeLanguageScreenState extends State<WelcomeLanguageScreen> {
                 // Bottom CTA Button with translated text
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     color: AppColors.background,
                     border: Border(
                       top: BorderSide(color: AppColors.border, width: 1.0),

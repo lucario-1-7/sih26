@@ -31,6 +31,12 @@ class ChallengeRepository {
     return items.map((e) => Challenge.fromJson(e as Map<String, dynamic>)).toList();
   }
 
+  Future<List<Challenge>> listAllChallenges({int limit = 50}) async {
+    final json = await _client.get('/challenges', query: {'limit': limit.toString()});
+    final items = (json?['items'] as List<dynamic>?) ?? const [];
+    return items.map((e) => Challenge.fromJson(e as Map<String, dynamic>)).toList();
+  }
+
   Future<Challenge> getChallenge(String id) async {
     final json = await _client.get('/challenges/$id');
     return Challenge.fromJson(json!);

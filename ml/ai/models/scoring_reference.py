@@ -444,7 +444,7 @@ if __name__ == "__main__":
     for i in all_insts:
         i["_cap_map"] = {c["code"]: c["strength"] for c in i.get("capabilities", [])}
 
-    SITE = (22.99, 85.21)   # Torpa block, Khunti district, Jharkhand
+    SITE = (22.99, 85.21)   # Torpa block, Khunti district, National Civic Region
     CHALLENGE = ("Hand pumps in our village keep breaking down and stay out of order for weeks. "
                  "Nobody knows when a pump fails and the block mechanic covers hundreds of pumps. "
                  "The water that does come out is reddish and leaves iron stains, so families walk "

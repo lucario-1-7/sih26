@@ -1,0 +1,185 @@
+{
+  "_note": "Controlled vocabulary shared by challenges (required_capabilities) and institutions (institution_capabilities). This is what makes matching capability-based instead of keyword-based. 28 codes is deliberate: large enough to be meaningful, small enough to seed by hand in one hour.",
+  "capabilities": [
+    {
+      "code": "LAB_WATER_QUALITY",
+      "kind": "LAB",
+      "label": "Water quality testing laboratory",
+      "desc": "Physico-chemical and bacteriological analysis of drinking and surface water; fluoride, iron, arsenic, nitrate, coliform assays."
+    },
+    {
+      "code": "LAB_SOIL_AGRI",
+      "kind": "LAB",
+      "label": "Soil and agricultural sciences lab",
+      "desc": "Soil nutrient profiling, crop trials, seed testing, agronomy field station."
+    },
+    {
+      "code": "LAB_MATERIALS",
+      "kind": "LAB",
+      "label": "Materials and metallurgical testing",
+      "desc": "Corrosion, fatigue, coating, alloy characterisation, failure analysis of components."
+    },
+    {
+      "code": "LAB_BIOTECH",
+      "kind": "LAB",
+      "label": "Biotechnology / microbiology lab",
+      "desc": "Microbial culture, bioremediation, diagnostics development."
+    },
+    {
+      "code": "LAB_ENV_MONITORING",
+      "kind": "LAB",
+      "label": "Environmental monitoring lab",
+      "desc": "Air, noise, effluent and emission monitoring; environmental impact assessment capability."
+    },
+    {
+      "code": "LAB_STRUCTURAL",
+      "kind": "LAB",
+      "label": "Structural and geotechnical testing",
+      "desc": "Concrete, soil mechanics, foundation and structural load testing."
+    },
+    {
+      "code": "LAB_CLINICAL_PH",
+      "kind": "LAB",
+      "label": "Clinical / public health lab",
+      "desc": "Community health screening, epidemiological sampling, diagnostics validation."
+    },
+    {
+      "code": "EQ_FABRICATION",
+      "kind": "EQUIP",
+      "label": "Fabrication workshop",
+      "desc": "Machining, welding, sheet metal, 3D printing, rapid prototyping of physical hardware."
+    },
+    {
+      "code": "EQ_ELECTRONICS_IOT",
+      "kind": "EQUIP",
+      "label": "Electronics / IoT prototyping",
+      "desc": "PCB design and assembly, sensor integration, LoRa/GSM telemetry benches."
+    },
+    {
+      "code": "EQ_DRONE_UAV",
+      "kind": "EQUIP",
+      "label": "UAV / drone survey capability",
+      "desc": "Licensed drone operation for mapping, inspection and survey."
+    },
+    {
+      "code": "EQ_GIS_RS",
+      "kind": "EQUIP",
+      "label": "GIS and remote sensing setup",
+      "desc": "Satellite imagery processing, spatial analytics, terrain and watershed modelling."
+    },
+    {
+      "code": "EQ_FIELD_VEHICLE",
+      "kind": "EQUIP",
+      "label": "Field mobility and survey equipment",
+      "desc": "Vehicles, portable test kits, survey instruments for repeated site visits."
+    },
+    {
+      "code": "SKILL_CIVIL_HYDRO",
+      "kind": "SKILL",
+      "label": "Civil / hydrology / groundwater",
+      "desc": "Aquifer behaviour, recharge, water supply networks, hydraulic design."
+    },
+    {
+      "code": "SKILL_MECH_DESIGN",
+      "kind": "SKILL",
+      "label": "Mechanical design and reliability",
+      "desc": "Mechanism design, wear and failure modelling, maintainability engineering."
+    },
+    {
+      "code": "SKILL_EMBEDDED",
+      "kind": "SKILL",
+      "label": "Embedded systems and firmware",
+      "desc": "Low-power microcontroller firmware, sensor drivers, field-grade device engineering."
+    },
+    {
+      "code": "SKILL_ML_DATA",
+      "kind": "SKILL",
+      "label": "Machine learning and data science",
+      "desc": "Predictive modelling, forecasting, anomaly detection, analytics pipelines."
+    },
+    {
+      "code": "SKILL_SOFTWARE_APP",
+      "kind": "SKILL",
+      "label": "Software and mobile application",
+      "desc": "Web/mobile application engineering, APIs, dashboards, offline-first apps."
+    },
+    {
+      "code": "SKILL_ENERGY_SYS",
+      "kind": "SKILL",
+      "label": "Energy systems",
+      "desc": "Solar PV, microgrids, storage, energy efficiency and audit."
+    },
+    {
+      "code": "SKILL_AGRONOMY",
+      "kind": "SKILL",
+      "label": "Agronomy and extension",
+      "desc": "Cropping systems, extension services, farmer advisory design."
+    },
+    {
+      "code": "SKILL_PUBLIC_HEALTH",
+      "kind": "SKILL",
+      "label": "Public health and epidemiology",
+      "desc": "Community health programme design, health systems research."
+    },
+    {
+      "code": "SKILL_EDU_PEDAGOGY",
+      "kind": "SKILL",
+      "label": "Education and pedagogy",
+      "desc": "Curriculum design, learning assessment, teacher training, ed-tech evaluation."
+    },
+    {
+      "code": "SKILL_SOCIAL_SURVEY",
+      "kind": "SKILL",
+      "label": "Social science field research",
+      "desc": "Household surveys, participatory rural appraisal, baseline/endline study design."
+    },
+    {
+      "code": "SKILL_POLICY_ECON",
+      "kind": "SKILL",
+      "label": "Policy, economics and evaluation",
+      "desc": "Cost-benefit analysis, scheme design, impact evaluation methodology."
+    },
+    {
+      "code": "FIELD_LOCAL_PRESENCE",
+      "kind": "FIELD",
+      "label": "Local presence near problem site",
+      "desc": "Campus, office or operational unit within routine travel distance of the site."
+    },
+    {
+      "code": "FIELD_COMMUNITY_NETWORK",
+      "kind": "FIELD",
+      "label": "Community mobilisation network",
+      "desc": "SHG / NSS / panchayat / frontline-worker networks able to reach households."
+    },
+    {
+      "code": "FIELD_MAINTENANCE_NET",
+      "kind": "FIELD",
+      "label": "Field maintenance and service network",
+      "desc": "Trained technicians and spare-part logistics able to sustain deployed hardware."
+    },
+    {
+      "code": "ORG_INCUBATION",
+      "kind": "ORG",
+      "label": "Incubation / startup support",
+      "desc": "Incubator or TBI able to spin out and sustain a solution beyond the project."
+    },
+    {
+      "code": "ORG_CSR_FUNDING",
+      "kind": "ORG",
+      "label": "CSR or grant funding capacity",
+      "desc": "Ability to fund pilots and deployment from CSR or institutional budget."
+    },
+    {
+      "code": "ORG_MANUFACTURING",
+      "kind": "ORG",
+      "label": "Manufacturing / scale production",
+      "desc": "Ability to produce validated hardware at district or state volume."
+    },
+    {
+      "code": "ORG_PROCUREMENT",
+      "kind": "ORG",
+      "label": "Government procurement channel",
+      "desc": "Ability to place a validated solution on a state rate contract or scheme budget line, which is how a pilot actually becomes district-wide deployment."
+    }
+  ]
+}

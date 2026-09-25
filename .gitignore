@@ -31,3 +31,4 @@ mobile/build/
 *.log
 tokens.txt
 
+/docs

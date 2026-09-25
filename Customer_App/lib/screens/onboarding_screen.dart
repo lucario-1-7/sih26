@@ -1,6 +1,7 @@
-import 'package:feather_icons/feather_icons.dart';
+import 'package:customer_app/theme/feather_icons.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import '../services/theme_service.dart';
 import '../theme/app_theme.dart';
 import '../widgets/auth_progress_indicator.dart';
 import '../widgets/primary_button.dart';
@@ -97,8 +98,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   Widget build(BuildContext context) {
     final isLastPage = _currentPage == _items.length - 1;
 
-    return Scaffold(
-      backgroundColor: AppColors.background,
+    return AnimatedBuilder(
+      animation: ThemeService.instance,
+      builder: (context, _) {
+        return Scaffold(
+          backgroundColor: AppColors.background,
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
@@ -121,7 +125,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               curve: Curves.easeInOutCubic,
                             );
                           },
-                          child: const Icon(
+                          child: Icon(
                             FeatherIcons.arrowLeft,
                             size: 20,
                             color: AppColors.primaryText,
@@ -131,7 +135,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         GestureDetector(
                           behavior: HitTestBehavior.opaque,
                           onTap: () => Navigator.pop(context),
-                          child: const Icon(
+                          child: Icon(
                             FeatherIcons.arrowLeft,
                             size: 20,
                             color: AppColors.primaryText,
@@ -250,6 +254,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           ),
         ),
       ),
+    );
+      },
     );
   }
 }
